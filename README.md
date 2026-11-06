@@ -9,20 +9,20 @@ El frontend **nunca** consulta Firestore: todo dato pasa por la API
 ## Pantallas (Sprint 0)
 
 La aplicación se recorre como la real: primero las pantallas **públicas**, y al ingresar pasa a las **privadas**.
-El ingreso y los datos de las salas son de **demostración** (se guardan en el navegador); la sesión, la base de
-datos y el tiempo real verdaderos llegan en los siguientes sprints.
+El ingreso y el registro son de **demostración** (la sesión se guarda en el navegador): la autenticación verdadera
+llega en el Sprint 1. Las pantallas que todavía no corresponden muestran solo su título y en qué sprint se harán.
 
 | Ruta | Pantalla | Acceso | Qué hace hoy |
 | --- | --- | --- | --- |
-| `/` | Inicio | Pública | Bienvenida con "Crear cuenta" e "Ingresar" |
+| `/` | Inicio | Pública | Bienvenida con "Crear cuenta", "Ingresar" y "Ver la base técnica" |
 | `/ingreso` | Ingreso | Pública | Validaciones y errores; sirve cualquier correo y contraseña (la contraseña «error» muestra el mensaje de credenciales incorrectas) |
 | `/registro` | Registro | Pública | Nombres, apellidos, usuario, correo, contraseña y avatar, con validaciones (el usuario «admin» muestra el error de usuario ocupado) |
 | `/ayuda` | Ayuda | Pública | Preguntas frecuentes |
-| `/base-tecnica` | **Base técnica (TS-00)** | Pública | Pide el dato a la API: cargando, error con "Reintentar" y éxito |
+| `/base-tecnica` | **Base técnica (TS-00)** | Pública | Pide el dato a la API. Botones para ver los tres casos: cargando, error con "Reintentar" y éxito (dato real) |
 | `*` | Página no encontrada (404) | Pública | Mensaje claro y enlace a Mis salas |
-| `/salas` | Mis salas | Privada | Crear sala (ventana), unirse con el ID, copiar el ID y entrar a una sala |
-| `/salas/:id` | Sala | Privada | Cuadrícula de personas, controles (micrófono y cámara apagados al entrar), panel de Personas y Chat |
-| `/perfil` | Perfil | Privada | Ver y editar los datos, y eliminar la cuenta con ventana de confirmación |
+| `/salas` | Mis salas | Privada | Título y mensaje: se hará en los sprints 2 y 3 (US-06, US-07, US-08) |
+| `/salas/:id` | Sala | Privada | Título y mensaje: se hará en los sprints 3, 4 y 5 (US-09 a US-14) |
+| `/perfil` | Perfil | Privada | Título y mensaje: se hará en el Sprint 2 (US-04, US-05) |
 
 Una ruta privada sin sesión lleva al ingreso y, al ingresar, vuelve a la ruta pedida. "Cerrar sesión" vuelve al inicio.
 
@@ -34,9 +34,8 @@ src/
 ├── App.tsx             # Rutas
 ├── config.ts           # URL de la API (VITE_API_URL)
 ├── index.css           # Guía visual: colores claro y oscuro, foco y componentes
-├── components/         # LayoutPublico y LayoutApp (encabezado, navegación, pie), campos, diálogo, avatar
+├── components/         # LayoutPublico y LayoutApp (encabezado, navegación, pie), campos, avatar, pantalla pendiente
 ├── sesion/             # Sesión de demostración y ruta privada
-├── data/               # Salas de ejemplo
 ├── hooks/              # useTitulo: título distinto en cada página
 └── pages/              # Una página por pantalla
 ```

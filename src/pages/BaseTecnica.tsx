@@ -3,11 +3,13 @@ import { API_URL } from "../config";
 import { useTitulo } from "../hooks/useTitulo";
 
 // Pantalla de la base técnica (TS-00): pide un dato a la API, que lo lee de Firestore,
-// y lo muestra con sus tres estados: cargando, error (con "Reintentar") y éxito.
+// y lo muestra con sus tres casos: cargando, error (con "Reintentar") y éxito.
 type Estado =
   | { tipo: "cargando" }
   | { tipo: "error"; mensaje: string }
   | { tipo: "exito"; mensaje: string; actualizadoEn: string };
+
+type Caso = "real" | "cargando" | "error";
 
 interface RespuestaApi {
   mensaje: string;
@@ -15,6 +17,7 @@ interface RespuestaApi {
 }
 
 const ESPERA_MAXIMA_MS = 60_000; // el plan gratuito de Render puede tardar hasta un minuto en despertar
+const ERROR_DE_EJEMPLO = "Revisa tu conexión e inténtalo de nuevo.";
 
 function formatearFecha(iso: string): string {
   const fecha = new Date(iso);
@@ -24,8 +27,11 @@ function formatearFecha(iso: string): string {
 
 export function BaseTecnica() {
   useTitulo("Base técnica");
-  const [estado, setEstado] = useState<Estado>({ tipo: "cargando" });
+  const [real, setReal] = useState<Estado>({ tipo: "cargando" });
   const [intento, setIntento] = useState(0);
+  // Para mostrar cada caso en la demostración: "real" usa lo que responde la API;
+  // "cargando" y "error" muestran ese caso sin depender de la red.
+  const [caso, setCaso] = useState<Caso>("real");
 
   useEffect(() => {
     const control = new AbortController();
@@ -35,7 +41,7 @@ export function BaseTecnica() {
       control.abort();
     }, ESPERA_MAXIMA_MS);
 
-    setEstado({ tipo: "cargando" });
+    setReal({ tipo: "cargando" });
     fetch(`${API_URL}/api/v1/base-tecnica`, { signal: control.signal })
       .then(async (respuesta) => {
         if (!respuesta.ok) {
@@ -44,14 +50,14 @@ export function BaseTecnica() {
         }
         return (await respuesta.json()) as RespuestaApi;
       })
-      .then((dato) => setEstado({ tipo: "exito", mensaje: dato.mensaje, actualizadoEn: dato.actualizadoEn }))
+      .then((dato) => setReal({ tipo: "exito", mensaje: dato.mensaje, actualizadoEn: dato.actualizadoEn }))
       .catch((error: unknown) => {
         if (control.signal.aborted && !agotado) return; // se salió de la pantalla: no hay nada que mostrar
         const sinConexion = error instanceof TypeError || agotado;
-        setEstado({
+        setReal({
           tipo: "error",
           mensaje: sinConexion
-            ? "Revisa tu conexión e inténtalo de nuevo."
+            ? ERROR_DE_EJEMPLO
             : error instanceof Error
               ? error.message
               : "Inténtalo de nuevo en unos minutos.",
@@ -64,6 +70,17 @@ export function BaseTecnica() {
       control.abort();
     };
   }, [intento]);
+
+  const estado: Estado =
+    caso === "cargando" ? { tipo: "cargando" } : caso === "error" ? { tipo: "error", mensaje: ERROR_DE_EJEMPLO } : real;
+
+  function reintentar() {
+    setCaso("real");
+    setIntento((n) => n + 1);
+  }
+
+  const boton =
+    "inline-flex min-h-11 items-center rounded-lg border-[1.5px] border-enlace bg-fondo px-4 py-2 font-bold text-enlace aria-pressed:bg-enlace aria-pressed:text-fondo";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -94,7 +111,7 @@ export function BaseTecnica() {
           <div role="alert">
             <p className="font-bold text-error">No pudimos cargar los datos</p>
             <p className="mb-4 text-suave">{estado.mensaje}</p>
-            <button type="button" className="btn-principal" onClick={() => setIntento((n) => n + 1)}>
+            <button type="button" className="btn-principal" onClick={reintentar}>
               Reintentar
             </button>
           </div>
@@ -110,6 +127,26 @@ export function BaseTecnica() {
             <p className="mt-3 text-suave">Última actualización: {formatearFecha(estado.actualizadoEn)}</p>
           </div>
         )}
+      </section>
+
+      <section aria-labelledby="titulo-casos" className="mt-6">
+        <h2 id="titulo-casos" className="mb-1 text-lg font-bold">
+          Ver los tres casos
+        </h2>
+        <p className="mb-3 text-suave">
+          Para la demostración, estos botones muestran cada caso. «Éxito» pide el dato real a la API publicada.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" className={boton} aria-pressed={caso === "cargando"} onClick={() => setCaso("cargando")}>
+            Ver cargando
+          </button>
+          <button type="button" className={boton} aria-pressed={caso === "error"} onClick={() => setCaso("error")}>
+            Ver error
+          </button>
+          <button type="button" className={boton} aria-pressed={false} onClick={reintentar}>
+            Ver éxito (dato real)
+          </button>
+        </div>
       </section>
     </div>
   );

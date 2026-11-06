@@ -27,6 +27,11 @@ export function Inicio() {
           </>
         )}
       </div>
+      <p className="mt-6">
+        <Link to="/base-tecnica" className="btn-secundario">
+          Ver la base técnica
+        </Link>
+      </p>
     </section>
   );
 }
