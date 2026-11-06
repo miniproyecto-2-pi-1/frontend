@@ -5,6 +5,7 @@ import { ThemeToggle } from "./ThemeToggle";
 const ENLACES = [
   { a: "/", texto: "Inicio", fin: true },
   { a: "/salas", texto: "Mis salas" },
+  { a: "/perfil", texto: "Perfil" },
   { a: "/base-tecnica", texto: "Base técnica" },
   { a: "/ayuda", texto: "Ayuda" },
 ];
