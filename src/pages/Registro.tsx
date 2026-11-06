@@ -17,7 +17,7 @@ export function Registro() {
   const navegar = useNavigate();
   const formulario = useRef<HTMLFormElement>(null);
 
-  const [valores, setValores] = useState({ nombres: "", apellidos: "", username: "", correo: "", clave: "" });
+  const [valores, setValores] = useState({ nombres: "Camila", apellidos: "Torres", username: "camila_t", correo: "camila.torres@correounivalle.edu.co", clave: "ejemplo123" });
   const [avatar, setAvatar] = useState(0);
   const [errores, setErrores] = useState<Errores>({});
   const [intentos, setIntentos] = useState(0);
@@ -128,8 +128,8 @@ export function Registro() {
       </form>
 
       <p className="mt-4 text-sm text-suave">
-        Demostración del Sprint 0: para ver el error de usuario ocupado, escribe el nombre de usuario «admin». El registro
-        real se activa en el Sprint 1.
+        Demostración del Sprint 0: ya hay datos de ejemplo escritos, solo pulsa Crear cuenta. Para ver el error de usuario
+        ocupado, escribe el nombre de usuario «admin». El registro real se activa en el Sprint 1.
       </p>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useSesion } from "../sesion/SesionContext";
 import { PieDePagina, SaltarAlContenido, useFocoAlNavegar } from "./Estructura";
 import { ThemeToggle } from "./ThemeToggle";
@@ -15,9 +15,29 @@ export function LayoutPublico() {
       <SaltarAlContenido />
       <header className="border-b border-borde">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-          <Link to="/" className="mr-auto text-lg font-bold text-texto no-underline">
+          <Link to="/" className="text-lg font-bold text-texto no-underline">
             Salón de Estudio
           </Link>
+          <nav aria-label="Principal" className="mr-auto">
+            <ul className="flex gap-5">
+              {[
+                { a: "/", texto: "Inicio", fin: true },
+                { a: "/ayuda", texto: "Ayuda", fin: false },
+              ].map((e) => (
+                <li key={e.a}>
+                  <NavLink
+                    to={e.a}
+                    end={e.fin}
+                    className={({ isActive }) =>
+                      `inline-block py-2 text-texto underline-offset-4 hover:underline ${isActive ? "font-bold underline" : ""}`
+                    }
+                  >
+                    {e.texto}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
           <div className="flex flex-wrap items-center gap-2">
             <ThemeToggle />
             {usuario ? (

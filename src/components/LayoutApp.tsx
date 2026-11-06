@@ -21,19 +21,20 @@ export function LayoutApp() {
       <SaltarAlContenido />
       <header className="border-b border-borde">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-          <Link to="/salas" className="text-lg font-bold text-texto no-underline">
+          <Link to="/" className="text-lg font-bold text-texto no-underline">
             Salón de Estudio
           </Link>
           <nav aria-label="Principal" className="flex-1">
             <ul className="flex gap-5">
               {[
+                { a: "/", texto: "Inicio" },
                 { a: "/salas", texto: "Mis salas" },
                 { a: "/perfil", texto: "Perfil" },
               ].map((e) => (
                 <li key={e.a}>
                   <NavLink
                     to={e.a}
-                    end={e.a === "/salas"}
+                    end={e.a === "/salas" || e.a === "/"}
                     className={({ isActive }) =>
                       `inline-block py-2 text-texto underline-offset-4 hover:underline ${isActive ? "font-bold underline" : ""}`
                     }

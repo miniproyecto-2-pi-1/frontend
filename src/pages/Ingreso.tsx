@@ -19,8 +19,8 @@ export function Ingreso() {
   const ubicacion = useLocation();
   const desde = (ubicacion.state as { desde?: string } | null)?.desde ?? "/salas";
 
-  const [correo, setCorreo] = useState("");
-  const [clave, setClave] = useState("");
+  const [correo, setCorreo] = useState("camila.torres@correounivalle.edu.co");
+  const [clave, setClave] = useState("ejemplo123");
   const [verClave, setVerClave] = useState(false);
   const [errores, setErrores] = useState<Errores>({});
   const [intentos, setIntentos] = useState(0);
@@ -109,8 +109,8 @@ export function Ingreso() {
       </form>
 
       <p className="mt-4 text-sm text-suave">
-        Demostración del Sprint 0: sirve cualquier correo y contraseña. Para ver el mensaje de error, escribe la contraseña
-        «error». El ingreso real se activa en el Sprint 1.
+        Demostración del Sprint 0: ya hay datos de ejemplo escritos, solo pulsa Ingresar. Sirve cualquier correo y contraseña; para
+        ver el mensaje de error, escribe la contraseña «error». El ingreso real se activa en el Sprint 1.
       </p>
     </div>
   );
