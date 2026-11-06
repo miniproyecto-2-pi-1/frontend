@@ -19,7 +19,7 @@ llega en el Sprint 1. Las pantallas que todavía no corresponden muestran solo s
 | `/registro` | Registro | Pública | Nombres, apellidos, usuario, correo, contraseña y avatar, con validaciones (el usuario «admin» muestra el error de usuario ocupado) |
 | `/ayuda` | Ayuda | Pública | Preguntas frecuentes |
 | `/base-tecnica` | **Base técnica (TS-00)** | Pública | Pide el dato a la API. Botones para ver los tres casos: cargando, error con "Reintentar" y éxito (dato real) |
-| `*` | Página no encontrada (404) | Pública | Mensaje claro y enlace a Mis salas |
+| `*` | Página no encontrada (404) | Pública | Mensaje claro y enlace a Mis salas. Se ve desde el enlace «Página 404» del pie de página |
 | `/salas` | Mis salas | Privada | Título y mensaje: se hará en los sprints 2 y 3 (US-06, US-07, US-08) |
 | `/salas/:id` | Sala | Privada | Título y mensaje: se hará en los sprints 3, 4 y 5 (US-09 a US-14) |
 | `/perfil` | Perfil | Privada | Título y mensaje: se hará en el Sprint 2 (US-04, US-05) |

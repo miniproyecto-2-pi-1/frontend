@@ -44,6 +44,11 @@ export function PieDePagina() {
                 Base técnica
               </Link>
             </li>
+            <li>
+              <Link to="/404" className="text-enlace underline">
+                Página 404
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
