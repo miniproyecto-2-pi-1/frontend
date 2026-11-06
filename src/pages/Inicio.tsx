@@ -17,11 +17,6 @@ export function Inicio() {
           Ingresar
         </Link>
       </div>
-      <p className="mt-6">
-        <Link to="/base-tecnica" className="btn-secundario">
-          Ver la base técnica
-        </Link>
-      </p>
     </section>
   );
 }

@@ -14,11 +14,11 @@ llega en el Sprint 1. Las pantallas que todavía no corresponden muestran solo s
 
 | Ruta | Pantalla | Acceso | Qué hace hoy |
 | --- | --- | --- | --- |
-| `/` | Inicio | Pública | Bienvenida con "Crear cuenta", "Ingresar" y "Ver la base técnica" |
+| `/` | Inicio | Pública | Bienvenida con "Crear cuenta" e "Ingresar" |
 | `/ingreso` | Ingreso | Pública | Validaciones y errores; sirve cualquier correo y contraseña (la contraseña «error» muestra el mensaje de credenciales incorrectas) |
 | `/registro` | Registro | Pública | Nombres, apellidos, usuario, correo, contraseña y avatar, con validaciones (el usuario «admin» muestra el error de usuario ocupado) |
 | `/ayuda` | Ayuda | Pública | Preguntas frecuentes |
-| `/base-tecnica` | **Base técnica (TS-00)** | Pública | Pide el dato a la API. Botones para ver los tres casos: cargando, error con "Reintentar" y éxito (dato real) |
+| `/base-tecnica` | **Base técnica (TS-00)** | Pública | Pide el dato a la API (se llega desde el enlace «Base técnica» del pie de página). Botones para ver los tres casos: cargando, error con "Reintentar" y éxito (dato real) |
 | `*` | Página no encontrada (404) | Pública | Mensaje claro y enlace a Mis salas. Se ve desde el enlace «Página 404» del pie de página |
 | `/salas` | Mis salas | Privada | Título y mensaje: se hará en los sprints 2 y 3 (US-06, US-07, US-08) |
 | `/salas/:id` | Sala | Privada | Título y mensaje: se hará en los sprints 3, 4 y 5 (US-09 a US-14) |
