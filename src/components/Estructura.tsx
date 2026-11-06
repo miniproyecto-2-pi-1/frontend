@@ -1,0 +1,52 @@
+import { useEffect, useRef, type RefObject } from "react";
+import { Link } from "react-router-dom";
+
+// Enlace «Saltar al contenido»: primer elemento enfocable de cada pantalla (WCAG 2.4.1).
+export function SaltarAlContenido() {
+  return (
+    <a
+      href="#contenido"
+      className="sr-only z-50 rounded-lg bg-principal px-4 py-2 font-bold text-white focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
+    >
+      Saltar al contenido
+    </a>
+  );
+}
+
+// Al cambiar de pantalla, el foco pasa al contenido para que el lector de pantalla lo anuncie.
+export function useFocoAlNavegar(ruta: string): RefObject<HTMLElement | null> {
+  const principal = useRef<HTMLElement>(null);
+  const primera = useRef(true);
+  useEffect(() => {
+    if (primera.current) {
+      primera.current = false;
+      return;
+    }
+    principal.current?.focus();
+  }, [ruta]);
+  return principal;
+}
+
+export function PieDePagina() {
+  return (
+    <footer className="border-t border-borde">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-4 text-suave">
+        <p>Salón de Estudio · Proyecto Integrador I, Univalle</p>
+        <nav aria-label="Pie de página">
+          <ul className="flex gap-5">
+            <li>
+              <Link to="/ayuda" className="text-enlace underline">
+                Ayuda
+              </Link>
+            </li>
+            <li>
+              <Link to="/base-tecnica" className="text-enlace underline">
+                Base técnica
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+  );
+}

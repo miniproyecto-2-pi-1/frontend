@@ -8,19 +8,23 @@ El frontend **nunca** consulta Firestore: todo dato pasa por la API
 
 ## Pantallas (Sprint 0)
 
-Hay una ruta por cada pantalla del mapa del sitio:
+La aplicación se recorre como la real: primero las pantallas **públicas**, y al ingresar pasa a las **privadas**.
+El ingreso y los datos de las salas son de **demostración** (se guardan en el navegador); la sesión, la base de
+datos y el tiempo real verdaderos llegan en los siguientes sprints.
 
-| Ruta | Pantalla | Estado |
-| --- | --- | --- |
-| `/` | Inicio | Diseñada |
-| `/ingreso` | Ingreso | Diseño; el inicio de sesión llega en el Sprint 1 |
-| `/registro` | Registro | Diseño; el registro llega en el Sprint 1 |
-| `/salas` | Mis salas | Estado vacío; llega en el Sprint 2 |
-| `/salas/:id` | Sala | Marcador; llega en los sprints 3 y 4 |
-| `/perfil` | Perfil | Marcador; llega en el Sprint 2 |
-| `/ayuda` | Ayuda | Preguntas frecuentes |
-| `/base-tecnica` | **Base técnica (TS-00)** | Pide el dato a la API: cargando, error con "Reintentar" y éxito |
-| `*` | Página no encontrada (404) | Diseñada |
+| Ruta | Pantalla | Acceso | Qué hace hoy |
+| --- | --- | --- | --- |
+| `/` | Inicio | Pública | Bienvenida con "Crear cuenta" e "Ingresar" |
+| `/ingreso` | Ingreso | Pública | Validaciones y errores; sirve cualquier correo y contraseña (la contraseña «error» muestra el mensaje de credenciales incorrectas) |
+| `/registro` | Registro | Pública | Nombres, apellidos, usuario, correo, contraseña y avatar, con validaciones (el usuario «admin» muestra el error de usuario ocupado) |
+| `/ayuda` | Ayuda | Pública | Preguntas frecuentes |
+| `/base-tecnica` | **Base técnica (TS-00)** | Pública | Pide el dato a la API: cargando, error con "Reintentar" y éxito |
+| `*` | Página no encontrada (404) | Pública | Mensaje claro y enlace a Mis salas |
+| `/salas` | Mis salas | Privada | Crear sala (ventana), unirse con el ID, copiar el ID y entrar a una sala |
+| `/salas/:id` | Sala | Privada | Cuadrícula de personas, controles (micrófono y cámara apagados al entrar), panel de Personas y Chat |
+| `/perfil` | Perfil | Privada | Ver y editar los datos, y eliminar la cuenta con ventana de confirmación |
+
+Una ruta privada sin sesión lleva al ingreso y, al ingresar, vuelve a la ruta pedida. "Cerrar sesión" vuelve al inicio.
 
 ## Estructura
 
@@ -30,7 +34,9 @@ src/
 ├── App.tsx             # Rutas
 ├── config.ts           # URL de la API (VITE_API_URL)
 ├── index.css           # Guía visual: colores claro y oscuro, foco y componentes
-├── components/         # Layout (encabezado, navegación, pie), botón de tema
+├── components/         # LayoutPublico y LayoutApp (encabezado, navegación, pie), campos, diálogo, avatar
+├── sesion/             # Sesión de demostración y ruta privada
+├── data/               # Salas de ejemplo
 ├── hooks/              # useTitulo: título distinto en cada página
 └── pages/              # Una página por pantalla
 ```
