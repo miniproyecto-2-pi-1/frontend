@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* Modo oscuro por clase (.dark en <html>), controlado por el botón de tema. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---- Guía visual: colores (claro y oscuro). Contraste verificado según WCAG 2.2 AA. ---- */
+:root {
+  --fondo: #ffffff;
+  --superficie: #f4f2f9;
+  --texto: #2b2833;
+  --suave: #5a5469;
+  --principal: #6d3fe0; /* texto blanco encima: 6,1 : 1 */
+  --enlace: #5b35c4;
+  --borde: #d9d4e6;
+  --campo: #6f6885; /* bordes de campos y botones secundarios */
+  --error: #b3261e;
+  --exito: #1f7a3f;
+  --exito-fondo: #ddf3e4;
+}
+
+.dark {
+  --fondo: #2b2833;
+  --superficie: #25222d;
+  --texto: #f3f1f8;
+  --suave: #bdb8cc;
+  --principal: #6d3fe0;
+  --enlace: #c4b1ff;
+  --borde: #3d3949;
+  --campo: #9a94ab;
+  --error: #ff8aa0;
+  --exito: #57d58a;
+  --exito-fondo: #173a24;
+}
+
+@theme inline {
+  --color-fondo: var(--fondo);
+  --color-superficie: var(--superficie);
+  --color-texto: var(--texto);
+  --color-suave: var(--suave);
+  --color-principal: var(--principal);
+  --color-enlace: var(--enlace);
+  --color-borde: var(--borde);
+  --color-campo: var(--campo);
+  --color-error: var(--error);
+  --color-exito: var(--exito);
+  --color-exito-fondo: var(--exito-fondo);
+  --font-sans: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Foco siempre visible (WCAG 2.4.7). */
+:focus-visible {
+  outline: 2px solid var(--enlace);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* El contenido principal recibe el foco al cambiar de página, sin dibujar recuadro. */
+main:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Componentes básicos de la guía visual (CSS simple, con las variables de color) ---- */
+@layer components {
+  .btn-principal,
+  .btn-secundario {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn-principal {
+    background: var(--principal);
+    color: #ffffff;
+    border: 1.5px solid var(--principal);
+  }
+  .btn-principal:hover {
+    filter: brightness(1.1);
+  }
+  .btn-secundario {
+    background: var(--fondo);
+    color: var(--enlace);
+    border: 1.5px solid var(--enlace);
+  }
+  .btn-secundario:hover {
+    background: var(--superficie);
+  }
+  .btn-secundario[aria-pressed="true"] {
+    background: var(--enlace);
+    color: var(--fondo);
+  }
+  .campo {
+    min-height: 2.75rem;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1.5px solid var(--campo);
+    background: var(--fondo);
+    color: var(--texto);
+    padding: 0.5rem 0.75rem;
+  }
+  .tarjeta {
+    border-radius: 10px;
+    border: 1px solid var(--borde);
+    background: var(--superficie);
+    padding: 1.25rem;
+  }
+}
