@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 // Pantalla que todavía no se construye: muestra su título y en qué sprint se hará (y con qué historias).
 interface Etapa {
   sprint: string;
@@ -5,7 +7,7 @@ interface Etapa {
   que: string;
 }
 
-export function PantallaPendiente({ titulo, etapas }: { titulo: string; etapas: Etapa[] }) {
+export function PantallaPendiente({ titulo, etapas, children }: { titulo: string; etapas: Etapa[]; children?: ReactNode }) {
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-2 text-3xl font-bold">{titulo}</h1>
@@ -22,6 +24,7 @@ export function PantallaPendiente({ titulo, etapas }: { titulo: string; etapas: 
           ))}
         </ul>
       </section>
+      {children}
     </div>
   );
 }
