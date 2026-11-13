@@ -10,7 +10,7 @@ import { NoEncontrada } from "./pages/NoEncontrada";
 import { Perfil } from "./pages/Perfil";
 import { Registro } from "./pages/Registro";
 import { Sala } from "./pages/Sala";
-import { RutaPrivada } from "./sesion/SesionContext";
+import { RutaPrivada } from "./sesion/Rutas";
 
 // Una ruta por cada pantalla del mapa del sitio, en dos grupos:
 // públicas (antes de ingresar) y privadas (con sesión iniciada).

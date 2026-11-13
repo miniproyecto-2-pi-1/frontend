@@ -119,6 +119,7 @@ export async function apiFetch<T>(ruta: string, opciones: OpcionesApi = {}): Pro
     control.abort();
   }, ESPERA_MAXIMA_MS);
   const cancelarExterno = () => control.abort();
+  if (opciones.signal?.aborted) control.abort();
   opciones.signal?.addEventListener("abort", cancelarExterno);
 
   try {
