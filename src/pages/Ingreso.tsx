@@ -20,9 +20,11 @@ export function Ingreso() {
   const { estado } = useSesion();
   const navegar = useNavigate();
   const ubicacion = useLocation();
-  const desde = (ubicacion.state as { desde?: string } | null)?.desde ?? "/salas";
+  const estadoRuta = ubicacion.state as { desde?: string; correo?: string } | null;
+  const desde = estadoRuta?.desde ?? "/salas";
 
-  const [correo, setCorreo] = useState("");
+  // Desde el registro («Ir a iniciar sesión») llega el correo ya escrito.
+  const [correo, setCorreo] = useState(estadoRuta?.correo ?? "");
   const [clave, setClave] = useState("");
   const [verClave, setVerClave] = useState(false);
   const [errores, setErrores] = useState<Errores>({});

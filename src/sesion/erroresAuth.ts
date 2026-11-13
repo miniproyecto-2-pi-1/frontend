@@ -2,6 +2,7 @@
 export interface ErrorAuth {
   campo: "correo" | "clave" | "general";
   mensaje: string;
+  codigo: string; // código original de Firebase, por ejemplo "auth/email-already-in-use"
 }
 
 function codigo(error: unknown): string {
@@ -9,7 +10,12 @@ function codigo(error: unknown): string {
 }
 
 export function traducirErrorAuth(error: unknown): ErrorAuth {
-  switch (codigo(error)) {
+  const c = codigo(error);
+  return { ...mensajeDe(c), codigo: c };
+}
+
+function mensajeDe(c: string): Omit<ErrorAuth, "codigo"> {
+  switch (c) {
     case "auth/invalid-credential":
     case "auth/invalid-login-credentials":
     case "auth/wrong-password":
