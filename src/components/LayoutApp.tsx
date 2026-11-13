@@ -1,5 +1,6 @@
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useSesion } from "../sesion/SesionContext";
+import { useSalir } from "../sesion/useSalir";
 import { Avatar } from "./Avatar";
 import { PieDePagina, SaltarAlContenido, useFocoAlNavegar } from "./Estructura";
 import { ThemeToggle } from "./ThemeToggle";
@@ -8,14 +9,8 @@ import { ThemeToggle } from "./ThemeToggle";
 export function LayoutApp() {
   const { pathname } = useLocation();
   const principal = useFocoAlNavegar(pathname);
-  const { usuario, cerrarSesion } = useSesion();
-  const navegar = useNavigate();
-
-  // Primero se sale de la zona privada (si no, RutaPrivada mandaría al ingreso) y luego se cierra la sesión.
-  function salir() {
-    navegar("/", { replace: true });
-    void cerrarSesion().catch(() => undefined);
-  }
+  const { usuario } = useSesion();
+  const salir = useSalir();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -54,7 +49,7 @@ export function LayoutApp() {
                 <span className="font-bold">{usuario.username}</span>
               </span>
             )}
-            <button type="button" onClick={salir} className="btn-secundario">
+            <button type="button" onClick={() => void salir()} className="btn-secundario">
               Cerrar sesión
             </button>
           </div>
