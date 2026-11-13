@@ -42,20 +42,23 @@ function CargandoSesion() {
 export function RutaPrivada({ children }: { children: ReactNode }) {
   const { estado } = useSesion();
   const ubicacion = useLocation();
+  const desde = ubicacion.pathname + ubicacion.search + ubicacion.hash;
 
   if (estado === "cargando") return <CargandoSesion />;
-  if (estado === "sinUsername") return <Navigate to="/elegir-username" replace />;
-  if (estado === "anonimo")
-    return <Navigate to="/ingreso" replace state={{ desde: ubicacion.pathname + ubicacion.search + ubicacion.hash }} />;
+  // Con sesión pero sin username, cualquier ruta privada lleva a elegirlo; después se vuelve a la ruta pedida.
+  if (estado === "sinUsername") return <Navigate to="/elegir-username" replace state={{ desde }} />;
+  if (estado === "anonimo") return <Navigate to="/ingreso" replace state={{ desde }} />;
   return <>{children}</>;
 }
 
 // /elegir-username solo se abre cuando falta el nombre de usuario ("sinUsername").
 export function RutaSinUsername({ children }: { children: ReactNode }) {
   const { estado } = useSesion();
+  const ubicacion = useLocation();
+  const desde = (ubicacion.state as { desde?: string } | null)?.desde ?? "/salas";
 
   if (estado === "cargando") return <CargandoSesion />;
   if (estado === "anonimo") return <Navigate to="/ingreso" replace />;
-  if (estado === "listo") return <Navigate to="/salas" replace />;
+  if (estado === "listo") return <Navigate to={desde} replace />;
   return <>{children}</>;
 }

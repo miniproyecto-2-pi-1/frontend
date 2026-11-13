@@ -2,15 +2,16 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
-import { Avatar } from "../components/Avatar";
+import { BotonGoogle, SeparadorO } from "../components/BotonGoogle";
 import { Campo } from "../components/Campo";
+import { SelectorAvatar } from "../components/SelectorAvatar";
 import { auth } from "../firebase";
 import { useTitulo } from "../hooks/useTitulo";
 import { SIN_FIREBASE, traducirErrorAuth } from "../sesion/erroresAuth";
 import { useSesion } from "../sesion/SesionContext";
-import { PATRON_USERNAME, type DatosRegistro, type Usuario } from "../tipos";
-
-const NOMBRES_AVATAR = ["Morado", "Verde", "Magenta", "Turquesa", "Rojo", "Ámbar"];
+import { useIngresoGoogle } from "../sesion/useIngresoGoogle";
+import { type DatosRegistro, type Usuario } from "../tipos";
+import { validarApellidos, validarNombres, validarUsername } from "../validacion";
 
 type CampoRegistro = "nombres" | "apellidos" | "username" | "correo" | "clave";
 type Errores = Partial<Record<CampoRegistro | "general", string>>;
@@ -21,18 +22,17 @@ const CORREO_REGISTRADO = "Este correo ya está registrado.";
 // Validación en el navegador: cada campo con su propio mensaje (US-01, datos inválidos).
 function validar(v: Record<CampoRegistro, string>): Errores {
   const n: Errores = {};
-  if (!v.nombres.trim()) n.nombres = "Escribe tus nombres.";
-  if (!v.apellidos.trim()) n.apellidos = "Escribe tus apellidos.";
-  const username = v.username.trim();
-  if (!username) n.username = "Elige un nombre de usuario.";
-  else if (!PATRON_USERNAME.test(username)) n.username = "Usa de 3 a 20 letras, números o guion bajo, sin espacios.";
+  n.nombres = validarNombres(v.nombres);
+  n.apellidos = validarApellidos(v.apellidos);
+  n.username = validarUsername(v.username);
   const correo = v.correo.trim();
   if (!correo) n.correo = "Escribe tu correo electrónico.";
   else if (!/^\S+@\S+\.\S+$/.test(correo)) n.correo = "Escribe un correo válido, por ejemplo nombre@correo.com.";
   if (!v.clave) n.clave = "Elige una contraseña.";
   else if (v.clave.length < 8 || !/[A-Za-z]/.test(v.clave) || !/\d/.test(v.clave))
     n.clave = "La contraseña debe tener al menos 8 caracteres, con letras y números.";
-  return n;
+  // Solo quedan las claves con error, para poder contar los errores con Object.keys.
+  return Object.fromEntries(Object.entries(n).filter(([, mensaje]) => mensaje)) as Errores;
 }
 
 // Convierte un error de la API en errores del formulario.
@@ -52,11 +52,13 @@ function erroresDeApi(error: unknown): Errores {
 }
 
 // Registro manual (US-01): crea la cuenta en Firebase Auth y luego el perfil con POST /api/v1/users.
+// Registro con Google (US-02): tras la ventana de Google, SesionContext decide si falta el username.
 // La unicidad del nombre de usuario y del correo la decide el servidor.
 // Referencia visual: docs/prototipo/registro-*.
 export function Registro() {
   useTitulo("Registro");
-  const { perfilListo } = useSesion();
+  const { estado, perfilListo } = useSesion();
+  const google = useIngresoGoogle();
   const navegar = useNavigate();
   const formulario = useRef<HTMLFormElement>(null);
   const alerta = useRef<HTMLParagraphElement>(null);
@@ -67,6 +69,13 @@ export function Registro() {
   const [errores, setErrores] = useState<Errores>({});
   const [intentos, setIntentos] = useState(0);
   const [enviando, setEnviando] = useState(false);
+
+  // Solo tras Google: el registro manual pasa un momento por "sinUsername" (antes del POST) y no debe saltar.
+  useEffect(() => {
+    if (!google.autenticado) return;
+    if (estado === "listo") navegar("/salas", { replace: true });
+    else if (estado === "sinUsername") navegar("/elegir-username", { replace: true });
+  }, [google.autenticado, estado, navegar]);
 
   // Tras un intento fallido, el foco va al primer campo con error; si solo hay error general, al aviso.
   useEffect(() => {
@@ -229,32 +238,12 @@ export function Registro() {
           }
         />
 
-        <fieldset>
-          <legend className="mb-2 font-bold">Elige tu avatar</legend>
-          <div className="grid grid-cols-6 justify-items-center gap-1 sm:flex sm:justify-between">
-            {NOMBRES_AVATAR.map((nombre, i) => (
-              <label key={nombre} className="cursor-pointer">
-                <input
-                  type="radio"
-                  name="avatar"
-                  value={i}
-                  checked={avatar === i}
-                  onChange={() => setAvatar(i)}
-                  className="peer sr-only"
-                />
-                <span className="block rounded-full p-0.5 peer-checked:ring-[3px] peer-checked:ring-enlace peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-enlace">
-                  <Avatar nombre={valores.nombres || "Tú"} color={i} tam={38} />
-                </span>
-                <span className="sr-only">{nombre}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <SelectorAvatar valor={avatar} onCambio={setAvatar} nombre={valores.nombres} />
 
         <button
           type="submit"
           className="btn-principal w-full disabled:cursor-wait disabled:opacity-80"
-          disabled={enviando}
+          disabled={enviando || google.ocupado}
           aria-busy={enviando}
         >
           {enviando && (
@@ -265,6 +254,9 @@ export function Registro() {
           )}
           {enviando ? "Creando cuenta…" : "Crear cuenta"}
         </button>
+
+        <SeparadorO />
+        <BotonGoogle google={google} deshabilitado={enviando} />
 
         <p className="text-center">
           ¿Ya tienes cuenta?{" "}

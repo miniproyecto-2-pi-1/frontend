@@ -19,9 +19,13 @@ export interface DatosRegistro {
   avatar: number;
 }
 
-// Cuerpo de POST /api/v1/users/me/username: completar el perfil (por ejemplo, tras ingresar con Google).
+// Cuerpo de POST /api/v1/users/me/username: completar el perfil tras ingresar con Google (US-02).
+// Nombres y apellidos llegan prellenados con el displayName de Google, pero la persona puede editarlos.
 export interface DatosUsername {
   username: string;
+  nombres: string;
+  apellidos: string;
+  avatar: number;
 }
 
 export const PATRON_USERNAME = /^[A-Za-z0-9_]{3,20}$/;
