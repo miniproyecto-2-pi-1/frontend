@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Registro - Salón de Estudio</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              main: '#6D3FE0',
+              link: '#5B35C4',
+              textPrimary: '#2B2833',
+              textSecondary: '#5A5469',
+              surface: '#F4F2F9',
+              border: '#D5D0E0',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-rules">
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #FFFFFF;
+      color: #2B2833;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-border {
+      border-width: 1.5px;
+    }
+    /* Estilo de anillo seleccionado según la guía */
+    .avatar-selected {
+      outline: 2.5px solid #6D3FE0;
+      outline-offset: 2.5px;
+    }
+  </style>
+</head>
+<body class="flex justify-center bg-white min-h-screen">
+<!-- BEGIN: MobileContainer -->
+<!-- Contenedor adaptado a dimensiones móviles de 390px x 844px aproximado, sin header ni footer -->
+<main class="w-full max-w-[390px] px-4 py-8 flex flex-col justify-start">
+<!-- BEGIN: HeaderSection -->
+<header class="mb-6">
+<h1 class="text-[24px] font-bold leading-tight text-[#2B2833]">
+        Crea tu cuenta
+      </h1>
+<p class="text-[15px] text-[#5A5469] mt-1">
+        Para entrar a tus salas de estudio.
+      </p>
+</header>
+<!-- END: HeaderSection -->
+<!-- BEGIN: RegistrationForm -->
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<!-- Campo Nombres -->
+<div data-purpose="form-group-nombres">
+<label class="block text-[13px] font-bold text-[#2B2833] mb-1" for="nombres">
+          Nombres
+        </label>
+<input class="w-full h-11 px-3.5 bg-white text-[#2B2833] text-[15px] rounded-[8px] border-[#D5D0E0] custom-border focus:border-[#6D3FE0] focus:ring-1 focus:ring-[#6D3FE0] transition-colors outline-none" id="nombres" name="nombres" type="text" value="Camila"/>
+</div>
+<!-- Campo Apellidos -->
+<div data-purpose="form-group-apellidos">
+<label class="block text-[13px] font-bold text-[#2B2833] mb-1" for="apellidos">
+          Apellidos
+        </label>
+<input class="w-full h-11 px-3.5 bg-white text-[#2B2833] text-[15px] rounded-[8px] border-[#D5D0E0] custom-border focus:border-[#6D3FE0] focus:ring-1 focus:ring-[#6D3FE0] transition-colors outline-none" id="apellidos" name="apellidos" type="text" value="Torres"/>
+</div>
+<!-- Campo Nombre de Usuario -->
+<div data-purpose="form-group-usuario">
+<label class="block text-[13px] font-bold text-[#2B2833] mb-1" for="username">
+          Nombre de usuario
+        </label>
+<input class="w-full h-11 px-3.5 bg-white text-[#2B2833] text-[15px] rounded-[8px] border-[#D5D0E0] custom-border focus:border-[#6D3FE0] focus:ring-1 focus:ring-[#6D3FE0] transition-colors outline-none" id="username" name="username" type="text" value="camila_t"/>
+<p class="text-[12px] text-[#5A5469] mt-1">
+          De 3 a 20 letras, números o guion bajo.
+        </p>
+</div>
+<!-- Campo Correo Electrónico -->
+<div data-purpose="form-group-correo">
+<label class="block text-[13px] font-bold text-[#2B2833] mb-1" for="email">
+          Correo electrónico
+        </label>
+<input class="w-full h-11 px-3.5 bg-white text-[#2B2833] text-[15px] rounded-[8px] border-[#D5D0E0] custom-border focus:border-[#6D3FE0] focus:ring-1 focus:ring-[#6D3FE0] transition-colors outline-none" id="email" name="email" type="email" value="camila.torres@correounivalle.edu.co"/>
+</div>
+<!-- Campo Contraseña -->
+<div data-purpose="form-group-password">
+<label class="block text-[13px] font-bold text-[#2B2833] mb-1" for="password">
+          Contraseña
+        </label>
+<input class="w-full h-11 px-3.5 bg-white text-[#2B2833] text-[15px] rounded-[8px] border-[#D5D0E0] custom-border focus:border-[#6D3FE0] focus:ring-1 focus:ring-[#6D3FE0] transition-colors outline-none tracking-widest" id="password" name="password" type="password" value="password123"/>
+<p class="text-[12px] text-[#5A5469] mt-1">
+          Mínimo 8 caracteres, con letras y números.
+        </p>
+</div>
+<!-- BEGIN: AvatarSelector -->
+<div class="pt-1 pb-1" data-purpose="avatar-picker">
+<label class="block text-[13px] font-bold text-[#2B2833] mb-2.5">
+          Elige tu avatar
+        </label>
+<!-- Grilla / fila de 6 avatares con iniciales CA -->
+<div class="flex items-center justify-between gap-1.5 px-0.5">
+<!-- 1. Morado -->
+<button aria-label="Avatar morado" class="w-10 h-10 rounded-full bg-[#6D3FE0] text-white font-bold text-xs flex items-center justify-center transition-transform active:scale-95" type="button">
+            CA
+          </button>
+<!-- 2. Verde -->
+<button aria-label="Avatar verde" class="w-10 h-10 rounded-full bg-[#1F7A3F] text-white font-bold text-xs flex items-center justify-center transition-transform active:scale-95" type="button">
+            CA
+          </button>
+<!-- 3. Magenta -->
+<button aria-label="Avatar magenta" class="w-10 h-10 rounded-full bg-[#9E2A82] text-white font-bold text-xs flex items-center justify-center transition-transform active:scale-95" type="button">
+            CA
+          </button>
+<!-- 4. Turquesa -->
+<button aria-label="Avatar turquesa" class="w-10 h-10 rounded-full bg-[#0E7A8A] text-white font-bold text-xs flex items-center justify-center transition-transform active:scale-95" type="button">
+            CA
+          </button>
+<!-- 5. Rojo -->
+<button aria-label="Avatar rojo" class="w-10 h-10 rounded-full bg-[#B3261E] text-white font-bold text-xs flex items-center justify-center transition-transform active:scale-95" type="button">
+            CA
+          </button>
+<!-- 6. Ámbar (Seleccionado con aro #6D3FE0) -->
+<button aria-label="Avatar ámbar seleccionado" class="w-10 h-10 rounded-full bg-[#C25E00] text-white font-bold text-xs flex items-center justify-center avatar-selected transition-transform active:scale-95" type="button">
+            CA
+          </button>
+</div>
+</div>
+<!-- END: AvatarSelector -->
+<!-- BEGIN: ActionButtons -->
+<div class="pt-2 space-y-3">
+<!-- Botón principal de registro -->
+<button class="w-full h-11 bg-[#6D3FE0] hover:bg-[#5B35C4] active:bg-[#4E2DA8] text-white font-bold text-[15px] rounded-[8px] transition-colors flex items-center justify-center shadow-sm" type="submit">
+          Crear cuenta
+        </button>
+<!-- Separador con línea y texto "o" -->
+<div class="relative flex py-1 items-center">
+<div class="flex-grow border-t border-[#D5D0E0]"></div>
+<span class="flex-shrink mx-3 text-xs text-[#5A5469] lowercase font-medium">o</span>
+<div class="flex-grow border-t border-[#D5D0E0]"></div>
+</div>
+<!-- Botón secundario con Google -->
+<button class="w-full h-11 bg-white hover:bg-slate-50 active:bg-slate-100 text-[#2B2833] font-semibold text-[14px] rounded-[8px] border-[#D5D0E0] custom-border flex items-center justify-center gap-2.5 transition-colors" type="button">
+<!-- Icono SVG Google -->
+<svg aria-hidden="true" class="w-4 h-4 flex-shrink-0" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12c0 2.03.45 3.84 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+          Registrarse con Google
+        </button>
+</div>
+<!-- END: ActionButtons -->
+<!-- BEGIN: LoginRedirect -->
+<div class="text-center pt-2">
+<p class="text-[13px] text-[#2B2833]">
+          ¿Ya tienes cuenta? 
+          <a class="text-[#5B35C4] font-bold hover:underline transition-all" href="#">
+            Inicia sesión
+          </a>
+</p>
+</div>
+<!-- END: LoginRedirect -->
+</form>
+<!-- END: RegistrationForm -->
+</main>
+<!-- END: MobileContainer -->
+</body></html>

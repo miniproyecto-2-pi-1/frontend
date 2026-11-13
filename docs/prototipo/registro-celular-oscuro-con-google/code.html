@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Registro - Celular - Oscuro | Salón de Estudio</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Forms Plugin -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            app: {
+              bg: '#2B2833',
+              surface: '#25222D',
+              primary: '#6D3FE0',
+              'primary-hover': '#5B35C4',
+              text: '#F3F1F8',
+              secondary: '#BDB8CC',
+              link: '#C4B1FF',
+              border: 'rgba(189, 184, 204, 0.35)',
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for strict 1.5px borders and iOS layout alignment -->
+<style data-purpose="custom-borders-and-base">
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #1a1820;
+    }
+    .custom-input {
+      border: 1.5px solid rgba(189, 184, 204, 0.35);
+      border-radius: 8px;
+    }
+    .custom-input:focus {
+      border-color: #C4B1FF;
+      box-shadow: 0 0 0 2px #C4B1FF;
+      outline: none;
+    }
+    .custom-btn-outline {
+      border: 1.5px solid rgba(189, 184, 204, 0.35);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4 text-app-text">
+<!-- BEGIN: MobileDeviceCanvas (390 x 844 px canvas simulation) -->
+<main class="w-full max-w-[390px] min-h-[844px] bg-[#2B2833] flex flex-col justify-start relative shadow-2xl overflow-y-auto px-4 py-8" data-purpose="mobile-viewport-container">
+<!-- BEGIN: HeaderSection -->
+<header class="mb-6" data-purpose="screen-header">
+<h1 class="text-2xl font-bold text-app-text tracking-tight mb-1">
+        Crea tu cuenta
+      </h1>
+<p class="text-sm text-app-secondary">
+        Para entrar a tus salas de estudio.
+      </p>
+</header>
+<!-- END: HeaderSection -->
+<!-- BEGIN: RegistrationForm -->
+<form class="flex flex-col space-y-4" data-purpose="registration-form" onsubmit="event.preventDefault();">
+<!-- Field: Nombres -->
+<div class="flex flex-col">
+<label class="text-xs font-bold text-app-text mb-1.5" for="nombres">
+          Nombres
+        </label>
+<input class="custom-input bg-[#25222D] text-app-text px-3.5 py-2.5 text-sm w-full transition-colors" id="nombres" name="nombres" placeholder="Tu nombre" required="" type="text" value="Camila"/>
+</div>
+<!-- Field: Apellidos -->
+<div class="flex flex-col">
+<label class="text-xs font-bold text-app-text mb-1.5" for="apellidos">
+          Apellidos
+        </label>
+<input class="custom-input bg-[#25222D] text-app-text px-3.5 py-2.5 text-sm w-full transition-colors" id="apellidos" name="apellidos" placeholder="Tus apellidos" required="" type="text" value="Torres"/>
+</div>
+<!-- Field: Nombre de usuario -->
+<div class="flex flex-col">
+<label class="text-xs font-bold text-app-text mb-1.5" for="username">
+          Nombre de usuario
+        </label>
+<input class="custom-input bg-[#25222D] text-app-text px-3.5 py-2.5 text-sm w-full transition-colors" id="username" name="username" placeholder="usuario" required="" type="text" value="camila_t"/>
+<span class="text-[12px] text-app-secondary mt-1">
+          De 3 a 20 letras, números o guion bajo.
+        </span>
+</div>
+<!-- Field: Correo electrónico -->
+<div class="flex flex-col">
+<label class="text-xs font-bold text-app-text mb-1.5" for="email">
+          Correo electrónico
+        </label>
+<input class="custom-input bg-[#25222D] text-app-text px-3.5 py-2.5 text-sm w-full transition-colors" id="email" name="email" placeholder="ejemplo@correo.com" required="" type="email" value="camila.torres@correounivalle.edu.co"/>
+</div>
+<!-- Field: Contraseña -->
+<div class="flex flex-col">
+<label class="text-xs font-bold text-app-text mb-1.5" for="password">
+          Contraseña
+        </label>
+<input class="custom-input bg-[#25222D] text-app-text px-3.5 py-2.5 text-sm w-full tracking-widest transition-colors" id="password" name="password" placeholder="••••••••" required="" type="password" value="SuperSecret123"/>
+<span class="text-[12px] text-app-secondary mt-1">
+          Mínimo 8 caracteres, con letras y números.
+        </span>
+</div>
+<!-- BEGIN: AvatarSelector -->
+<div class="flex flex-col pt-1" data-purpose="avatar-selection-group">
+<label class="text-xs font-bold text-app-text mb-2.5">
+          Elige tu avatar
+        </label>
+<div class="flex items-center justify-between gap-1.5 px-0.5">
+<!-- 1. Morado -->
+<button aria-label="Avatar morado" class="w-10 h-10 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center transition-transform active:scale-95 hover:opacity-90" type="button">
+            CA
+          </button>
+<!-- 2. Verde -->
+<button aria-label="Avatar verde" class="w-10 h-10 rounded-full bg-[#107C41] text-white text-xs font-bold flex items-center justify-center transition-transform active:scale-95 hover:opacity-90" type="button">
+            CA
+          </button>
+<!-- 3. Magenta -->
+<button aria-label="Avatar magenta" class="w-10 h-10 rounded-full bg-[#A01A7D] text-white text-xs font-bold flex items-center justify-center transition-transform active:scale-95 hover:opacity-90" type="button">
+            CA
+          </button>
+<!-- 4. Turquesa -->
+<button aria-label="Avatar turquesa" class="w-10 h-10 rounded-full bg-[#00828A] text-white text-xs font-bold flex items-center justify-center transition-transform active:scale-95 hover:opacity-90" type="button">
+            CA
+          </button>
+<!-- 5. Rojo -->
+<button aria-label="Avatar rojo" class="w-10 h-10 rounded-full bg-[#B32034] text-white text-xs font-bold flex items-center justify-center transition-transform active:scale-95 hover:opacity-90" type="button">
+            CA
+          </button>
+<!-- 6. Ámbar (Seleccionado con aro morado grueso) -->
+<button aria-label="Avatar ámbar seleccionado" class="w-10 h-10 rounded-full bg-[#C25A00] text-white text-xs font-bold flex items-center justify-center ring-[3px] ring-offset-2 ring-offset-[#2B2833] ring-[#6D3FE0] transition-transform active:scale-95 shadow-md" type="button">
+            CA
+          </button>
+</div>
+</div>
+<!-- END: AvatarSelector -->
+<!-- BEGIN: ActionButtons -->
+<div class="pt-3 flex flex-col space-y-3.5" data-purpose="action-buttons-group">
+<!-- Botón principal: Crear cuenta -->
+<button class="w-full bg-app-primary hover:bg-app-primary-hover active:scale-[0.99] text-white font-semibold py-3 px-4 rounded-[8px] transition-all duration-150 shadow-sm text-sm" type="submit">
+          Crear cuenta
+        </button>
+<!-- Separador horizontal con 'o' -->
+<div class="flex items-center my-1">
+<div class="flex-grow border-t border-[rgba(189,184,204,0.2)]"></div>
+<span class="px-3 text-xs text-app-secondary lowercase">o</span>
+<div class="flex-grow border-t border-[rgba(189,184,204,0.2)]"></div>
+</div>
+<!-- Botón secundario: Registrarse con Google -->
+<button class="custom-btn-outline w-full bg-[#25222D] hover:bg-[#2d2937] active:scale-[0.99] text-app-text font-medium py-2.5 px-4 flex items-center justify-center gap-2.5 transition-all duration-150 text-sm" type="button">
+<!-- SVG Logo Oficial Google -->
+<svg aria-hidden="true" class="w-4 h-4 flex-shrink-0" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span>Registrarse con Google</span>
+</button>
+</div>
+<!-- END: ActionButtons -->
+<!-- Enlace a Iniciar Sesión -->
+<footer class="text-center pt-2 pb-1" data-purpose="form-footer">
+<p class="text-xs text-app-text">
+          ¿Ya tienes cuenta? 
+          <a class="text-app-link font-semibold hover:underline transition-colors ml-1" href="#">
+            Inicia sesión
+          </a>
+</p>
+</footer>
+</form>
+<!-- END: RegistrationForm -->
+</main>
+<!-- END: MobileDeviceCanvas -->
+</body></html>

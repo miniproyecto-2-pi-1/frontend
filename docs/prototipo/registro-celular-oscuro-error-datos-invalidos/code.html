@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Registro - Celular - Oscuro - Datos Inválidos</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            appBg: '#2B2833',
+            surface: '#25222D',
+            primaryBrand: '#6D3FE0',
+            primaryHover: '#5B35C4',
+            errorBorder: '#FF8AA0',
+            errorText: '#FF8AA0',
+            inputBorder: '#423F4D',
+            subtleText: '#BDB8CC',
+            lightText: '#F3F1F8'
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styling">
+    body {
+      background-color: #2B2833;
+      color: #F3F1F8;
+      font-family: 'Noto Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .mobile-frame {
+      width: 100%;
+      max-width: 390px;
+      min-height: 844px;
+      background-color: #2B2833;
+      padding: 24px 16px 36px 16px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    .field-border-normal {
+      border: 1.5px solid #423F4D;
+    }
+    .field-border-error {
+      border: 1.5px solid #FF8AA0;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-purple-500 selection:text-white">
+<!-- BEGIN: RegisterMobileScreen -->
+<main class="mobile-frame" data-purpose="registration-screen">
+<!-- BEGIN: HeaderSection -->
+<header class="mb-5" data-purpose="screen-header">
+<h1 class="text-[24px] font-bold text-[#F3F1F8] leading-tight">Crea tu cuenta</h1>
+<p class="text-[14px] text-[#BDB8CC] mt-1">Para entrar a tus salas de estudio.</p>
+</header>
+<!-- END: HeaderSection -->
+<!-- BEGIN: RegistrationForm -->
+<form class="flex flex-col gap-3.5" data-purpose="registration-form" novalidate="" onsubmit="event.preventDefault();">
+<!-- Field 1: Nombres (Con error) -->
+<div data-purpose="form-field-group">
+<label class="block text-[14px] font-semibold text-[#F3F1F8] mb-1" for="nombres">Nombres</label>
+<input aria-describedby="nombres-error" aria-invalid="true" class="w-full h-11 px-3 bg-[#25222D] rounded-[8px] field-border-error text-[#F3F1F8] text-[15px] focus:outline-none focus:ring-1 focus:ring-[#FF8AA0]" id="nombres" name="nombres" placeholder="" type="text" value=""/>
+<!-- Error message with icon -->
+<div class="flex items-center gap-1.5 mt-1.5 text-[#FF8AA0] text-[13px] font-medium" id="nombres-error" role="alert">
+<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<circle cx="12" cy="16" fill="currentColor" r="0.5"></circle>
+</svg>
+<span>Escribe tus nombres.</span>
+</div>
+</div>
+<!-- Field 2: Apellidos (Válido con datos de ejemplo) -->
+<div data-purpose="form-field-group">
+<label class="block text-[14px] font-semibold text-[#F3F1F8] mb-1" for="apellidos">Apellidos</label>
+<input class="w-full h-11 px-3 bg-[#25222D] rounded-[8px] field-border-normal text-[#F3F1F8] text-[15px] focus:outline-none focus:border-[#C4B1FF]" id="apellidos" name="apellidos" type="text" value="Torres"/>
+</div>
+<!-- Field 3: Nombre de usuario (Válido con texto de ayuda) -->
+<div data-purpose="form-field-group">
+<label class="block text-[14px] font-semibold text-[#F3F1F8] mb-1" for="username">Nombre de usuario</label>
+<input class="w-full h-11 px-3 bg-[#25222D] rounded-[8px] field-border-normal text-[#F3F1F8] text-[15px] focus:outline-none focus:border-[#C4B1FF]" id="username" name="username" type="text" value="camila_t"/>
+<p class="text-[12px] text-[#BDB8CC] mt-1">De 3 a 20 letras, números o guion bajo.</p>
+</div>
+<!-- Field 4: Correo electrónico (Con error) -->
+<div data-purpose="form-field-group">
+<label class="block text-[14px] font-semibold text-[#F3F1F8] mb-1" for="email">Correo electrónico</label>
+<input aria-describedby="email-error" aria-invalid="true" class="w-full h-11 px-3 bg-[#25222D] rounded-[8px] field-border-error text-[#F3F1F8] text-[15px] focus:outline-none focus:ring-1 focus:ring-[#FF8AA0]" id="email" name="email" type="email" value="camila.torres"/>
+<!-- Error message with icon -->
+<div class="flex items-start gap-1.5 mt-1.5 text-[#FF8AA0] text-[13px] font-medium" id="email-error" role="alert">
+<svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<circle cx="12" cy="16" fill="currentColor" r="0.5"></circle>
+</svg>
+<span class="leading-tight">Escribe un correo válido, por ejemplo nombre@correo.com.</span>
+</div>
+</div>
+<!-- Field 5: Contraseña (Con error) -->
+<div data-purpose="form-field-group">
+<label class="block text-[14px] font-semibold text-[#F3F1F8] mb-1" for="password">Contraseña</label>
+<input aria-describedby="password-error" aria-invalid="true" class="w-full h-11 px-3 bg-[#25222D] rounded-[8px] field-border-error text-[#F3F1F8] text-[15px] focus:outline-none focus:ring-1 focus:ring-[#FF8AA0] tracking-widest" id="password" name="password" type="password" value="123"/>
+<!-- Error message with icon -->
+<div class="flex items-start gap-1.5 mt-1.5 text-[#FF8AA0] text-[13px] font-medium" id="password-error" role="alert">
+<svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<circle cx="12" cy="16" fill="currentColor" r="0.5"></circle>
+</svg>
+<span class="leading-tight">La contraseña debe tener al menos 8 caracteres, con letras y números.</span>
+</div>
+</div>
+<!-- BEGIN: AvatarPicker -->
+<div class="mt-1" data-purpose="avatar-selection">
+<label class="block text-[14px] font-semibold text-[#F3F1F8] mb-2">Elige tu avatar</label>
+<div class="flex items-center justify-between gap-1 px-1">
+<!-- Avatar option 1 -->
+<button class="w-10 h-10 rounded-full bg-[#6D3FE0] text-white font-bold text-xs flex items-center justify-center focus:outline-none" type="button">CA</button>
+<!-- Avatar option 2 -->
+<button class="w-10 h-10 rounded-full bg-[#16A34A] text-white font-bold text-xs flex items-center justify-center focus:outline-none" type="button">CA</button>
+<!-- Avatar option 3 -->
+<button class="w-10 h-10 rounded-full bg-[#9333EA] text-white font-bold text-xs flex items-center justify-center focus:outline-none" type="button">CA</button>
+<!-- Avatar option 4 -->
+<button class="w-10 h-10 rounded-full bg-[#0891B2] text-white font-bold text-xs flex items-center justify-center focus:outline-none" type="button">CA</button>
+<!-- Avatar option 5 -->
+<button class="w-10 h-10 rounded-full bg-[#DC2626] text-white font-bold text-xs flex items-center justify-center focus:outline-none" type="button">CA</button>
+<!-- Selected avatar option 6 with purple halo -->
+<div class="p-[2.5px] rounded-full border-2 border-[#6D3FE0] flex items-center justify-center">
+<button class="w-[34px] h-[34px] rounded-full bg-[#D97706] text-white font-bold text-xs flex items-center justify-center focus:outline-none" type="button">CA</button>
+</div>
+</div>
+</div>
+<!-- END: AvatarPicker -->
+<!-- Submit Button -->
+<button class="w-full h-11 mt-2.5 bg-[#6D3FE0] hover:bg-[#5B35C4] active:bg-[#4E2DA8] text-white font-semibold rounded-[8px] text-[15px] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C4B1FF]" data-purpose="submit-button" type="submit">
+        Crear cuenta
+      </button>
+<!-- Divider -->
+<div class="relative flex items-center justify-center my-0.5" data-purpose="form-divider">
+<div class="border-t border-[#423F4D] w-full"></div>
+<span class="bg-[#2B2833] px-2 text-[12px] text-[#BDB8CC] absolute">o</span>
+</div>
+<!-- Google Sign In Button -->
+<button class="w-full h-11 bg-[#25222D] hover:bg-[#2e2a38] text-[#F3F1F8] field-border-normal rounded-[8px] font-medium text-[14px] flex items-center justify-center gap-2.5 transition-colors focus:outline-none focus:border-[#C4B1FF]" data-purpose="google-oauth-button" type="button">
+<!-- Google Logo SVG -->
+<svg class="w-4 h-4 shrink-0" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span>Registrarse con Google</span>
+</button>
+<!-- Login Link -->
+<footer class="mt-2 text-center text-[13px] text-[#BDB8CC]" data-purpose="login-link-container">
+<span>¿Ya tienes cuenta? </span>
+<a class="text-[#C4B1FF] font-medium hover:underline focus:outline-none focus:underline" href="#">Inicia sesión</a>
+</footer>
+</form>
+<!-- END: RegistrationForm -->
+</main>
+<!-- END: RegisterMobileScreen -->
+</body></html>

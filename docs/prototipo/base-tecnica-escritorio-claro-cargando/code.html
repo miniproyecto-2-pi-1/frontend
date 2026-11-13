@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base técnica - Computador - Claro (Cargando)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #FFFFFF;
+      color: #2B2833;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#FFFFFF] text-[#2B2833] flex flex-col justify-between p-8 antialiased selection:bg-[#6D3FE0] selection:text-white">
+  <!-- Encabezado de la página -->
+  <header class="w-full max-w-5xl mx-auto flex items-center justify-between py-2">
+    <h1 class="text-2xl font-bold tracking-tight text-[#2B2833]">Salón de Estudio</h1>
+    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F4F2F9] text-[#5A5469] border border-[#5A5469]/20">BASE TÉCNICA</span>
+  </header>
+
+  <!-- Contenedor central con tarjeta de estado -->
+  <main class="w-full max-w-2xl mx-auto my-auto flex flex-col items-center justify-center">
+    <div class="w-full bg-[#F4F2F9] rounded-[10px] border border-[#5A5469]/20 p-12 flex flex-col items-center justify-center text-center shadow-sm">
+      <!-- Indicador Spinner / Cargando -->
+      <div class="relative w-12 h-12 mb-6">
+        <div class="w-12 h-12 rounded-full border-[3px] border-[#5A5469]/20 border-t-[#6D3FE0] animate-spin"></div>
+      </div>
+      
+      <h2 class="text-lg font-bold text-[#2B2833] mb-1">Cargando datos...</h2>
+      <p class="text-sm text-[#5A5469]">Conectando con el servidor.</p>
+    </div>
+  </main>
+
+  <!-- Pie de página limpio y sin bordes -->
+  <footer class="w-full text-center py-4 mt-auto">
+    <p class="text-sm text-[#5A5469]">Base técnica · Modo Claro · Salón de Estudio</p>
+  </footer>
+</body>
+</html>

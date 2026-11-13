@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Celular - Oscuro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #2B2833;
+      color: #F3F1F8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#6D3FE0] selection:text-white w-full max-w-[390px] mx-auto px-4">
+  <!-- Encabezado Celular -->
+  <header class="w-full pt-6 pb-2 flex items-center justify-start">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-lg bg-[#6D3FE0] flex items-center justify-center text-white font-bold text-base shadow-sm">
+        S
+      </div>
+      <span class="font-bold text-lg text-[#F3F1F8] tracking-tight">Salón de Estudio</span>
+    </div>
+  </header>
+
+  <!-- Contenido Central Centrado con márgenes de 16px (px-4) -->
+  <main class="flex-1 flex flex-col items-center justify-center text-center py-6">
+    <!-- 404 Grande en Morado -->
+    <span class="text-[88px] font-bold text-[#6D3FE0] leading-none select-none tracking-tight">
+      404
+    </span>
+
+    <!-- Título de pantalla -->
+    <h1 class="text-2xl font-bold text-[#F3F1F8] mt-3 mb-2 tracking-tight">
+      Página no encontrada
+    </h1>
+
+    <!-- Subtítulo -->
+    <p class="text-base text-[#BDB8CC] mb-8 leading-relaxed max-w-[280px]">
+      La dirección no existe o la sala ya no está disponible.
+    </p>
+
+    <!-- Botón Principal Morado a todo el ancho disponible -->
+    <a href="#mis-salas" class="w-full flex items-center justify-center py-3 bg-[#6D3FE0] hover:bg-[#5B35C4] text-white font-medium text-base rounded-[8px] transition-all duration-150 shadow-sm active:scale-[0.98]">
+      Ir a Mis salas
+    </a>
+  </main>
+
+  <!-- Pie de página sin bordes casi al final de la pantalla -->
+  <footer class="w-full pb-6 pt-2 text-center">
+    <p class="text-sm text-[#BDB8CC]">
+      Ayuda · Salón de Estudio
+    </p>
+  </footer>
+</body>
+</html>

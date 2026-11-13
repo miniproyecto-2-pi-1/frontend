@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base técnica - Celular - Oscuro (Error)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #1E1B24;
+      color: #F3F1F8;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#1E1B24] text-[#F3F1F8] flex flex-col items-center p-4">
+  <div class="w-full max-w-[390px] h-[800px] bg-[#2B2833] rounded-[24px] border-[1.5px] border-[#3D3847] flex flex-col overflow-hidden shadow-lg">
+    <!-- Encabezado -->
+    <header class="p-4 border-b-[1.5px] border-[#3D3847]">
+      <h1 class="text-[18px] font-bold text-[#F3F1F8]">Salón de Estudio</h1>
+    </header>
+
+    <!-- Contenido centrado -->
+    <main class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div class="w-14 h-14 rounded-full border-[2px] border-[#FF8AA0] text-[#FF8AA0] flex items-center justify-center mb-5">
+        <svg class="w-7 h-7 stroke-[2.2px] stroke-current" fill="none" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h2 class="text-[18px] font-bold text-[#F3F1F8]">No pudimos cargar los datos</h2>
+      <p class="text-[14px] text-[#BDB8CC] mt-2 mb-6 max-w-[240px]">Revisa tu conexión e inténtalo de nuevo.</p>
+      <button class="h-[44px] px-8 bg-[#6D3FE0] hover:bg-[#5b35c4] text-white text-[15px] font-semibold rounded-[8px] transition-colors shadow-sm">
+        Reintentar
+      </button>
+    </main>
+  </div>
+</body>
+</html>

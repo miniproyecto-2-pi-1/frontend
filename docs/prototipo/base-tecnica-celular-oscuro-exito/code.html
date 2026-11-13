@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base técnica - Celular - Oscuro (Éxito)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #1E1B24;
+      color: #F3F1F8;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#1E1B24] text-[#F3F1F8] flex flex-col items-center p-4">
+  <div class="w-full max-w-[390px] h-[800px] bg-[#2B2833] rounded-[24px] border-[1.5px] border-[#3D3847] flex flex-col overflow-hidden shadow-lg">
+    <!-- Encabezado -->
+    <header class="p-4 border-b-[1.5px] border-[#3D3847]">
+      <h1 class="text-[18px] font-bold text-[#F3F1F8]">Salón de Estudio</h1>
+    </header>
+
+    <!-- Contenido centrado -->
+    <main class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1B3828] text-[#57D58A] border-[1.5px] border-[#2A573D] rounded-full text-[13px] font-semibold mb-5">
+        <span class="w-2 h-2 rounded-full bg-[#57D58A]"></span>
+        Conectado a la API
+      </div>
+      <p class="text-[15px] font-medium text-[#BDB8CC] mb-4">Dato leído de Firestore</p>
+      <div class="w-full bg-[#201D27] border-[1.5px] border-[#3D3847] rounded-[8px] p-4 text-[15px] text-[#F3F1F8] font-medium shadow-inner leading-relaxed">
+        «Hola desde Firestore: el Salón de Estudio ya funciona»
+      </div>
+    </main>
+  </div>
+</body>
+</html>
