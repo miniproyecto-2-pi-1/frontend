@@ -1,0 +1,83 @@
+<!DOCTYPE html><html class="h-full" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Salón de Estudio - Base Técnica</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            app: {
+              bg: '#2B2833',
+              card: '#221F29',
+              border: '#3F3B4B',
+              primary: '#6D3FE0',
+              accentGreen: '#1E8E3E',
+              errorRed: '#E85D75'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-animations">
+    @keyframes spin-custom {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .custom-spinner {
+      border: 3.5px solid rgba(167, 139, 250, 0.2);
+      border-top-color: #A78BFA;
+      border-radius: 50%;
+      animation: spin-custom 0.9s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-[#FFFFFF] text-[#2B2833] min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 font-sans antialiased selection:bg-[#6D3FE0] selection:text-white">
+<!-- BEGIN: StateSwitcher -->
+<!-- Selector superior para alternar vistas interactivamente -->
+
+<!-- END: StateSwitcher -->
+<!-- BEGIN: MobileDeviceFrame -->
+<!-- Marco de dispositivo móvil iOS estándar (390px) -->
+<div class="w-[390px] h-[780px] bg-[#FFFFFF] rounded-[44px] shadow-2xl flex flex-col overflow-hidden relative border-[6px] border-[#EDE9F4] ring-1 ring-[#D8D2E4]" data-purpose="mobile-mockup"><header class="w-full pt-10 pb-4 px-6 border-b border-[#EDE9F4] flex items-center justify-start z-10 shrink-0"><h1 class="text-[17px] font-bold tracking-tight text-[#2B2833]">Salón de Estudio</h1></header><main class="flex-1 flex flex-col items-center justify-center px-6 relative w-full"><section class="flex flex-col items-center justify-center text-center transition-all duration-300 w-full animate-fadeIn" data-purpose="loading-state" id="view-loading"><div class="relative w-11 h-11 mb-6"><div class="w-full h-full custom-spinner"></div></div><h2 class="text-base font-bold text-[#2B2833] mb-1.5 tracking-tight">Cargando datos...</h2><p class="text-[13px] text-[#5A5469] font-normal leading-relaxed">Conectando con el servidor.</p></section><section class="hidden flex flex-col items-center justify-center text-center transition-all duration-300 w-full max-w-[290px] animate-fadeIn" data-purpose="error-state" id="view-error"><div class="w-11 h-11 rounded-full border-2 border-[#B3261E] bg-[#FDF2F2] flex items-center justify-center mb-5 text-[#B3261E] shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 8v5m0 3.5h.01" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><h2 class="text-base font-bold text-[#2B2833] mb-1.5 tracking-tight">No pudimos cargar los datos</h2><p class="text-[13px] text-[#5A5469] font-normal leading-relaxed mb-6">Revisa tu conexión e inténtalo de nuevo.</p><button class="w-36 py-2.5 px-5 bg-[#6D3FE0] hover:bg-[#5E34C7] active:scale-95 transition-all text-white text-sm font-semibold rounded-xl shadow-md flex items-center justify-center" type="button">Reintentar</button></section><section class="hidden flex flex-col items-center justify-center text-center transition-all duration-300 w-full animate-fadeIn" data-purpose="success-state" id="view-success"><div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#EBF7EE] border border-[#A7E2BA] mb-3 shadow-sm"><span class="w-2 h-2 rounded-full bg-[#1F7A3F] animate-pulse"></span><span class="text-xs font-semibold text-[#1F7A3F] tracking-wide">Conectado a la API</span></div><h2 class="text-sm font-bold text-[#2B2833] mb-4 tracking-tight">Dato leído de Firestore</h2><div class="w-full max-w-[280px] bg-[#F4F2F9] border border-[#E2DEEA] rounded-2xl p-4 shadow-sm"><p class="text-[13px] text-[#2B2833] font-normal leading-relaxed text-center">«Hola desde Firestore: el Salón de Estudio ya funciona»</p></div></section></main><div class="w-full pb-3 flex justify-center shrink-0"><div class="w-32 h-1 bg-[#D8D2E4] rounded-full"></div></div></div>
+<!-- END: MobileDeviceFrame -->
+<!-- BEGIN: InteractiveTabScript -->
+<script data-purpose="state-toggle-logic">
+    function switchState(state) {
+      // Ocultar todas las vistas
+      const views = ['loading', 'error', 'success'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const tab = document.getElementById(`tab-${v}`);
+        if (el) el.classList.add('hidden');
+        if (tab) {
+          tab.classList.remove('bg-[#6D3FE0]', 'text-white', 'shadow-sm');
+          tab.classList.add('text-neutral-400');
+        }
+      });
+
+      // Mostrar la vista seleccionada
+      const activeView = document.getElementById(`view-${state}`);
+      const activeTab = document.getElementById(`tab-${state}`);
+      
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeTab) {
+        activeTab.classList.add('bg-[#6D3FE0]', 'text-white', 'shadow-sm');
+        activeTab.classList.remove('text-neutral-400');
+      }
+    }
+  </script>
+<!-- END: InteractiveTabScript -->
+
+
+</body></html>

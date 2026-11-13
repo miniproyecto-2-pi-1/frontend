@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Registro - Salón de Estudio</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Custom Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#2B2833',
+              surface: '#25222D',
+              primary: '#6D3FE0',
+              'primary-hover': '#5B35C4',
+              text: '#F3F1F8',
+              secondary: '#BDB8CC',
+              link: '#C4B1FF',
+              border: '#453E53',
+              focus: '#C4B1FF',
+              error: '#FF8AA0',
+              success: '#57D58A'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for specific UI specs (borders, font, states) -->
+<style data-purpose="base-styling">
+    body {
+      background-color: #2B2833;
+      font-family: 'Noto Sans', sans-serif;
+      color: #F3F1F8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1rem;
+    }
+    
+    .custom-input {
+      border: 1.5px solid #453E53;
+      border-radius: 8px;
+      background-color: transparent;
+      color: #F3F1F8;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .custom-input:focus {
+      border-color: #C4B1FF;
+      outline: none;
+      box-shadow: 0 0 0 2px #C4B1FF;
+    }
+
+    .custom-input::placeholder {
+      color: #7A7488;
+    }
+
+    .custom-card {
+      background-color: #25222D;
+      border-radius: 10px;
+      border: 1.5px solid #363140;
+    }
+  </style>
+</head>
+<body class="selection:bg-brand-primary selection:text-white">
+<!-- BEGIN: RegisterSection -->
+<main class="w-full max-w-[480px] mx-auto flex flex-col items-center" data-purpose="register-container">
+<!-- Title & Subtitle Header -->
+<header class="text-center mb-6 w-full" data-purpose="register-header">
+<h1 class="text-[24px] font-bold text-brand-text mb-1 tracking-tight">Crea tu cuenta</h1>
+<p class="text-[14px] text-brand-secondary">Para entrar a tus salas de estudio.</p>
+</header>
+<!-- Main Registration Card -->
+<section class="custom-card w-full p-6 sm:p-8 shadow-2xl" data-purpose="register-card">
+<form class="space-y-4" novalidate="" onsubmit="event.preventDefault();">
+<!-- Field: Nombres -->
+<div data-purpose="field-first-name">
+<label class="block text-[14px] font-bold text-brand-text mb-1.5" for="first-name">
+            Nombres
+          </label>
+<input class="custom-input w-full px-3.5 py-2.5 text-[15px]" id="first-name" name="firstName" required="" type="text" value="Camila"/>
+</div>
+<!-- Field: Apellidos -->
+<div data-purpose="field-last-name">
+<label class="block text-[14px] font-bold text-brand-text mb-1.5" for="last-name">
+            Apellidos
+          </label>
+<input class="custom-input w-full px-3.5 py-2.5 text-[15px]" id="last-name" name="lastName" required="" type="text" value="Torres"/>
+</div>
+<!-- Field: Nombre de usuario -->
+<div data-purpose="field-username">
+<label class="block text-[14px] font-bold text-brand-text mb-1.5" for="username">
+            Nombre de usuario
+          </label>
+<input class="custom-input w-full px-3.5 py-2.5 text-[15px]" id="username" name="username" required="" type="text" value="camila_t"/>
+<p class="mt-1.5 text-[12px] text-brand-secondary">
+            De 3 a 20 letras, números o guion bajo.
+          </p>
+</div>
+<!-- Field: Correo electrónico -->
+<div data-purpose="field-email">
+<label class="block text-[14px] font-bold text-brand-text mb-1.5" for="email">
+            Correo electrónico
+          </label>
+<input class="custom-input w-full px-3.5 py-2.5 text-[15px]" id="email" name="email" required="" type="email" value="camila.torres@correounivalle.edu.co"/>
+</div>
+<!-- Field: Contraseña -->
+<div data-purpose="field-password">
+<label class="block text-[14px] font-bold text-brand-text mb-1.5" for="password">
+            Contraseña
+          </label>
+<input class="custom-input w-full px-3.5 py-2.5 text-[15px] tracking-widest" id="password" name="password" required="" type="password" value="••••••••"/>
+<p class="mt-1.5 text-[12px] text-brand-secondary">
+            Mínimo 8 caracteres, con letras y números.
+          </p>
+</div>
+<!-- Field: Elige tu avatar -->
+<div class="pt-1" data-purpose="avatar-picker-group">
+<label class="block text-[14px] font-bold text-brand-text mb-2.5">
+            Elige tu avatar
+          </label>
+<div aria-label="Selecciona un color de avatar" class="flex items-center justify-between gap-1.5 sm:gap-2" role="radiogroup">
+<!-- Avatar 1: Morado -->
+<button aria-checked="false" class="w-10 h-10 rounded-full bg-[#6D3FE0] text-white text-[13px] font-bold flex items-center justify-center transition-transform hover:scale-105 focus:outline-none" role="radio" title="Avatar morado" type="button">
+              CA
+            </button>
+<!-- Avatar 2: Verde -->
+<button aria-checked="false" class="w-10 h-10 rounded-full bg-[#2E7D32] text-white text-[13px] font-bold flex items-center justify-center transition-transform hover:scale-105 focus:outline-none" role="radio" title="Avatar verde" type="button">
+              CA
+            </button>
+<!-- Avatar 3: Magenta -->
+<button aria-checked="false" class="w-10 h-10 rounded-full bg-[#C2185B] text-white text-[13px] font-bold flex items-center justify-center transition-transform hover:scale-105 focus:outline-none" role="radio" title="Avatar magenta" type="button">
+              CA
+            </button>
+<!-- Avatar 4: Turquesa -->
+<button aria-checked="false" class="w-10 h-10 rounded-full bg-[#00838F] text-white text-[13px] font-bold flex items-center justify-center transition-transform hover:scale-105 focus:outline-none" role="radio" title="Avatar turquesa" type="button">
+              CA
+            </button>
+<!-- Avatar 5: Rojo -->
+<button aria-checked="false" class="w-10 h-10 rounded-full bg-[#C62828] text-white text-[13px] font-bold flex items-center justify-center transition-transform hover:scale-105 focus:outline-none" role="radio" title="Avatar rojo" type="button">
+              CA
+            </button>
+<!-- Avatar 6: Ámbar/Naranja (Seleccionado con aro exterior distintivo) -->
+<button aria-checked="true" class="w-10 h-10 rounded-full bg-[#E65100] text-white text-[13px] font-bold flex items-center justify-center ring-2 ring-offset-2 ring-offset-[#25222D] ring-white transition-transform hover:scale-105 focus:outline-none" role="radio" title="Avatar ámbar seleccionado" type="button">
+              CA
+            </button>
+</div>
+</div>
+<!-- Submit Button: Crear cuenta -->
+<div class="pt-2">
+<button class="w-full py-3 px-4 bg-brand-primary hover:bg-brand-primary-hover active:scale-[0.99] text-white font-bold text-[15px] rounded-[8px] transition-all focus:outline-none focus:ring-2 focus:ring-brand-focus" data-purpose="submit-button" type="submit">
+            Crear cuenta
+          </button>
+</div>
+<!-- Separator -->
+<div class="flex items-center my-3" data-purpose="divider">
+<div class="flex-grow border-t border-[#3A3545]"></div>
+<span class="px-3 text-[13px] text-brand-secondary font-medium">o</span>
+<div class="flex-grow border-t border-[#3A3545]"></div>
+</div>
+<!-- Secondary Button: Continuar con Google -->
+<div>
+<button class="w-full py-2.5 px-4 bg-transparent border-[1.5px] border-[#453E53] hover:border-brand-link hover:bg-[#2F2B39] active:scale-[0.99] text-brand-text font-medium text-[14px] rounded-[8px] flex items-center justify-center gap-2.5 transition-all focus:outline-none focus:ring-2 focus:ring-brand-focus" data-purpose="google-signup-button" type="button">
+<!-- Inline Google Icon -->
+<svg aria-hidden="true" class="w-4 h-4 shrink-0" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.14z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span>Registrarse con Google</span>
+</button>
+</div>
+<!-- Login Redirect Link -->
+<div class="text-center pt-2" data-purpose="login-redirect">
+<p class="text-[14px] text-brand-secondary">
+            ¿Ya tienes cuenta? 
+            <a class="text-brand-link hover:underline font-semibold ml-1 focus:outline-none focus:ring-1 focus:ring-brand-focus rounded" href="#">
+              Inicia sesión
+            </a>
+</p>
+</div>
+</form>
+</section>
+<!-- Context / Prototype Hint Note -->
+<p class="mt-6 text-center text-[12px] leading-relaxed text-brand-secondary max-w-sm opacity-80" data-purpose="prototype-note">
+      Demostración del Sprint 0: ya hay datos de ejemplo escritos, solo pulsa Crear cuenta. Para ver el error de usuario ocupado, escribe el nombre de usuario «admin». El registro real se activa en el Sprint 1.
+    </p>
+</main>
+<!-- END: RegisterSection -->
+<!-- Interactivity Script for Avatar Selection -->
+<script data-purpose="avatar-picker-interactions">
+    document.addEventListener('DOMContentLoaded', () => {
+      const avatarButtons = document.querySelectorAll('[data-purpose="avatar-picker-group"] button');
+      
+      avatarButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Deselect all buttons
+          avatarButtons.forEach(btn => {
+            btn.setAttribute('aria-checked', 'false');
+            btn.classList.remove('ring-2', 'ring-offset-2', 'ring-offset-[#25222D]', 'ring-white');
+          });
+          
+          // Select clicked button
+          button.setAttribute('aria-checked', 'true');
+          button.classList.add('ring-2', 'ring-offset-2', 'ring-offset-[#25222D]', 'ring-white');
+        });
+      });
+    });
+  </script>
+</body></html>

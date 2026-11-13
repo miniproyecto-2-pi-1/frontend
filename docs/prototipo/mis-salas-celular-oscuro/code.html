@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Salón de Estudio - Inicio</title>
+<!-- Google Font: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            app: {
+              bg: '#2B2833',
+              surface: '#25222D',
+              primary: '#6D3FE0',
+              text: '#F3F1F8',
+              secondary: '#BDB8CC',
+              link: '#C4B1FF',
+              border: '#413C4D',
+              greenHeader: '#207A3F',
+              magentaHeader: '#A03E9B'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          borderRadius: {
+            'btn': '8px',
+            'card': '10px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="base-typography">
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #1b1921;
+      color: #F3F1F8;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+<style data-purpose="component-styles">
+    /* Exact 1.5px border styling per visual guidelines */
+    .border-custom-1-5 {
+      border-width: 1.5px;
+    }
+  </style>
+</head>
+<body class="min-h-full flex items-center justify-center p-0 sm:p-4">
+<!-- BEGIN: MobileContainer -->
+<!-- Container with max-width corresponding to mobile viewport (390px) -->
+<main class="w-full max-w-[390px] min-h-screen sm:min-h-[844px] bg-[#2B2833] flex flex-col px-4 pt-5 pb-8 sm:rounded-[36px] shadow-2xl relative border-x sm:border border-white/5 overflow-hidden" data-purpose="mobile-viewport">
+<!-- BEGIN: TopBar -->
+<header class="flex items-center justify-between pt-2 pb-4" data-purpose="header">
+<!-- App Title -->
+<h1 class="text-[17px] font-bold tracking-tight text-[#F3F1F8]">Salón de Estudio</h1>
+<!-- User Avatar -->
+<div class="w-8 h-8 rounded-full bg-[#6D3FE0] flex items-center justify-center text-white text-[12px] font-bold" data-purpose="user-avatar">
+        CA
+      </div>
+</header>
+<!-- END: TopBar -->
+<!-- BEGIN: QuickActions -->
+<section class="flex flex-col gap-3 mt-2" data-purpose="quick-actions">
+<!-- Primary Action: Nueva Sala -->
+<button class="w-full h-12 bg-[#6D3FE0] hover:bg-[#5b32c7] active:scale-[0.99] transition-all text-white font-bold text-[16px] rounded-[8px] flex items-center justify-center gap-2 shadow-sm" data-purpose="create-room-button" type="button">
+<!-- Plus Icon -->
+<svg class="w-5 h-5 stroke-current" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
+<line x1="12" x2="12" y1="5" y2="19"></line>
+<line x1="5" x2="19" y1="12" y2="12"></line>
+</svg>
+<span>Nueva sala</span>
+</button>
+<!-- Join by Code Input & Button Wrapper -->
+<div class="w-full bg-[#25222D] border-[1.5px] border-[#464154] rounded-[8px] p-1.5 flex items-center justify-between gap-2" data-purpose="join-code-container">
+<input aria-label="Introduce un código de sala" class="w-full bg-transparent border-0 text-[#F3F1F8] placeholder-[#9E97B0] text-[15px] pl-3 py-1.5 focus:ring-0 focus:outline-none" data-purpose="room-code-input" placeholder="Introduce un código" type="text"/>
+<button class="bg-[#6D3FE0] hover:bg-[#5b32c7] text-white font-bold text-[15px] px-5 py-2.5 rounded-[8px] flex-shrink-0 transition-colors" data-purpose="join-room-button" type="button">
+          Unirme
+        </button>
+</div>
+</section>
+<!-- END: QuickActions -->
+<!-- BEGIN: RoomListSection -->
+<section class="mt-6 flex flex-col gap-3.5 flex-1" data-purpose="room-list-section">
+<!-- Section Heading -->
+<h2 class="text-[#BDB8CC] text-[14px] font-bold tracking-wide" data-purpose="section-title">
+        Tus salas
+      </h2>
+<!-- Room Card 1: Cálculo II (Purple Header) -->
+<article class="w-full bg-[#25222D] rounded-[10px] overflow-hidden border-[1.5px] border-[#393444] shadow-sm flex flex-col" data-purpose="room-card">
+<!-- Colored Header Banner -->
+<div class="bg-[#6D3FE0] px-4 py-3 text-white">
+<h3 class="text-[17px] font-bold leading-snug">Cálculo II</h3>
+<p class="text-[13px] opacity-90 tracking-wide font-normal mt-0.5">K7P2-91XQ</p>
+</div>
+<!-- Card Body -->
+<div class="px-4 py-3 flex flex-col gap-1">
+<span class="text-[14px] font-bold text-[#F3F1F8]">Anfitrión</span>
+<span class="text-[13px] text-[#BDB8CC]">3 conectadas</span>
+</div>
+<!-- Card Actions Divider & Row -->
+<div class="border-t border-[#353040] px-4 py-2.5 flex items-center justify-between text-[13px]">
+<a class="text-[#C4B1FF] font-bold hover:underline" data-purpose="enter-link" href="#">Entrar</a>
+<button class="text-[#BDB8CC] hover:text-[#F3F1F8] flex items-center gap-1.5 transition-colors" data-purpose="copy-id-button" type="button">
+<!-- Copy Icon (two overlapping squares) -->
+<svg class="w-4 h-4 stroke-current fill-none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+<span>Copiar ID</span>
+</button>
+</div>
+</article>
+<!-- Room Card 2: Proyecto Integrador (Green Header) -->
+<article class="w-full bg-[#25222D] rounded-[10px] overflow-hidden border-[1.5px] border-[#393444] shadow-sm flex flex-col" data-purpose="room-card">
+<!-- Colored Header Banner -->
+<div class="bg-[#207A3F] px-4 py-3 text-white">
+<h3 class="text-[17px] font-bold leading-snug">Proyecto Integrador</h3>
+<p class="text-[13px] opacity-90 tracking-wide font-normal mt-0.5">M4T8-27ZB</p>
+</div>
+<!-- Card Body -->
+<div class="px-4 py-3 flex flex-col gap-1">
+<span class="text-[14px] font-bold text-[#F3F1F8]">Anfitrión</span>
+<span class="text-[13px] text-[#BDB8CC]">Nadie conectado</span>
+</div>
+<!-- Card Actions Divider & Row -->
+<div class="border-t border-[#353040] px-4 py-2.5 flex items-center justify-between text-[13px]">
+<a class="text-[#C4B1FF] font-bold hover:underline" data-purpose="enter-link" href="#">Entrar</a>
+<button class="text-[#BDB8CC] hover:text-[#F3F1F8] flex items-center gap-1.5 transition-colors" data-purpose="copy-id-button" type="button">
+<!-- Copy Icon -->
+<svg class="w-4 h-4 stroke-current fill-none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+<span>Copiar ID</span>
+</button>
+</div>
+</article>
+<!-- Room Card 3: Física Mecánica (Magenta Header - Secondary Room) -->
+<article class="w-full bg-[#25222D] rounded-[10px] overflow-hidden border-[1.5px] border-[#393444] shadow-sm flex flex-col" data-purpose="room-card">
+<!-- Colored Header Banner -->
+<div class="bg-[#A03E9B] px-4 py-3 text-white">
+<h3 class="text-[17px] font-bold leading-snug">Física Mecánica</h3>
+<p class="text-[13px] opacity-90 tracking-wide font-normal mt-0.5">R9D1-55LC</p>
+</div>
+<!-- Card Body -->
+<div class="px-4 py-3 flex flex-col gap-1">
+<span class="text-[14px] font-bold text-[#F3F1F8]">Invitado</span>
+<span class="text-[13px] text-[#BDB8CC]">2 conectadas</span>
+</div>
+<!-- Card Actions Divider & Row -->
+<div class="border-t border-[#353040] px-4 py-2.5 flex items-center justify-between text-[13px]">
+<a class="text-[#C4B1FF] font-bold hover:underline" data-purpose="enter-link" href="#">Entrar</a>
+<button class="text-[#BDB8CC] hover:text-[#F3F1F8] flex items-center gap-1.5 transition-colors" data-purpose="copy-id-button" type="button">
+<!-- Copy Icon -->
+<svg class="w-4 h-4 stroke-current fill-none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+<span>Copiar ID</span>
+</button>
+</div>
+</article>
+</section>
+<!-- END: RoomListSection -->
+</main>
+<!-- END: MobileContainer -->
+</body></html>

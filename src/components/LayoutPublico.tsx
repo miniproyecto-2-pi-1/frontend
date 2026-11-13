@@ -8,7 +8,10 @@ import { ThemeToggle } from "./ThemeToggle";
 export function LayoutPublico() {
   const { pathname } = useLocation();
   const principal = useFocoAlNavegar(pathname);
-  const { usuario, salir } = useSesion();
+  const { estado, cerrarSesion } = useSesion();
+  // Con sesión (aunque falte el nombre de usuario) se ofrece volver a la app o cerrar sesión.
+  const conSesion = estado === "listo" || estado === "sinUsername";
+  const salir = () => void cerrarSesion().catch(() => undefined);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -40,7 +43,7 @@ export function LayoutPublico() {
           </nav>
           <div className="flex flex-wrap items-center gap-2">
             <ThemeToggle />
-            {usuario ? (
+            {conSesion ? (
               <>
                 <Link to="/salas" className="btn-principal">
                   Ir a Mis salas

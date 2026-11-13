@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Computador - Oscuro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#6D3FE0',
+            'brand-hover': '#5B35C4',
+            surface: '#25222D',
+            txt: '#F3F1F8',
+            'txt-sec': '#BDB8CC',
+            link: '#C4B1FF',
+            err: '#FF8AA0',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Noto Sans', sans-serif; background-color: #2B2833; color: #F3F1F8; }
+    .border-15 { border-width: 1.5px; border-style: solid; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-[#2B2833] text-txt antialiased">
+  <!-- Encabezado -->
+  <header class="w-full max-w-[1440px] mx-auto px-8 py-5 flex items-center justify-between border-b border-15 border-[#3E394A]">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base shadow-sm">
+        S
+      </div>
+      <span class="text-xl font-bold tracking-tight text-txt">Salón de Estudio</span>
+    </div>
+  </header>
+
+  <!-- Tarjeta Centrada -->
+  <main class="w-full max-w-[480px] mx-auto px-6 py-10 my-auto">
+    <div class="bg-surface rounded-[10px] p-8 border-15 border-[#3E394A] shadow-sm">
+      <div class="text-left mb-6">
+        <h1 class="text-2xl font-bold text-txt tracking-tight">Crea tu cuenta</h1>
+        <p class="text-sm text-txt-sec mt-1">Para entrar a tus salas de estudio.</p>
+      </div>
+
+      <form class="space-y-4" onsubmit="event.preventDefault();"><!-- Nombres -->
+        <div>
+          <label class="block text-xs font-semibold text-txt mb-1.5" for="first_name">Nombres</label>
+          <input type="text" id="first_name" value="Camila" class="w-full px-3.5 py-2.5 bg-[#2B2833] text-txt rounded-[8px] border-15 border-[#4F495E] focus:border-brand focus:outline-none text-sm transition-colors">
+        </div>
+
+        <!-- Apellidos -->
+        <div>
+          <label class="block text-xs font-semibold text-txt mb-1.5" for="last_name">Apellidos</label>
+          <input type="text" id="last_name" value="Torres" class="w-full px-3.5 py-2.5 bg-[#2B2833] text-txt rounded-[8px] border-15 border-[#4F495E] focus:border-brand focus:outline-none text-sm transition-colors">
+        </div>
+
+        <!-- Nombre de usuario -->
+        <div>
+          <label class="block text-xs font-semibold text-txt mb-1.5" for="username">Nombre de usuario</label>
+          <input type="text" id="username" value="camila_t" class="w-full px-3.5 py-2.5 bg-[#2B2833] text-txt rounded-[8px] border-15 border-[#4F495E] focus:border-brand focus:outline-none text-sm transition-colors">
+          <p class="mt-1.5 text-xs text-txt-sec">De 3 a 20 letras, números o guion bajo.</p>
+        </div>
+
+        <!-- Correo Electrónico -->
+        <div>
+          <label class="block text-xs font-semibold text-txt mb-1.5" for="email">Correo electrónico</label>
+          <input type="email" id="email" value="camila.torres@correounivalle.edu.co" class="w-full px-3.5 py-2.5 bg-[#2B2833] text-txt rounded-[8px] border-15 border-[#4F495E] focus:border-brand focus:outline-none text-sm transition-colors">
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label class="block text-xs font-semibold text-txt mb-1.5" for="password">Contraseña</label>
+          <input type="password" id="password" value="••••••••" class="w-full px-3.5 py-2.5 bg-[#2B2833] text-txt rounded-[8px] border-15 border-[#4F495E] focus:border-brand focus:outline-none text-sm transition-colors">
+          <p class="mt-1.5 text-xs text-txt-sec">Mínimo 8 caracteres, con letras y números.</p>
+        </div>
+
+        <!-- Elige tu avatar -->
+        <div>
+          <label class="block text-xs font-semibold text-txt mb-1.5">Elige tu avatar</label>
+          <div class="flex items-center gap-2 mt-2">
+            <button type="button" class="w-8 h-8 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              CA
+            </button>
+            <button type="button" class="w-8 h-8 rounded-full bg-[#1F7A3F] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              CA
+            </button>
+            <button type="button" class="w-8 h-8 rounded-full bg-[#9C27B0] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              CA
+            </button>
+            <button type="button" class="w-8 h-8 rounded-full bg-[#00838F] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              CA
+            </button>
+            <button type="button" class="w-8 h-8 rounded-full bg-[#C62828] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              CA
+            </button>
+            <button type="button" class="w-8 h-8 rounded-full bg-[#E65100] text-white text-xs font-bold flex items-center justify-center shrink-0 ring-2 ring-offset-2 ring-[#6D3FE0] ring-offset-[#25222D]">
+              CA
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón Crear cuenta -->
+        <button type="submit" class="w-full py-2.5 mt-2 rounded-[8px] bg-brand text-white font-semibold text-sm shadow-sm hover:bg-brand-hover transition-colors">
+          Crear cuenta
+        </button>
+
+        <!-- Enlace a ingreso -->
+        <p class="text-center text-xs text-txt-sec mt-4">
+          ¿Ya tienes cuenta? <a href="#ingreso" class="text-link font-semibold hover:underline">Inicia sesión</a>
+        </p></form>
+    </div><p class="text-xs text-txt-sec text-center mt-5 leading-relaxed">
+      Demostración del Sprint 0: ya hay datos de ejemplo escritos, solo pulsa Crear cuenta. Para ver el error de usuario ocupado, escribe el nombre de usuario «admin». El registro real se activa en el Sprint 1.
+    </p>
+  </main>
+
+  <!-- Pie -->
+  <footer class="w-full max-w-[1440px] mx-auto px-8 py-5 flex items-center justify-center text-xs text-txt-sec">
+    Ayuda · Salón de Estudio
+  </footer>
+
+
+
+
+
+</body></html>

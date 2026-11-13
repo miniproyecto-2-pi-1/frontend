@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio - Computador - Claro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Noto Sans', 'sans-serif'],
+          },
+          colors: {
+            fondoClaro: '#FFFFFF',
+            superficieClaro: '#F4F2F9',
+            textoClaro: '#2B2833',
+            secundarioClaro: '#5A5469',
+            principalMorado: '#6D3FE0',
+            enlaceClaro: '#5B35C4',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #FFFFFF;
+      color: #2B2833;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#FFFFFF] text-[#2B2833] flex flex-col items-center justify-start p-6 md:p-12">
+  <div class="w-full max-w-[1040px] bg-[#F4F2F9] rounded-[10px] p-6 md:p-8 shadow-sm border-[1.5px] border-[#E2DEED]">
+    
+    <!-- Encabezado -->
+    <header class="flex items-center justify-between pb-6 mb-6 border-b-[1.5px] border-[#E2DEED]">
+      <div class="flex items-center gap-3">
+        <button class="p-1 text-[#2B2833] hover:text-[#6D3FE0] transition-colors" aria-label="Menú">
+          <svg class="w-6 h-6 stroke-[2px] stroke-current" fill="none" viewBox="0 0 24 24">
+            <line x1="4" y1="6" x2="20" y2="6" stroke-linecap="round"/>
+            <line x1="4" y1="12" x2="20" y2="12" stroke-linecap="round"/>
+            <line x1="4" y1="18" x2="20" y2="18" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <h1 class="text-[20px] font-bold tracking-tight text-[#2B2833]">Salón de Estudio</h1>
+      </div>
+
+      <div class="w-10 h-10 rounded-full bg-[#6D3FE0] text-white flex items-center justify-center font-bold text-sm tracking-wide shadow-sm">
+        CA
+      </div>
+    </header>
+
+    <!-- Barra de acciones: Nueva sala e Introducir código -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
+      <div class="md:col-span-4">
+        <button class="w-full h-[48px] bg-[#6D3FE0] hover:bg-[#5b35c4] text-white font-semibold rounded-[8px] flex items-center justify-center gap-2 shadow-sm transition-colors text-[15px]">
+          <svg class="w-5 h-5 stroke-[2.2px] stroke-current" fill="none" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" stroke-linecap="round"/>
+            <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/>
+          </svg>
+          Nueva sala
+        </button>
+      </div>
+
+      <div class="md:col-span-8">
+        <div class="relative flex items-center h-[48px] bg-white border-[1.5px] border-[#6D3FE0] rounded-[8px] px-3 focus-within:ring-2 focus-within:ring-[#6D3FE0]/20">
+          <input 
+            type="text" 
+            placeholder="Introduce un código" 
+            class="w-full bg-transparent text-[#2B2833] placeholder-[#5A5469] text-[15px] outline-none pr-[90px]"
+          />
+          <button class="absolute right-1.5 h-[36px] px-5 bg-[#6D3FE0] hover:bg-[#5b35c4] text-white font-medium rounded-[6px] text-[14px] transition-colors">
+            Unirme
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección Tus salas -->
+    <div>
+      <h2 class="text-[16px] font-bold text-[#5A5469] mb-4">Tus salas</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <!-- Tarjeta 1: Cálculo II -->
+        <div class="bg-white rounded-[10px] overflow-hidden border-[1.5px] border-[#E2DEED] flex flex-col shadow-sm">
+          <div class="bg-[#6D3FE0] p-4 text-white">
+            <h3 class="text-[17px] font-bold leading-tight">Cálculo II</h3>
+            <p class="text-[13px] opacity-90 font-mono tracking-wider mt-0.5">K7P2-91XQ</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between bg-white">
+            <div>
+              <p class="text-[14px] font-semibold text-[#2B2833]">Anfitrión</p>
+              <p class="text-[13px] text-[#5A5469] mt-0.5">3 conectadas</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 mt-4 border-t-[1.5px] border-[#F4F2F9]">
+              <a href="#" class="text-[#5B35C4] hover:text-[#6D3FE0] font-semibold text-[14px]">Entrar</a>
+              <button class="text-[#5B35C4] hover:text-[#6D3FE0] text-[13px] font-medium flex items-center gap-1.5">
+                <svg class="w-4 h-4 stroke-[2px] stroke-current" fill="none" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar ID
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 2: Proyecto Integrador -->
+        <div class="bg-white rounded-[10px] overflow-hidden border-[1.5px] border-[#E2DEED] flex flex-col shadow-sm">
+          <div class="bg-[#207A3F] p-4 text-white">
+            <h3 class="text-[17px] font-bold leading-tight">Proyecto Integrador</h3>
+            <p class="text-[13px] opacity-90 font-mono tracking-wider mt-0.5">M4T8-27ZB</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between bg-white">
+            <div>
+              <p class="text-[14px] font-semibold text-[#2B2833]">Anfitrión</p>
+              <p class="text-[13px] text-[#5A5469] mt-0.5">Nadie conectado</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 mt-4 border-t-[1.5px] border-[#F4F2F9]">
+              <a href="#" class="text-[#5B35C4] hover:text-[#6D3FE0] font-semibold text-[14px]">Entrar</a>
+              <button class="text-[#5B35C4] hover:text-[#6D3FE0] text-[13px] font-medium flex items-center gap-1.5">
+                <svg class="w-4 h-4 stroke-[2px] stroke-current" fill="none" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar ID
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 3: Física Mecánica -->
+        <div class="bg-white rounded-[10px] overflow-hidden border-[1.5px] border-[#E2DEED] flex flex-col shadow-sm">
+          <div class="bg-[#A03E9B] p-4 text-white">
+            <h3 class="text-[17px] font-bold leading-tight">Física Mecánica</h3>
+            <p class="text-[13px] opacity-90 font-mono tracking-wider mt-0.5">R9D1-55LC</p>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between bg-white">
+            <div>
+              <p class="text-[14px] font-semibold text-[#2B2833]">Invitado</p>
+              <p class="text-[13px] text-[#5A5469] mt-0.5">2 conectadas</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 mt-4 border-t-[1.5px] border-[#F4F2F9]">
+              <a href="#" class="text-[#5B35C4] hover:text-[#6D3FE0] font-semibold text-[14px]">Entrar</a>
+              <button class="text-[#5B35C4] hover:text-[#6D3FE0] text-[13px] font-medium flex items-center gap-1.5">
+                <svg class="w-4 h-4 stroke-[2px] stroke-current" fill="none" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar ID
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Prototipo Interactivo - Salón de Estudio (Desktop)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#6D3FE0',
+              hover: '#5B35C4',
+              light: '#8F6CF5'
+            },
+            light: {
+              bg: '#FFFFFF',
+              surface: '#F4F2F9',
+              text: '#2B2833',
+              secondary: '#5A5469',
+              border: '#E2DDF0'
+            },
+            dark: {
+              bg: '#2B2833',
+              surface: '#25222D',
+              card: '#201E27',
+              text: '#F3F1F8',
+              secondary: '#BDB8CC',
+              border: '#3D384A'
+            },
+            status: {
+              success: '#1F7A3F',
+              successDark: '#57D58A',
+              error: '#B3261E',
+              errorDark: '#FF8AA0'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .view-container {
+      display: none !important;
+      min-height: 100vh;
+      width: 100%;
+    }
+    .view-container.active {
+      display: flex !important;
+      flex-direction: column;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .striped-pattern {
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(109, 63, 224, 0.08),
+        rgba(109, 63, 224, 0.08) 16px,
+        rgba(109, 63, 224, 0.16) 16px,
+        rgba(109, 63, 224, 0.16) 32px
+      );
+    }
+    .dark .striped-pattern {
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.04),
+        rgba(255, 255, 255, 0.04) 16px,
+        rgba(255, 255, 255, 0.09) 16px,
+        rgba(255, 255, 255, 0.09) 32px
+      );
+    }
+    .chat-highlight {
+      background-color: #fef08a;
+      color: #854d0e;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+    .dark .chat-highlight {
+      background-color: #854d0e;
+      color: #fef08a;
+    }
+    .transition-accordion {
+      transition: max-height 0.25s ease-in-out, opacity 0.2s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-[#FFFFFF] text-[#2B2833] dark:bg-[#2B2833] dark:text-[#F3F1F8] transition-colors duration-200">
+<!-- BARRA DE CONTROL DEL PROTOTIPO (Flotante arriba a la derecha) -->
+<aside aria-label="Control del Prototipo" class="fixed top-3 right-5 z-50 flex items-center gap-2 bg-white/95 dark:bg-[#201E27]/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-gray-200 dark:border-[#3D384A] shadow-md text-xs">
+<span class="font-semibold text-brand px-1">Prototipo</span>
+<span class="text-gray-300 dark:text-gray-600">|</span>
+<button class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-700 dark:text-gray-300 cursor-pointer" onclick="toggleDarkMode()" type="button">
+<span id="theme-icon">🌙</span>
+<span id="theme-text">Modo Oscuro</span>
+</button>
+<span class="text-gray-300 dark:text-gray-600">|</span>
+<div class="flex items-center gap-1">
+<span class="text-gray-500 dark:text-gray-400">Ir a:</span>
+<select class="bg-transparent font-medium border-0 focus:ring-0 cursor-pointer text-brand py-0.5 pr-2 outline-none" id="quick-nav" onchange="navigateTo(this.value)">
+<option class="bg-white dark:bg-[#201E27]" value="inicio">1. Inicio Público</option>
+<option class="bg-white dark:bg-[#201E27]" value="login">2. Iniciar Sesión (Ingreso)</option>
+<option class="bg-white dark:bg-[#201E27]" value="registro">3. Registro</option>
+<option class="bg-white dark:bg-[#201E27]" value="salas">4. Mis Salas</option>
+<option class="bg-white dark:bg-[#201E27]" value="sala">5. Sala de Estudio</option>
+<option class="bg-white dark:bg-[#201E27]" value="base-cargando">6. Base Técnica - Cargando</option>
+<option class="bg-white dark:bg-[#201E27]" value="base-error">7. Base Técnica - Error</option>
+<option class="bg-white dark:bg-[#201E27]" value="base-exito">8. Base Técnica - Éxito</option>
+<option class="bg-white dark:bg-[#201E27]" value="404">9. Página 404</option>
+</select>
+</div>
+</aside>
+<!-- ========================================== -->
+<!-- 1. VISTA: INICIO PÚBLICO (LANDING)         -->
+<!-- ========================================== -->
+<main class="view-container active" id="view-inicio-publico">
+<!-- Header -->
+<header class="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between border-b border-gray-100 dark:border-[#3D384A]/60 flex-shrink-0">
+<div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+<div class="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center font-bold text-lg shadow-sm">
+          S
+        </div>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 text-sm font-medium border-[1.5px] border-brand text-brand hover:bg-brand/5 dark:text-[#8F6CF5] dark:border-[#8F6CF5] dark:hover:bg-[#8F6CF5]/10 rounded-lg transition cursor-pointer" onclick="navigateTo('login')" type="button">
+          Ingresar
+        </button>
+</div>
+</header>
+<!-- Hero Content -->
+<div class="flex-1 flex flex-col items-center justify-center text-center px-6 py-16 max-w-3xl mx-auto w-full my-auto">
+<h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+        Estudia en grupo,<br/>con video y chat
+      </h2>
+<p class="text-base sm:text-lg text-light-secondary dark:text-dark-secondary mb-10 max-w-xl">
+        Crea una sala, comparte el código y estudien juntos en tiempo real con pizarra, audio y video.
+      </p>
+<div class="flex flex-col sm:flex-row items-center gap-3 w-full max-w-sm">
+<button class="w-full py-3.5 px-6 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-base shadow-sm transition cursor-pointer" onclick="navigateTo('registro')" type="button">
+          Crear cuenta
+        </button>
+<button class="w-full py-3.5 px-6 rounded-lg border-[1.5px] border-brand text-brand dark:text-[#8F6CF5] dark:border-[#8F6CF5] hover:bg-brand/5 font-semibold text-base transition cursor-pointer" onclick="navigateTo('login')" type="button">
+          Ingresar
+        </button>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-gray-100 dark:border-[#3D384A]/40 mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- ========================================== -->
+<!-- 2. VISTA: INGRESO (LOGIN)                  -->
+<!-- ========================================== -->
+<main class="view-container" id="view-login">
+<header class="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between border-b border-gray-100 dark:border-[#3D384A]/60 flex-shrink-0">
+<div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+<div class="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center font-bold text-lg">S</div>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+</header>
+<div class="flex-1 flex items-center justify-center px-4 py-12">
+<div class="w-full max-w-md bg-light-surface dark:bg-dark-surface p-8 sm:p-10 rounded-[10px] border-[1.5px] border-light-border dark:border-dark-border shadow-sm">
+<h2 class="text-2xl font-bold mb-1">Inicia sesión</h2>
+<p class="text-sm text-light-secondary dark:text-dark-secondary mb-6">Para entrar a tus salas de estudio.</p>
+<form class="space-y-4" id="form-login" onsubmit="event.preventDefault(); navigateTo('salas'); return false;">
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-light-secondary dark:text-dark-secondary" for="login-email">Correo electrónico</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand" id="login-email" name="email" type="email" value="camila@correo.com"/>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="block text-xs font-semibold uppercase tracking-wider text-light-secondary dark:text-dark-secondary" for="login-password">Contraseña</label>
+<button class="text-xs text-brand font-medium hover:underline cursor-pointer" onclick="togglePasswordVisibility('login-password')" type="button">Mostrar</button>
+</div>
+<input class="w-full px-3.5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand" id="login-password" name="password" type="password" value="••••••••"/>
+</div>
+<button class="w-full mt-2 py-3 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition shadow-sm cursor-pointer" id="btn-submit-login" onclick="navigateTo('salas')" type="button">
+            Ingresar
+          </button>
+</form>
+<div class="mt-6 text-center text-sm text-light-secondary dark:text-dark-secondary">
+          ¿No tienes cuenta? 
+          <button class="text-brand font-semibold hover:underline cursor-pointer" onclick="navigateTo('registro')" type="button">Regístrate</button>
+</div>
+</div>
+</div>
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-gray-100 dark:border-[#3D384A]/40 mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- ========================================== -->
+<!-- 3. VISTA: REGISTRO                         -->
+<!-- ========================================== -->
+<main class="view-container" id="view-registro">
+<header class="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between border-b border-gray-100 dark:border-[#3D384A]/60 flex-shrink-0">
+<div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+<div class="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center font-bold text-lg">S</div>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 text-sm font-medium border-[1.5px] border-brand text-brand hover:bg-brand/5 dark:text-[#8F6CF5] dark:border-[#8F6CF5] dark:hover:bg-[#8F6CF5]/10 rounded-lg transition cursor-pointer" onclick="navigateTo('login')" type="button">
+          Ingresar
+        </button>
+</div>
+</header>
+<div class="flex-1 flex items-center justify-center px-4 py-12">
+<div class="w-full max-w-lg bg-light-surface dark:bg-dark-surface p-8 sm:p-10 rounded-[12px] border-[1.5px] border-light-border dark:border-dark-border shadow-sm">
+<h2 class="text-2xl font-bold mb-1">Crea tu cuenta</h2>
+<p class="text-sm text-light-secondary dark:text-dark-secondary mb-6">Entra y estudia en tus grupos.</p>
+<form class="space-y-4" id="form-registro" novalidate="" onsubmit="handleRegisterSubmit(event)">
+<!-- Fila Nombres y Apellidos -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-light-secondary dark:text-dark-secondary" for="registro-nombres">Nombres</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand transition" id="registro-nombres" placeholder="Ej. Camila" type="text" value="Camila"/>
+<p class="hidden text-xs text-status-error dark:text-status-errorDark mt-1 font-medium flex items-center gap-1" id="error-nombres">
+<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Escribe tus nombres.</span>
+</p>
+</div>
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-light-secondary dark:text-dark-secondary" for="registro-apellidos">Apellidos</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand transition" id="registro-apellidos" placeholder="Ej. Torres" type="text" value="Torres"/>
+<p class="hidden text-xs text-status-error dark:text-status-errorDark mt-1 font-medium flex items-center gap-1" id="error-apellidos">
+<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Escribe tus apellidos.</span>
+</p>
+</div>
+</div>
+<!-- Nombre de usuario -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-light-secondary dark:text-dark-secondary" for="registro-username">Nombre de usuario</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand transition" id="registro-username" placeholder="camila_t" type="text" value="camila_t"/>
+<p class="text-[11px] text-light-secondary dark:text-dark-secondary mt-1" id="help-username">De 3 a 20 letras, números o guion bajo.</p>
+<p class="hidden text-xs text-status-error dark:text-status-errorDark mt-1 font-medium items-center gap-1" id="error-username">
+<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span id="error-username-text">Ese nombre de usuario ya existe. Elige otro.</span>
+</p>
+</div>
+<!-- Correo electrónico -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-light-secondary dark:text-dark-secondary" for="registro-email">Correo electrónico</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand transition" id="registro-email" placeholder="camila.torres@correounivalle.edu.co" type="email" value="camila.torres@correounivalle.edu.co"/>
+<p class="hidden text-xs text-status-error dark:text-status-errorDark mt-1 font-medium items-center gap-1" id="error-email">
+<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span id="error-email-text">Escribe un correo válido, por ejemplo nombre@correo.com.</span>
+</p>
+</div>
+<!-- Contraseña -->
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="block text-xs font-semibold uppercase tracking-wider text-light-secondary dark:text-dark-secondary" for="registro-password">Contraseña</label>
+<button class="text-xs text-brand font-medium hover:underline cursor-pointer" onclick="togglePasswordVisibility('registro-password')" type="button">Mostrar</button>
+</div>
+<input class="w-full px-3.5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand transition" id="registro-password" placeholder="••••••••" type="password" value="Camila2025*"/>
+<p class="text-[11px] text-light-secondary dark:text-dark-secondary mt-1" id="help-password">Mínimo 8 caracteres, con letras y números.</p>
+<p class="hidden text-xs text-status-error dark:text-status-errorDark mt-1 font-medium items-center gap-1" id="error-password">
+<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span id="error-password-text">La contraseña debe tener al menos 8 caracteres, con letras y números.</span>
+</p>
+</div>
+<!-- Selector de avatar: 6 círculos con iniciales "CA" -->
+<div class="pt-1">
+<label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-light-secondary dark:text-dark-secondary">Elige tu avatar</label>
+<div class="flex items-center justify-between gap-2.5 sm:gap-3" id="avatar-selector-group">
+<!-- 1. Morado (default seleccionado) -->
+<button aria-label="Avatar morado" class="avatar-option w-11 h-11 rounded-full bg-[#6D3FE0] text-white font-bold text-sm flex items-center justify-center cursor-pointer transition-all ring-4 ring-[#6D3FE0] ring-offset-2 dark:ring-offset-[#25222D] scale-105" data-color="purple" onclick="selectAvatar(this)" type="button">
+CA
+</button>
+<!-- 2. Verde -->
+<button aria-label="Avatar verde" class="avatar-option w-11 h-11 rounded-full bg-[#1F7A3F] text-white font-bold text-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105" data-color="green" onclick="selectAvatar(this)" type="button">
+CA
+</button>
+<!-- 3. Magenta -->
+<button aria-label="Avatar magenta" class="avatar-option w-11 h-11 rounded-full bg-[#C026D3] text-white font-bold text-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105" data-color="magenta" onclick="selectAvatar(this)" type="button">
+CA
+</button>
+<!-- 4. Turquesa -->
+<button aria-label="Avatar turquesa" class="avatar-option w-11 h-11 rounded-full bg-[#0D9488] text-white font-bold text-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105" data-color="teal" onclick="selectAvatar(this)" type="button">
+CA
+</button>
+<!-- 5. Rojo -->
+<button aria-label="Avatar rojo" class="avatar-option w-11 h-11 rounded-full bg-[#E11D48] text-white font-bold text-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105" data-color="red" onclick="selectAvatar(this)" type="button">
+CA
+</button>
+<!-- 6. Ámbar -->
+<button aria-label="Avatar ámbar" class="avatar-option w-11 h-11 rounded-full bg-[#D97706] text-white font-bold text-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105" data-color="amber" onclick="selectAvatar(this)" type="button">
+CA
+</button>
+</div>
+</div>
+<!-- Botón Crear cuenta -->
+<button class="w-full mt-2 py-3.5 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition shadow-sm cursor-pointer" id="btn-submit-registro" type="submit">
+Crear cuenta
+</button>
+</form>
+<!-- Separador con línea y "o" -->
+<div class="relative my-5 flex items-center justify-center">
+<div class="absolute inset-0 flex items-center"><div class="w-full border-t border-light-border dark:border-dark-border"></div></div>
+<span class="relative bg-light-surface dark:bg-dark-surface px-3 text-xs uppercase tracking-wider text-light-secondary dark:text-dark-secondary font-medium">o</span>
+</div>
+<!-- Botón Registrarse con Google -->
+<button class="w-full py-3 px-4 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-[#1E1C24] hover:bg-gray-50 dark:hover:bg-[#201E27] font-semibold text-sm flex items-center justify-center gap-3 transition cursor-pointer text-[#2B2833] dark:text-[#F3F1F8]" onclick="handleGoogleRegister()" type="button">
+<svg class="w-4 h-4 flex-shrink-0" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path>
+</svg>
+<span>Registrarse con Google</span>
+</button>
+<div class="mt-6 text-center text-sm text-light-secondary dark:text-dark-secondary">
+          ¿Ya tienes cuenta? 
+          <button class="text-brand font-semibold hover:underline cursor-pointer" onclick="navigateTo('login')" type="button">Inicia sesión</button>
+</div>
+</div>
+</div>
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-gray-100 dark:border-[#3D384A]/40 mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- ========================================== -->
+<!-- 4. VISTA: MIS SALAS (DASHBOARD)            -->
+<!-- ========================================== -->
+<main class="view-container" id="view-dashboard">
+<!-- Navbar Privada -->
+<header class="w-full px-8 py-4 border-b border-light-border dark:border-dark-border flex items-center justify-between bg-white dark:bg-dark-surface flex-shrink-0">
+<div class="flex items-center gap-4">
+<button class="text-light-secondary dark:text-dark-secondary hover:text-brand p-1 cursor-pointer" onclick="navigateTo('inicio')" title="Inicio" type="button">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-brand text-white flex items-center justify-center font-bold text-sm">
+          CA
+        </div>
+<button class="text-xs text-light-secondary dark:text-dark-secondary hover:text-red-500 font-medium ml-2 cursor-pointer" onclick="navigateTo('inicio')" title="Cerrar sesión" type="button">
+          Salir
+        </button>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 max-w-7xl mx-auto w-full px-8 py-8">
+<!-- Acciones de cabecera -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+<!-- Botón Nueva Sala -->
+<button class="h-14 rounded-xl bg-brand hover:bg-brand-hover text-white font-semibold flex items-center justify-center gap-2 shadow-sm transition cursor-pointer" onclick="openModalCrearSala()" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          + Nueva sala
+        </button>
+<!-- Unirme por ID de sala: únicamente campo y botón Unirme -->
+<div class="h-14 flex items-center gap-2 bg-light-surface dark:bg-dark-surface rounded-xl p-2 border-[1.5px] border-light-border dark:border-dark-border focus-within:border-brand transition">
+<input aria-label="Introduce el ID de la sala" class="flex-1 bg-transparent px-3 text-sm focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 font-medium uppercase" id="input-room-code" placeholder="Introduce el ID de la sala" type="text"/>
+<button class="h-full px-6 rounded-lg bg-brand hover:bg-brand-hover text-white text-sm font-semibold transition cursor-pointer flex-shrink-0" onclick="joinRoomByCode()" type="button">
+            Unirme
+          </button>
+</div>
+</div>
+<!-- Sección Tus Salas -->
+<div class="mb-4">
+<h2 class="text-lg font-bold mb-4">Tus salas</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="rooms-grid">
+<!-- Tarjeta 1: Cálculo II -->
+<div class="rounded-xl overflow-hidden border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-dark-surface shadow-sm flex flex-col">
+<div class="bg-brand text-white p-5">
+<h3 class="text-lg font-bold">Cálculo II</h3>
+<p class="text-xs text-white/80 font-mono mt-0.5">K7P2-91XQ</p>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+<div class="space-y-1">
+<p class="text-xs text-light-secondary dark:text-dark-secondary">Anfitrión</p>
+<p class="text-sm font-semibold flex items-center gap-1.5 text-status-success dark:text-status-successDark">
+<span class="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span>
+                  3 conectadas
+                </p>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-[#3D384A]/40 text-sm">
+<button class="text-brand dark:text-[#8F6CF5] font-semibold hover:underline flex items-center gap-1 cursor-pointer" onclick="enterRoom('Cálculo II', 'K7P2-91XQ')" type="button">
+                  Entrar →
+                </button>
+<button class="text-light-secondary dark:text-dark-secondary hover:text-brand dark:hover:text-white flex items-center gap-1.5 text-xs cursor-pointer transition py-1 px-2 rounded-md hover:bg-brand/5" onclick="copyRoomId('K7P2-91XQ', this, 'Cálculo II')" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="btn-copy-label">Copiar ID</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tarjeta 2: Proyecto Integrador -->
+<div class="rounded-xl overflow-hidden border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-dark-surface shadow-sm flex flex-col">
+<div class="bg-[#1F7A3F] dark:bg-[#1E703A] text-white p-5">
+<h3 class="text-lg font-bold">Proyecto Integrador</h3>
+<p class="text-xs text-white/80 font-mono mt-0.5">M4T8-27ZB</p>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+<div class="space-y-1">
+<p class="text-xs text-light-secondary dark:text-dark-secondary">Anfitrión</p>
+<p class="text-sm font-semibold text-light-secondary dark:text-dark-secondary">
+                  Nadie conectado
+                </p>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-[#3D384A]/40 text-sm">
+<button class="text-brand dark:text-[#8F6CF5] font-semibold hover:underline flex items-center gap-1 cursor-pointer" onclick="enterRoom('Proyecto Integrador', 'M4T8-27ZB')" type="button">
+                  Entrar →
+                </button>
+<button class="text-light-secondary dark:text-dark-secondary hover:text-brand dark:hover:text-white flex items-center gap-1.5 text-xs cursor-pointer transition py-1 px-2 rounded-md hover:bg-brand/5" onclick="copyRoomId('M4T8-27ZB', this, 'Proyecto Integrador')" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="btn-copy-label">Copiar ID</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tarjeta 3: Física Mecánica -->
+<div class="rounded-xl overflow-hidden border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-dark-surface shadow-sm flex flex-col">
+<div class="bg-[#9333ea] dark:bg-[#7e22ce] text-white p-5">
+<h3 class="text-lg font-bold">Física Mecánica</h3>
+<p class="text-xs text-white/80 font-mono mt-0.5">R9D1-55LC</p>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+<div class="space-y-1">
+<p class="text-xs text-light-secondary dark:text-dark-secondary">Invitado</p>
+<p class="text-sm font-semibold text-status-success dark:text-status-successDark">
+                  2 conectadas
+                </p>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-[#3D384A]/40 text-sm">
+<button class="text-brand dark:text-[#8F6CF5] font-semibold hover:underline flex items-center gap-1 cursor-pointer" onclick="enterRoom('Física Mecánica', 'R9D1-55LC')" type="button">
+                  Entrar →
+                </button>
+<button class="text-light-secondary dark:text-dark-secondary hover:text-brand dark:hover:text-white flex items-center gap-1.5 text-xs cursor-pointer transition py-1 px-2 rounded-md hover:bg-brand/5" onclick="copyRoomId('R9D1-55LC', this, 'Física Mecánica')" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="btn-copy-label">Copiar ID</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-light-border dark:border-dark-border mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- ========================================== -->
+<!-- MODAL: CREAR SALA (Sobre Dashboard)        -->
+<!-- ========================================== -->
+<div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4" id="modal-crear-sala">
+<div class="bg-white dark:bg-[#25222D] border-[1.5px] border-light-border dark:border-dark-border w-full max-w-lg rounded-2xl p-6 sm:p-7 shadow-2xl">
+<h3 class="text-xl font-bold mb-4">Nueva sala</h3>
+<div class="mb-4">
+<label class="block text-xs font-semibold mb-1 text-light-secondary dark:text-dark-secondary" for="input-new-room-name">Nombre de la sala</label>
+<input class="w-full px-4 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-light-surface dark:bg-[#1E1C24] text-sm focus:outline-none focus:border-brand dark:focus:border-brand" id="input-new-room-name" type="text" value="Cálculo II"/>
+<p class="text-xs text-light-secondary dark:text-dark-secondary mt-2">
+          Al crearla recibirás un ID para compartir con tu grupo.
+        </p>
+</div>
+<div class="flex items-center justify-end gap-3 pt-3">
+<button class="px-5 py-2.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer" onclick="closeModalCrearSala()" type="button">
+          Cancelar
+        </button>
+<button class="px-5 py-2.5 rounded-lg bg-brand hover:bg-brand-hover text-white text-sm font-semibold transition cursor-pointer" onclick="confirmCreateRoom()" type="button">
+          Crear sala
+        </button>
+</div>
+</div>
+</div>
+<!-- ========================================== -->
+<!-- 5. VISTA: SALA DE ESTUDIO (CALL + PANEL)   -->
+<!-- ========================================== -->
+<main class="view-container" id="view-sala">
+<!-- Barra superior de la Sala -->
+<header class="w-full px-6 py-3 border-b border-light-border dark:border-dark-border flex items-center justify-between bg-white dark:bg-dark-surface flex-shrink-0">
+<div class="flex items-center gap-3">
+<button class="p-1 text-light-secondary dark:text-dark-secondary hover:text-brand cursor-pointer" onclick="navigateTo('salas')" title="Volver a Mis Salas" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<h1 class="text-lg font-bold" id="active-room-title">Cálculo II</h1>
+<!-- Estado Conectado -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/40 text-status-success dark:text-status-successDark">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+          Conectado
+        </span>
+</div>
+<div class="flex items-center gap-3">
+<!-- Botón toggle panel lateral completo -->
+<button class="px-3.5 py-1.5 rounded-lg border-[1.5px] border-brand text-brand dark:text-[#8F6CF5] dark:border-[#8F6CF5] hover:bg-brand/5 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer" id="btn-toggle-panel" onclick="toggleSidePanel()" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span id="panel-btn-text">Ocultar panel</span>
+</button>
+</div>
+</header>
+<!-- Área principal: Cuadrícula de video + Panel lateral -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Cuadrícula de participantes (Video / Avatares) -->
+<section aria-label="Participantes en video" class="flex-1 p-6 flex flex-col justify-between overflow-y-auto">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 items-stretch max-w-5xl mx-auto w-full">
+<!-- Participante 1: Camila (tú) -->
+<div class="bg-light-surface dark:bg-dark-surface rounded-2xl border-[1.5px] border-light-border dark:border-dark-border flex flex-col items-center justify-center relative min-h-[180px] p-6 shadow-sm">
+<div class="w-20 h-20 rounded-full bg-brand text-white flex items-center justify-center font-bold text-2xl shadow" id="main-avatar-display">
+              CA
+            </div>
+<div class="absolute bottom-3 left-4 bg-white/80 dark:bg-black/60 px-3 py-1 rounded-md text-xs font-medium">
+              Camila (tú) · cámara apagada
+            </div>
+</div>
+<!-- Participante 2: Juan (Presentando) -->
+<div class="striped-pattern bg-light-surface dark:bg-dark-surface rounded-2xl border-[1.5px] border-light-border dark:border-dark-border flex flex-col items-center justify-center relative min-h-[180px] p-6 shadow-sm">
+<div class="w-20 h-20 rounded-full bg-brand text-white flex items-center justify-center font-bold text-2xl shadow">
+              JU
+            </div>
+<div class="absolute bottom-3 left-4 bg-white/80 dark:bg-black/60 px-3 py-1 rounded-md text-xs font-medium">
+              Juan · cámara encendida
+            </div>
+</div>
+<!-- Participante 3: María -->
+<div class="bg-light-surface dark:bg-dark-surface rounded-2xl border-[1.5px] border-light-border dark:border-dark-border flex flex-col items-center justify-center relative min-h-[180px] p-6 shadow-sm">
+<div class="w-20 h-20 rounded-full bg-brand text-white flex items-center justify-center font-bold text-2xl shadow">
+              MA
+            </div>
+<div class="absolute bottom-3 left-4 bg-white/80 dark:bg-black/60 px-3 py-1 rounded-md text-xs font-medium">
+              María · sin micrófono
+            </div>
+</div>
+<!-- Participante 4: Pablo (Presentando pantalla) -->
+<div class="bg-light-surface dark:bg-dark-surface rounded-2xl border-2 border-brand flex flex-col items-center justify-center relative min-h-[180px] p-6 shadow-sm">
+<div class="w-20 h-20 rounded-full bg-brand text-white flex items-center justify-center font-bold text-2xl shadow">
+              PA
+            </div>
+<div class="absolute bottom-3 left-4 bg-white/80 dark:bg-black/60 px-3 py-1 rounded-md text-xs font-medium">
+              Pablo · presentando pantalla
+            </div>
+</div>
+</div>
+<!-- Barra inferior de controles de llamada -->
+<div class="flex items-center justify-center gap-3 pt-6">
+<!-- Micrófono -->
+<button class="flex flex-col items-center gap-1 group cursor-pointer" id="ctrl-mic" onclick="toggleControl('ctrl-mic')" title="Micrófono" type="button">
+<div class="w-12 h-12 rounded-full border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-dark-surface flex items-center justify-center text-light-secondary dark:text-dark-secondary hover:text-brand shadow-sm">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary">Micrófono</span>
+</button>
+<!-- Cámara -->
+<button class="flex flex-col items-center gap-1 group cursor-pointer" id="ctrl-cam" onclick="toggleControl('ctrl-cam')" title="Cámara" type="button">
+<div class="w-12 h-12 rounded-full border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-dark-surface flex items-center justify-center text-light-secondary dark:text-dark-secondary hover:text-brand shadow-sm">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary">Cámara</span>
+</button>
+<!-- Compartir Pantalla -->
+<button class="flex flex-col items-center gap-1 group cursor-pointer" id="ctrl-share" onclick="toggleControl('ctrl-share')" title="Compartir pantalla" type="button">
+<div class="w-12 h-12 rounded-full border-[1.5px] border-light-border dark:border-dark-border bg-white dark:bg-dark-surface flex items-center justify-center text-light-secondary dark:text-dark-secondary hover:text-brand shadow-sm">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary">Compartir</span>
+</button>
+<!-- Salir de la sala -->
+<button class="flex flex-col items-center gap-1 group ml-3 cursor-pointer" onclick="navigateTo('salas')" title="Salir de la sala" type="button">
+<div class="w-12 h-12 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-md transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] text-red-600 dark:text-red-400 font-semibold">Salir</span>
+</button>
+</div>
+</section>
+<!-- Panel Lateral: Personas y Chat con Acordeones Independientes -->
+<aside aria-label="Personas y Chat" class="w-80 border-l border-light-border dark:border-dark-border bg-white dark:bg-dark-surface flex flex-col transition-all duration-200" id="side-panel">
+<!-- SECCIÓN 1: PERSONAS (ACORDEÓN) -->
+<div class="border-b border-light-border dark:border-dark-border flex flex-col flex-shrink-0" id="section-participants-container">
+<!-- Cabecera clickeable de Personas -->
+<button aria-controls="section-participants-body" aria-expanded="true" class="w-full p-4 flex items-center justify-between text-left hover:bg-light-surface/60 dark:hover:bg-[#1E1C24]/60 transition cursor-pointer select-none" id="btn-toggle-participants" onclick="toggleParticipantsAccordion()" type="button">
+<div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-light-secondary dark:text-dark-secondary">
+<span>Personas</span> · <span id="online-counter">4 en línea</span>
+</div>
+<svg class="w-4 h-4 text-light-secondary dark:text-dark-secondary transition-transform duration-200" fill="none" id="chevron-participants" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Cuerpo colapsable de Personas -->
+<div class="px-4 pb-4 transition-accordion" id="section-participants-body">
+<!-- Buscador de personas -->
+<div class="relative mb-3">
+<input class="w-full text-xs pl-7 pr-3 py-1.5 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-light-surface dark:bg-[#1E1C24] focus:outline-none focus:border-brand" id="input-search-participants" oninput="filterParticipants(this.value)" placeholder="Buscar participante" type="text"/>
+<svg class="w-3.5 h-3.5 absolute left-2 top-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<!-- Lista de participantes -->
+<div class="space-y-2 text-xs" id="participants-list">
+<div class="participant-item flex items-center justify-between" data-name="camila tu camila (tú)">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-brand text-white font-bold text-[10px] flex items-center justify-center">CA</span>
+<span class="participant-name font-medium">Camila (tú)</span>
+</div>
+<span class="text-[10px] text-status-success dark:text-status-successDark font-semibold">● En línea</span>
+</div>
+<div class="participant-item flex items-center justify-between" data-name="juan">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-brand text-white font-bold text-[10px] flex items-center justify-center">JU</span>
+<span class="participant-name font-medium">Juan</span>
+</div>
+<span class="text-[10px] text-status-success dark:text-status-successDark font-semibold">● En línea</span>
+</div>
+<div class="participant-item flex items-center justify-between" data-name="maria maría">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-brand text-white font-bold text-[10px] flex items-center justify-center">MA</span>
+<span class="participant-name font-medium">María</span>
+</div>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary">sin mic</span>
+</div>
+<div class="participant-item flex items-center justify-between" data-name="pablo">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-brand text-white font-bold text-[10px] flex items-center justify-center">PA</span>
+<span class="participant-name font-medium">Pablo</span>
+</div>
+<span class="text-[10px] text-brand dark:text-[#8F6CF5] font-semibold">pantalla</span>
+</div>
+</div>
+<!-- Mensaje sin resultados participantes -->
+<div class="hidden text-center py-3 text-xs text-light-secondary dark:text-dark-secondary italic" id="participants-empty">
+              No se encontraron participantes
+            </div>
+</div>
+</div>
+<!-- SECCIÓN 2: CHAT (ACORDEÓN FLEXIBLE) -->
+<div class="flex-1 flex flex-col min-h-0 overflow-hidden" id="section-chat-container">
+<!-- Cabecera clickeable de Chat con lupa -->
+<div class="p-4 flex items-center justify-between hover:bg-light-surface/60 dark:hover:bg-[#1E1C24]/60 transition select-none flex-shrink-0 cursor-pointer" onclick="toggleChatAccordion(event)">
+<div class="flex items-center gap-2">
+<button aria-controls="section-chat-body" aria-expanded="true" class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-light-secondary dark:text-dark-secondary cursor-pointer" id="btn-toggle-chat-header" type="button">
+<span>Chat en vivo</span>
+<span class="text-[10px] text-brand dark:text-[#8F6CF5] font-semibold" id="chat-room-badge">· Cálculo II</span>
+</button>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary hidden font-medium" id="chat-search-status"></span>
+</div>
+<div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+<!-- Botón lupa / buscador de chat -->
+<button aria-label="Buscar en el chat" class="p-1 rounded-md text-light-secondary dark:text-dark-secondary hover:text-brand dark:hover:text-[#8F6CF5] hover:bg-light-surface dark:hover:bg-[#1E1C24] transition cursor-pointer" id="btn-toggle-chat-search" onclick="toggleChatSearch()" title="Buscar en el chat" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Chevron acordeón chat -->
+<button aria-label="Colapsar chat" class="p-1 text-light-secondary dark:text-dark-secondary hover:text-brand cursor-pointer" onclick="toggleChatAccordion(event)" type="button">
+<svg class="w-4 h-4 transition-transform duration-200" fill="none" id="chevron-chat" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Cuerpo colapsable de Chat -->
+<div class="flex-1 flex flex-col justify-between px-4 pb-4 overflow-hidden" id="section-chat-body">
+<!-- Barra desplegable del buscador de chat -->
+<div class="hidden relative mb-2.5 transition-all flex-shrink-0" id="chat-search-bar-container">
+<div class="relative flex items-center">
+<svg class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<input autocomplete="off" class="w-full text-xs pl-8 pr-7 py-1.5 rounded-[8px] border-[1.5px] border-light-border dark:border-dark-border bg-light-surface dark:bg-[#1E1C24] focus:outline-none focus:border-brand" id="input-search-chat" oninput="filterChatMessages(this.value)" placeholder="Buscar en el chat..." type="text"/>
+<button aria-label="Cerrar búsqueda" class="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs font-bold px-1 rounded cursor-pointer" onclick="clearAndCloseChatSearch()" type="button">
+                  ✕
+                </button>
+</div>
+</div>
+<!-- Mensajes del Chat con scroll -->
+<div class="flex-1 overflow-y-auto space-y-3 text-xs pr-1" id="chat-messages-container">
+<div class="chat-message-item flex gap-2">
+<div class="w-5 h-5 rounded-full bg-[#1F7A3F] text-white font-bold text-[9px] flex items-center justify-center flex-shrink-0 mt-0.5">JU</div>
+<div class="flex-1">
+<div class="flex items-baseline gap-1.5">
+<span class="font-semibold message-sender">Juan</span>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary">21:40</span>
+</div>
+<p class="text-light-secondary dark:text-dark-secondary mt-0.5 message-text" data-original-text="Mañana repasamos integrales a las 4.">Mañana repasamos integrales a las 4.</p>
+</div>
+</div>
+<div class="chat-message-item flex gap-2">
+<div class="w-5 h-5 rounded-full bg-[#9333ea] text-white font-bold text-[9px] flex items-center justify-center flex-shrink-0 mt-0.5">MA</div>
+<div class="flex-1">
+<div class="flex items-baseline gap-1.5">
+<span class="font-semibold message-sender">María</span>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary">21:42</span>
+</div>
+<p class="text-light-secondary dark:text-dark-secondary mt-0.5 message-text" data-original-text="Perfecto. Yo llevo los ejercicios.">Perfecto. Yo llevo los ejercicios.</p>
+</div>
+</div>
+<div class="chat-message-item flex gap-2">
+<div class="w-5 h-5 rounded-full bg-brand text-white font-bold text-[9px] flex items-center justify-center flex-shrink-0 mt-0.5" id="chat-self-avatar">CA</div>
+<div class="flex-1">
+<div class="flex items-baseline gap-1.5">
+<span class="font-semibold message-sender">Camila (tú)</span>
+<span class="text-[10px] text-light-secondary dark:text-dark-secondary">10:03</span>
+</div>
+<p class="text-light-secondary dark:text-dark-secondary mt-0.5 message-text" data-original-text="Ya llegué. ¿Empezamos con el ejercicio 3?">Ya llegué. ¿Empezamos con el ejercicio 3?</p>
+</div>
+</div>
+</div>
+<!-- Mensaje sin resultados chat -->
+<div class="hidden text-center py-2 text-xs text-light-secondary dark:text-dark-secondary italic flex-shrink-0" id="chat-empty-search">
+              No se encontraron mensajes
+            </div>
+<!-- Input para escribir mensaje -->
+<form class="mt-3 flex items-center gap-2 flex-shrink-0" id="chat-form" onsubmit="sendChatMessage(event)">
+<input autocomplete="off" class="flex-1 text-xs px-3 py-2 rounded-lg border-[1.5px] border-light-border dark:border-dark-border bg-light-surface dark:bg-[#1E1C24] focus:outline-none focus:border-brand" id="input-chat-message" placeholder="Escribe un mensaje..." type="text"/>
+<button aria-label="Enviar mensaje" class="w-8 h-8 rounded-lg bg-brand hover:bg-brand-hover text-white flex items-center justify-center transition flex-shrink-0 cursor-pointer shadow-sm active:scale-95" id="btn-send-chat" type="submit">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</form>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- ========================================== -->
+<!-- 6. VISTA: BASE TÉCNICA - CARGANDO          -->
+<!-- ========================================== -->
+<main class="view-container" id="view-base-cargando">
+<header class="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between border-b border-gray-100 dark:border-[#3D384A]/60 flex-shrink-0">
+<div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+<div class="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center font-bold text-lg shadow-sm">S</div>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs px-2.5 py-1 rounded-full font-medium bg-light-surface dark:bg-dark-surface border-[1.5px] border-light-border dark:border-dark-border text-light-secondary dark:text-dark-secondary">Base técnica</span>
+</div>
+</header>
+<div class="flex-1 flex flex-col items-center justify-center px-4 py-20 text-center">
+<div class="w-full max-w-md bg-white dark:bg-dark-surface p-8 sm:p-10 rounded-[10px] border-[1.5px] border-light-border dark:border-dark-border shadow-sm flex flex-col items-center">
+<!-- Spinner circular morado -->
+<div class="w-14 h-14 rounded-full border-4 border-brand/20 border-t-brand animate-spin mb-6"></div>
+<h2 class="text-xl sm:text-2xl font-bold tracking-tight mb-2">Cargando datos...</h2>
+<p class="text-sm text-light-secondary dark:text-dark-secondary max-w-xs">
+          Conectando con el servidor.
+        </p>
+</div>
+</div>
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-gray-100 dark:border-[#3D384A]/40 mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- ========================================== -->
+<!-- 7. VISTA: BASE TÉCNICA - ERROR             -->
+<!-- ========================================== -->
+<main class="view-container" id="view-base-error">
+<header class="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between border-b border-gray-100 dark:border-[#3D384A]/60 flex-shrink-0">
+<div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+<div class="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center font-bold text-lg shadow-sm">S</div>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs px-2.5 py-1 rounded-full font-medium bg-light-surface dark:bg-dark-surface border-[1.5px] border-light-border dark:border-dark-border text-light-secondary dark:text-dark-secondary">Base técnica</span>
+</div>
+</header>
+<div class="flex-1 flex flex-col items-center justify-center px-4 py-20 text-center">
+<div class="w-full max-w-md bg-white dark:bg-dark-surface p-8 sm:p-10 rounded-[10px] border-[1.5px] border-light-border dark:border-dark-border shadow-sm flex flex-col items-center">
+<!-- Icono circular rojo de exclamación -->
+<div class="w-14 h-14 rounded-full bg-red-100 dark:bg-red-950/50 text-status-error dark:text-status-errorDark flex items-center justify-center mb-5 font-bold text-2xl shadow-inner border-[1.5px] border-red-200 dark:border-red-900/60">
+<svg class="w-7 h-7" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v4m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>
+</div>
+<h2 class="text-xl sm:text-2xl font-bold tracking-tight mb-2">No pudimos cargar los datos</h2>
+<p class="text-sm text-light-secondary dark:text-dark-secondary mb-6 max-w-xs">
+          Revisa tu conexión e inténtalo de nuevo.
+        </p>
+<button class="w-full py-3 px-6 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition shadow-sm cursor-pointer flex items-center justify-center gap-2" id="btn-reintentar-base" onclick="retryTechnicalLoad()" type="button">
+<span id="btn-reintentar-text">Reintentar</span>
+</button>
+</div>
+</div>
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-gray-100 dark:border-[#3D384A]/40 mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- ========================================== -->
+<!-- 8. VISTA: BASE TÉCNICA - ÉXITO             -->
+<!-- ========================================== -->
+<main class="view-container" id="view-base-exito">
+<header class="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between border-b border-gray-100 dark:border-[#3D384A]/60 flex-shrink-0">
+<div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+<div class="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center font-bold text-lg shadow-sm">S</div>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs px-2.5 py-1 rounded-full font-medium bg-light-surface dark:bg-dark-surface border-[1.5px] border-light-border dark:border-dark-border text-light-secondary dark:text-dark-secondary">Base técnica</span>
+</div>
+</header>
+<div class="flex-1 flex flex-col items-center justify-center px-4 py-20 text-center">
+<div class="w-full max-w-md bg-white dark:bg-dark-surface p-8 sm:p-10 rounded-[10px] border-[1.5px] border-light-border dark:border-dark-border shadow-sm flex flex-col items-center">
+<!-- Chip de estado verde -->
+<div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-950/50 text-status-success dark:text-status-successDark border border-green-200 dark:border-green-900/60 mb-5">
+<span class="w-2 h-2 rounded-full bg-status-success dark:bg-status-successDark inline-block"></span>
+<span>● Conectado a la API</span>
+</div>
+<h2 class="text-xl sm:text-2xl font-bold tracking-tight mb-4">Dato leído de Firestore</h2>
+<!-- Tarjeta con borde sutil -->
+<div class="w-full p-4 rounded-lg bg-light-surface dark:bg-[#1E1C24] border-[1.5px] border-light-border dark:border-dark-border text-sm font-medium text-light-text dark:text-dark-text mb-6">
+          «Hola desde Firestore: el Salón de Estudio ya funciona»
+        </div>
+<div class="flex items-center gap-3 w-full">
+<button class="flex-1 py-2.5 px-4 rounded-lg border-[1.5px] border-brand text-brand dark:text-[#8F6CF5] dark:border-[#8F6CF5] hover:bg-brand/5 text-xs font-semibold transition cursor-pointer" onclick="navigateTo('salas')" type="button">
+            Ir a Mis Salas
+          </button>
+<button class="flex-1 py-2.5 px-4 rounded-lg bg-brand hover:bg-brand-hover text-white text-xs font-semibold transition cursor-pointer shadow-sm" onclick="navigateTo('base-cargando')" type="button">
+            Recargar estado
+          </button>
+</div>
+</div>
+</div>
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-gray-100 dark:border-[#3D384A]/40 mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- ========================================== -->
+<!-- 9. VISTA: PÁGINA 404 (NO ENCONTRADA)       -->
+<!-- ========================================== -->
+<main class="view-container" id="view-404">
+<!-- Encabezado superior consistente -->
+<header class="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between border-b border-gray-100 dark:border-[#3D384A]/60 flex-shrink-0">
+<div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+<div class="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center font-bold text-lg shadow-sm">
+          S
+        </div>
+<h1 class="text-xl font-bold tracking-tight">Salón de Estudio</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 text-sm font-medium border-[1.5px] border-brand text-brand hover:bg-brand/5 dark:text-[#8F6CF5] dark:border-[#8F6CF5] dark:hover:bg-[#8F6CF5]/10 rounded-lg transition cursor-pointer" onclick="navigateTo('salas')" type="button">
+          Mis Salas
+        </button>
+</div>
+</header>
+<!-- Bloque de contenido perfectamente centrado vertical y horizontalmente en el viewport -->
+<div class="flex-1 flex flex-col items-center justify-center text-center px-6 py-12 max-w-2xl mx-auto w-full my-auto">
+<!-- Número 404 grande en morado #6D3FE0 -->
+<div class="text-7xl sm:text-8xl font-bold tracking-tight text-brand mb-4 select-none">
+        404
+      </div>
+<!-- Título -->
+<h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#2B2833] dark:text-[#F3F1F8] mb-3">
+        Página no encontrada
+      </h2>
+<!-- Subtítulo -->
+<p class="text-base text-light-secondary dark:text-dark-secondary mb-8 max-w-md">
+        La dirección no existe o la sala ya no está disponible.
+      </p>
+<!-- Botón principal morado (#6D3FE0, esquinas 8px, sin líneas punteadas, texto blanco) -->
+<button class="py-3 px-8 rounded-[8px] bg-brand hover:bg-brand-hover text-white font-semibold text-sm shadow-sm transition cursor-pointer" onclick="navigateTo('salas')" type="button">
+        Ir a Mis salas
+      </button>
+</div>
+<!-- Pie de página -->
+<footer class="w-full py-6 text-center text-xs text-light-secondary dark:text-dark-secondary border-t border-gray-100 dark:border-[#3D384A]/40 mt-auto flex-shrink-0">
+<button class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit" onclick="navigateTo('404')">Ayuda · Salón de Estudio</button>
+</footer>
+</main>
+<!-- NOTIFICACIÓN TOAST (Flotante) -->
+<div class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-2.5 rounded-xl border border-gray-700/30 dark:border-gray-200/50 shadow-xl text-xs font-semibold flex items-center gap-2 pointer-events-none" id="toast-notification">
+<svg class="w-4 h-4 text-green-400 dark:text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+<span id="toast-message">Mensaje</span>
+</div>
+<script>
+    // Variables de estado del prototipo
+    let LAST_COPIED_ROOM_ID = 'K7P2-91XQ';
+    let LAST_COPIED_ROOM_NAME = 'Cálculo II';
+    let SELECTED_AVATAR_COLOR = 'purple';
+
+    // Mapeo exhaustivo de pantallas (IDs reales y alias habituales)
+    const SCREEN_MAP = {
+      'inicio': 'view-inicio-publico',
+      'landing': 'view-inicio-publico',
+      'view-inicio-publico': 'view-inicio-publico',
+      
+      'login': 'view-login',
+      'ingreso': 'view-login',
+      'iniciar-sesion': 'view-login',
+      'view-login': 'view-login',
+      
+      'registro': 'view-registro',
+      'signup': 'view-registro',
+      'crear-cuenta': 'view-registro',
+      'view-registro': 'view-registro',
+      
+      'salas': 'view-dashboard',
+      'mis-salas': 'view-dashboard',
+      'dashboard': 'view-dashboard',
+      'view-dashboard': 'view-dashboard',
+      
+      'sala': 'view-sala',
+      'estudio': 'view-sala',
+      'view-sala': 'view-sala',
+      
+      'base-cargando': 'view-base-cargando',
+      'view-base-cargando': 'view-base-cargando',
+      
+      'base-error': 'view-base-error',
+      'view-base-error': 'view-base-error',
+      
+      'base-exito': 'view-base-exito',
+      'view-base-exito': 'view-base-exito',
+      
+      '404': 'view-404',
+      'not-found': 'view-404',
+      'view-404': 'view-404'
+    };
+
+    // Función universal de cambio de vista
+    function navigateTo(target, evt) {
+      if (evt && evt.preventDefault) {
+        evt.preventDefault();
+      }
+
+      const viewId = SCREEN_MAP[target] || target;
+      const allViews = document.querySelectorAll('.view-container');
+      let targetEl = document.getElementById(viewId);
+
+      if (!targetEl) {
+        targetEl = document.getElementById('view-' + target);
+      }
+
+      if (targetEl) {
+        allViews.forEach(v => v.classList.remove('active'));
+        targetEl.classList.add('active');
+
+        // Sincronizar select rápido si existe
+        const quickNav = document.getElementById('quick-nav');
+        if (quickNav) {
+          for (let opt of quickNav.options) {
+            if (opt.value === target || SCREEN_MAP[opt.value] === viewId) {
+              quickNav.value = opt.value;
+              break;
+            }
+          }
+        }
+
+        // Subir scroll suave
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Si navegamos a Mis Salas, sincronizar ID de sala copiado
+        if (viewId === 'view-dashboard') {
+          const roomInput = document.getElementById('input-room-code');
+          if (roomInput && !roomInput.value && LAST_COPIED_ROOM_ID) {
+            roomInput.value = LAST_COPIED_ROOM_ID;
+          }
+        }
+      }
+      return false;
+    }
+
+    // Alias directos para máxima resiliencia
+    window.navigateTo = navigateTo;
+    window.goToView = navigateTo;
+    window.switchScreen = navigateTo;
+    window.goToScreen = navigateTo;
+
+    // Toggle de contraseña
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+      }
+    }
+
+    // Toggle de Modo Oscuro / Claro
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      const icon = document.getElementById('theme-icon');
+      const text = document.getElementById('theme-text');
+      if (isDark) {
+        if (icon) icon.textContent = '☀️';
+        if (text) text.textContent = 'Modo Claro';
+      } else {
+        if (icon) icon.textContent = '🌙';
+        if (text) text.textContent = 'Modo Oscuro';
+      }
+    }
+
+    // Base Técnica: reintento
+    function retryTechnicalLoad() {
+      const btn = document.getElementById('btn-reintentar-base');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `
+          <div class="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+          <span>Reintentando conexión...</span>
+        `;
+      }
+      showToast('Reintentando conexión con Firestore...');
+      setTimeout(() => {
+        navigateTo('base-cargando');
+        setTimeout(() => {
+          navigateTo('base-exito');
+          showToast('¡Conexión establecida con éxito!');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<span id="btn-reintentar-text">Reintentar</span>`;
+          }
+        }, 1500);
+      }, 400);
+    }
+
+    // Modal Crear Sala
+    function openModalCrearSala() {
+      const modal = document.getElementById('modal-crear-sala');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeModalCrearSala() {
+      const modal = document.getElementById('modal-crear-sala');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function confirmCreateRoom() {
+      const input = document.getElementById('input-new-room-name');
+      const name = (input && input.value.trim()) ? input.value.trim() : 'Nueva Sala';
+      closeModalCrearSala();
+      showToast('Sala "' + name + '" creada con éxito');
+      enterRoom(name, 'SALA-' + Math.floor(1000 + Math.random() * 9000));
+    }
+
+    // Entrar a sala
+    function enterRoom(roomName, code) {
+      const titleEl = document.getElementById('active-room-title');
+      const badgeEl = document.getElementById('chat-room-badge');
+      if (titleEl) {
+        titleEl.textContent = roomName;
+      }
+      if (badgeEl) {
+        badgeEl.textContent = '· ' + roomName;
+      }
+      navigateTo('sala');
+      showToast('Entraste a la sala: ' + roomName);
+
+      setTimeout(() => {
+        const container = document.getElementById('chat-messages-container');
+        if (container) container.scrollTop = container.scrollHeight;
+      }, 100);
+    }
+
+    // Copiar ID en tarjeta y rellenar automáticamente el campo
+    function copyRoomId(code, buttonEl, roomTitle = 'Cálculo II') {
+      LAST_COPIED_ROOM_ID = code;
+      LAST_COPIED_ROOM_NAME = roomTitle;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).catch(() => fallbackCopy(code));
+      } else {
+        fallbackCopy(code);
+      }
+
+      showToast('ID copiado: ' + code);
+
+      const roomInput = document.getElementById('input-room-code');
+      if (roomInput) {
+        roomInput.value = code;
+        roomInput.focus();
+      }
+
+      if (buttonEl) {
+        const originalContent = buttonEl.innerHTML;
+        buttonEl.innerHTML = `
+          <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-green-600 dark:text-green-400 font-bold">✓ ¡Copiado!</span>
+        `;
+        buttonEl.classList.add('bg-green-50', 'dark:bg-green-950/40');
+
+        setTimeout(() => {
+          buttonEl.innerHTML = originalContent;
+          buttonEl.classList.remove('bg-green-50', 'dark:bg-green-950/40');
+        }, 2200);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = text;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(tempTextArea);
+    }
+
+    // Unirme por ID de sala
+    function joinRoomByCode() {
+      const input = document.getElementById('input-room-code');
+      const code = input ? input.value.trim().toUpperCase() : '';
+      if (!code) {
+        showToast('Por favor introduce el ID de la sala');
+        return;
+      }
+      if (code === '404' || code === 'ERROR' || code === 'INVALIDO') {
+        navigateTo('404');
+        showToast('La sala no fue encontrada');
+        return;
+      }
+
+      let targetName = 'Cálculo II';
+      if (code === 'K7P2-91XQ') targetName = 'Cálculo II';
+      else if (code === 'M4T8-27ZB') targetName = 'Proyecto Integrador';
+      else if (code === 'R9D1-55LC') targetName = 'Física Mecánica';
+      else if (LAST_COPIED_ROOM_NAME && code === LAST_COPIED_ROOM_ID) targetName = LAST_COPIED_ROOM_NAME;
+      else targetName = 'Sala ' + code;
+
+      enterRoom(targetName, code);
+    }
+
+    // Acordeones independientes de la sala
+    let isParticipantsOpen = true;
+    let isChatOpen = true;
+
+    function toggleParticipantsAccordion() {
+      const body = document.getElementById('section-participants-body');
+      const chevron = document.getElementById('chevron-participants');
+      const btn = document.getElementById('btn-toggle-participants');
+      if (!body) return;
+
+      isParticipantsOpen = !isParticipantsOpen;
+      if (isParticipantsOpen) {
+        body.classList.remove('hidden');
+        if (chevron) chevron.classList.remove('-rotate-90');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+      } else {
+        body.classList.add('hidden');
+        if (chevron) chevron.classList.add('-rotate-90');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    function toggleChatAccordion(e) {
+      if (e) e.stopPropagation();
+      const body = document.getElementById('section-chat-body');
+      const chevron = document.getElementById('chevron-chat');
+      const btn = document.getElementById('btn-toggle-chat-header');
+      const container = document.getElementById('section-chat-container');
+      if (!body) return;
+
+      isChatOpen = !isChatOpen;
+      if (isChatOpen) {
+        body.classList.remove('hidden');
+        if (chevron) chevron.classList.remove('-rotate-90');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+        if (container) {
+          container.classList.add('flex-1');
+          container.classList.remove('flex-shrink-0');
+        }
+      } else {
+        body.classList.add('hidden');
+        if (chevron) chevron.classList.add('-rotate-90');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+        if (container) {
+          container.classList.remove('flex-1');
+          container.classList.add('flex-shrink-0');
+        }
+      }
+    }
+
+    // Toggle panel lateral de la Sala completo
+    function toggleSidePanel() {
+      const panel = document.getElementById('side-panel');
+      const btnText = document.getElementById('panel-btn-text');
+      if (!panel) return;
+      if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+        if (btnText) btnText.textContent = 'Ocultar panel';
+      } else {
+        panel.classList.add('hidden');
+        if (btnText) btnText.textContent = 'Mostrar panel';
+      }
+    }
+
+    // Buscador de participantes
+    function filterParticipants(query) {
+      const q = (query || '').toLowerCase().trim();
+      const items = document.querySelectorAll('#participants-list .participant-item');
+      const emptyMsg = document.getElementById('participants-empty');
+      const counterEl = document.getElementById('online-counter');
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const nameAttr = (item.getAttribute('data-name') || '').toLowerCase();
+        const textContent = item.textContent.toLowerCase();
+        if (!q || nameAttr.includes(q) || textContent.includes(q)) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      if (emptyMsg) emptyMsg.classList.toggle('hidden', visibleCount > 0);
+      if (counterEl) counterEl.textContent = q ? `${visibleCount} visible(s)` : '4 en línea';
+    }
+
+    // Toggle barra buscador del chat
+    function toggleChatSearch() {
+      if (!isChatOpen) toggleChatAccordion();
+
+      const container = document.getElementById('chat-search-bar-container');
+      const input = document.getElementById('input-search-chat');
+      const btn = document.getElementById('btn-toggle-chat-search');
+      if (!container) return;
+
+      const isHidden = container.classList.contains('hidden');
+      if (isHidden) {
+        container.classList.remove('hidden');
+        if (btn) btn.classList.add('text-brand', 'dark:text-[#8F6CF5]', 'bg-brand/10');
+        if (input) input.focus();
+      } else {
+        container.classList.add('hidden');
+        if (btn) btn.classList.remove('text-brand', 'dark:text-[#8F6CF5]', 'bg-brand/10');
+        clearAndCloseChatSearch(false);
+      }
+    }
+
+    function clearAndCloseChatSearch(hideBar = true) {
+      const input = document.getElementById('input-search-chat');
+      if (input) input.value = '';
+      filterChatMessages('');
+      if (hideBar) {
+        const container = document.getElementById('chat-search-bar-container');
+        const btn = document.getElementById('btn-toggle-chat-search');
+        if (container) container.classList.add('hidden');
+        if (btn) btn.classList.remove('text-brand', 'dark:text-[#8F6CF5]', 'bg-brand/10');
+      }
+    }
+
+    function filterChatMessages(query) {
+      const q = (query || '').toLowerCase().trim();
+      const messages = document.querySelectorAll('#chat-messages-container .chat-message-item');
+      const emptyMsg = document.getElementById('chat-empty-search');
+      const statusEl = document.getElementById('chat-search-status');
+      let matches = 0;
+
+      messages.forEach(msg => {
+        const textEl = msg.querySelector('.message-text');
+        if (!textEl) return;
+
+        if (!textEl.hasAttribute('data-original-text')) {
+          textEl.setAttribute('data-original-text', textEl.textContent);
+        }
+        const originalText = textEl.getAttribute('data-original-text');
+
+        if (!q) {
+          msg.classList.remove('hidden');
+          textEl.innerHTML = originalText;
+          return;
+        }
+
+        const lower = originalText.toLowerCase();
+        if (lower.includes(q)) {
+          msg.classList.remove('hidden');
+          matches++;
+          const regex = new RegExp(`(${escapeRegExp(q)})`, 'gi');
+          textEl.innerHTML = originalText.replace(regex, '<mark class="chat-highlight">$1</mark>');
+        } else {
+          msg.classList.add('hidden');
+          textEl.textContent = originalText;
+        }
+      });
+
+      if (emptyMsg) emptyMsg.classList.toggle('hidden', !q || matches > 0);
+      if (statusEl) {
+        if (q) {
+          statusEl.classList.remove('hidden');
+          statusEl.textContent = `(${matches})`;
+        } else {
+          statusEl.classList.add('hidden');
+        }
+      }
+    }
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Toggle de controles de llamada (Mic, Cam, Share)
+    function toggleControl(btnId) {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      const iconContainer = btn.querySelector('div');
+      if (iconContainer) {
+        const isOff = iconContainer.classList.toggle('bg-red-500');
+        iconContainer.classList.toggle('text-white', isOff);
+        showToast(isOff ? 'Dispositivo silenciado/apagado' : 'Dispositivo activado');
+      }
+    }
+
+    function formatTime(date) {
+      const h = String(date.getHours()).padStart(2, '0');
+      const m = String(date.getMinutes()).padStart(2, '0');
+      return `${h}:${m}`;
+    }
+
+    function appendMessage(senderName, initials, text, isMe = false) {
+      const container = document.getElementById('chat-messages-container');
+      if (!container) return;
+
+      const timeStr = formatTime(new Date());
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-message-item flex gap-2 animate-fadeIn';
+      
+      let avatarColor = 'bg-brand';
+      if (!isMe) {
+        if (senderName.startsWith('Juan')) avatarColor = 'bg-[#1F7A3F]';
+        else if (senderName.startsWith('María')) avatarColor = 'bg-[#9333ea]';
+        else avatarColor = 'bg-[#4338ca]';
+      }
+
+      msgDiv.innerHTML = `
+        <div class="w-5 h-5 rounded-full ${avatarColor} text-white font-bold text-[9px] flex items-center justify-center flex-shrink-0 mt-0.5">${initials}</div>
+        <div class="flex-1">
+          <div class="flex items-baseline gap-1.5">
+            <span class="font-semibold message-sender">${senderName}</span>
+            <span class="text-[10px] text-light-secondary dark:text-dark-secondary">${timeStr}</span>
+          </div>
+          <p class="text-light-secondary dark:text-dark-secondary mt-0.5 message-text" data-original-text=""></p>
+        </div>
+      `;
+      const p = msgDiv.querySelector('.message-text');
+      p.textContent = text;
+      p.setAttribute('data-original-text', text);
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendChatMessage(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const input = document.getElementById('input-chat-message');
+      if (!input) return false;
+      const val = input.value.trim();
+      if (!val) return false;
+
+      if (!isChatOpen) toggleChatAccordion();
+
+      const searchChatInput = document.getElementById('input-search-chat');
+      if (searchChatInput && searchChatInput.value) {
+        searchChatInput.value = '';
+        filterChatMessages('');
+      }
+
+      appendMessage('Camila (tú)', 'CA', val, true);
+      input.value = '';
+      input.focus();
+
+      simulateBotReply(val);
+      return false;
+    }
+
+    function simulateBotReply(userMessage) {
+      const replies = [
+        { sender: 'Juan', initials: 'JU', text: '¡Entendido! Lo reviso enseguida en el ejercicio.' },
+        { sender: 'María', initials: 'MA', text: 'De acuerdo Camila, coincide con lo que calculé acá.' },
+        { sender: 'Pablo', initials: 'PA', text: 'Genial, voy a proyectar esa parte en pantalla.' },
+        { sender: 'Juan', initials: 'JU', text: 'Anotado. Avísame si necesitas que repitamos la fórmula.' }
+      ];
+      const randomReply = replies[Math.floor(Math.random() * replies.length)];
+
+      setTimeout(() => {
+        appendMessage(randomReply.sender, randomReply.initials, randomReply.text, false);
+      }, 1200);
+    }
+
+    // Selector interactivo de Avatar
+    function selectAvatar(btn) {
+      document.querySelectorAll('#avatar-selector-group .avatar-option').forEach(opt => {
+        opt.classList.remove('ring-4', 'ring-[#6D3FE0]', 'ring-offset-2', 'dark:ring-offset-[#25222D]', 'scale-105');
+      });
+      btn.classList.add('ring-4', 'ring-[#6D3FE0]', 'ring-offset-2', 'dark:ring-offset-[#25222D]', 'scale-105');
+      SELECTED_AVATAR_COLOR = btn.dataset.color || 'purple';
+      showToast('Avatar seleccionado');
+    }
+
+    // Funciones de validación y simulación de registro
+    function handleRegisterSubmit(e) {
+      if (e) e.preventDefault();
+
+      const nombresInput = document.getElementById('registro-nombres');
+      const apellidosInput = document.getElementById('registro-apellidos');
+      const usernameInput = document.getElementById('registro-username');
+      const emailInput = document.getElementById('registro-email');
+      const passwordInput = document.getElementById('registro-password');
+
+      const errNombres = document.getElementById('error-nombres');
+      const errApellidos = document.getElementById('error-apellidos');
+      const errUsername = document.getElementById('error-username');
+      const errUsernameText = document.getElementById('error-username-text');
+      const errEmail = document.getElementById('error-email');
+      const errEmailText = document.getElementById('error-email-text');
+      const errPassword = document.getElementById('error-password');
+      const errPasswordText = document.getElementById('error-password-text');
+
+      // Limpiar errores visuales
+      [nombresInput, apellidosInput, usernameInput, emailInput, passwordInput].forEach(inp => {
+        if (inp) {
+          inp.classList.remove('border-status-error', 'dark:border-status-errorDark', 'border-red-500');
+          inp.classList.add('border-light-border', 'dark:border-dark-border');
+        }
+      });
+      [errNombres, errApellidos, errUsername, errEmail, errPassword].forEach(err => {
+        if (err) {
+          err.classList.add('hidden');
+          err.classList.remove('flex');
+        }
+      });
+
+      let hasError = false;
+
+      // 1. Nombres
+      const nombresVal = (nombresInput ? nombresInput.value : '').trim();
+      if (!nombresVal) {
+        hasError = true;
+        setFieldError(nombresInput, errNombres);
+      }
+
+      // 2. Apellidos
+      const apellidosVal = (apellidosInput ? apellidosInput.value : '').trim();
+      if (!apellidosVal) {
+        hasError = true;
+        setFieldError(apellidosInput, errApellidos);
+      }
+
+      // 3. Username
+      const usernameVal = (usernameInput ? usernameInput.value : '').trim();
+      if (!usernameVal) {
+        hasError = true;
+        errUsernameText.textContent = 'Escribe un nombre de usuario.';
+        setFieldError(usernameInput, errUsername);
+      } else if (usernameVal.toLowerCase() === 'admin' || usernameVal.toLowerCase() === 'camila_estudio') {
+        hasError = true;
+        errUsernameText.textContent = 'Ese nombre de usuario ya existe. Elige otro.';
+        setFieldError(usernameInput, errUsername);
+      } else if (usernameVal.length < 3 || usernameVal.length > 20 || !/^[a-zA-Z0-9_]+$/.test(usernameVal)) {
+        hasError = true;
+        errUsernameText.textContent = 'De 3 a 20 letras, números o guion bajo.';
+        setFieldError(usernameInput, errUsername);
+      }
+
+      // 4. Email
+      const emailVal = (emailInput ? emailInput.value : '').trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailVal || !emailRegex.test(emailVal)) {
+        hasError = true;
+        errEmailText.textContent = 'Escribe un correo válido, por ejemplo nombre@correo.com.';
+        setFieldError(emailInput, errEmail);
+      } else if (emailVal.toLowerCase() === 'camila@correo.com') {
+        hasError = true;
+        errEmailText.textContent = 'Este correo ya está registrado. Inicia sesión';
+        setFieldError(emailInput, errEmail);
+      }
+
+      // 5. Password
+      const passVal = passwordInput ? passwordInput.value : '';
+      const hasLetters = /[a-zA-Z]/.test(passVal);
+      const hasNumbers = /[0-9]/.test(passVal);
+      if (!passVal || passVal.length < 8 || !hasLetters || !hasNumbers) {
+        hasError = true;
+        errPasswordText.textContent = 'La contraseña debe tener al menos 8 caracteres, con letras y números.';
+        setFieldError(passwordInput, errPassword);
+      }
+
+      if (hasError) {
+        showToast('Por favor corrige los campos marcados en rojo');
+        return false;
+      }
+
+      // Flujo exitoso
+      const loginEmail = document.getElementById('login-email');
+      if (loginEmail && emailVal) {
+        loginEmail.value = emailVal;
+      }
+
+      showToast('Cuenta creada con éxito. Inicia sesión para continuar.');
+      setTimeout(() => {
+        navigateTo('login');
+      }, 500);
+
+      return false;
+    }
+
+    function setFieldError(inputEl, errorEl) {
+      if (inputEl) {
+        inputEl.classList.remove('border-light-border', 'dark:border-dark-border');
+        inputEl.classList.add('border-status-error', 'dark:border-status-errorDark', 'border-red-500');
+        inputEl.focus();
+      }
+      if (errorEl) {
+        errorEl.classList.remove('hidden');
+        errorEl.classList.add('flex');
+      }
+    }
+
+    function handleGoogleRegister() {
+      showToast('Autenticando con Google...');
+      setTimeout(() => {
+        showToast('¡Registro exitoso con Google!');
+        navigateTo('salas');
+      }, 900);
+    }
+
+    // Toast flotante
+    let toastTimeout = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notification');
+      const toastMsg = document.getElementById('toast-message');
+      if (!toast || !toastMsg) return;
+      
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2600);
+    }
+
+    // Inicialización y garantía de listeners addEventListener adicionales
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Botón Ingresar en formulario Login
+      const loginBtn = document.getElementById('btn-submit-login');
+      if (loginBtn) {
+        loginBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigateTo('salas');
+        });
+      }
+      const loginForm = document.getElementById('form-login');
+      if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          navigateTo('salas');
+        });
+      }
+
+      // Pre-cargar ID copiado si campo está vacío
+      const roomInput = document.getElementById('input-room-code');
+      if (roomInput && !roomInput.value && LAST_COPIED_ROOM_ID) {
+        roomInput.value = LAST_COPIED_ROOM_ID;
+      }
+    });
+  </script>
+</body></html>

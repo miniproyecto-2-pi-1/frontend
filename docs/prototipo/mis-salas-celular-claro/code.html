@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio - Celular - Claro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #FFFFFF;
+      color: #2B2833;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#FFFFFF] text-[#2B2833] flex flex-col p-4">
+  <div class="w-full max-w-[390px] mx-auto flex flex-col gap-4">
+    
+    <!-- Encabezado móvil -->
+    <header class="flex items-center justify-between py-2">
+      <h1 class="text-[20px] font-bold text-[#2B2833]">Salón de Estudio</h1>
+      <div class="w-9 h-9 rounded-full bg-[#6D3FE0] text-white flex items-center justify-center font-bold text-sm">
+        CA
+      </div>
+    </header>
+
+    <!-- Botón Nueva Sala -->
+    <button class="w-full h-[48px] bg-[#6D3FE0] hover:bg-[#5b35c4] text-white font-semibold rounded-[8px] flex items-center justify-center gap-2 shadow-sm text-[15px]">
+      <svg class="w-5 h-5 stroke-[2.2px] stroke-current" fill="none" viewBox="0 0 24 24">
+        <line x1="12" y1="5" x2="12" y2="19" stroke-linecap="round"/>
+        <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/>
+      </svg>
+      Nueva sala
+    </button>
+
+    <!-- Campo introducir código con botón unirme -->
+    <div class="relative flex items-center h-[48px] bg-[#F4F2F9] border-[1.5px] border-[#6D3FE0] rounded-[8px] px-3">
+      <input 
+        type="text" 
+        placeholder="Introduce un código" 
+        class="w-full bg-transparent text-[#2B2833] placeholder-[#5A5469] text-[14px] outline-none pr-[80px]"
+      />
+      <button class="absolute right-1.5 h-[36px] px-4 bg-[#6D3FE0] text-white font-semibold rounded-[6px] text-[13px]">
+        Unirme
+      </button>
+    </div>
+
+    <!-- Tus salas -->
+    <div class="mt-2">
+      <h2 class="text-[15px] font-bold text-[#5A5469] mb-3">Tus salas</h2>
+
+      <div class="flex flex-col gap-3.5">
+        
+        <!-- Tarjeta 1: Cálculo II -->
+        <div class="bg-[#F4F2F9] rounded-[10px] overflow-hidden border-[1.5px] border-[#E2DEED] flex flex-col">
+          <div class="bg-[#6D3FE0] p-3.5 text-white">
+            <h3 class="text-[16px] font-bold">Cálculo II</h3>
+            <p class="text-[12px] opacity-90 font-mono tracking-wider">K7P2-91XQ</p>
+          </div>
+          <div class="p-3.5 bg-[#F4F2F9]">
+            <p class="text-[13px] font-semibold text-[#2B2833]">Anfitrión</p>
+            <p class="text-[12px] text-[#5A5469] mt-0.5">3 conectadas</p>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t-[1.5px] border-[#E2DEED]">
+              <a href="#" class="text-[#5B35C4] font-semibold text-[13px]">Entrar</a>
+              <button class="text-[#5B35C4] text-[13px] font-medium flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 stroke-[2px] stroke-current" fill="none" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar ID
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 2: Proyecto Integrador -->
+        <div class="bg-[#F4F2F9] rounded-[10px] overflow-hidden border-[1.5px] border-[#E2DEED] flex flex-col">
+          <div class="bg-[#207A3F] p-3.5 text-white">
+            <h3 class="text-[16px] font-bold">Proyecto Integrador</h3>
+            <p class="text-[12px] opacity-90 font-mono tracking-wider">M4T8-27ZB</p>
+          </div>
+          <div class="p-3.5 bg-[#F4F2F9]">
+            <p class="text-[13px] font-semibold text-[#2B2833]">Anfitrión</p>
+            <p class="text-[12px] text-[#5A5469] mt-0.5">Nadie conectado</p>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t-[1.5px] border-[#E2DEED]">
+              <a href="#" class="text-[#5B35C4] font-semibold text-[13px]">Entrar</a>
+              <button class="text-[#5B35C4] text-[13px] font-medium flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 stroke-[2px] stroke-current" fill="none" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar ID
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 3: Física Mecánica -->
+        <div class="bg-[#A03E9B] rounded-[10px] overflow-hidden border-[1.5px] border-[#E2DEED] flex flex-col">
+          <div class="bg-[#A03E9B] p-3.5 text-white">
+            <h3 class="text-[16px] font-bold">Física Mecánica</h3>
+            <p class="text-[12px] opacity-90 font-mono tracking-wider">R9D1-55LC</p>
+          </div>
+          <div class="p-3.5 bg-[#F4F2F9]">
+            <p class="text-[13px] font-semibold text-[#2B2833]">Invitado</p>
+            <p class="text-[12px] text-[#5A5469] mt-0.5">2 conectadas</p>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t-[1.5px] border-[#E2DEED]">
+              <a href="#" class="text-[#5B35C4] font-semibold text-[13px]">Entrar</a>
+              <button class="text-[#5B35C4] text-[13px] font-medium flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 stroke-[2px] stroke-current" fill="none" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar ID
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

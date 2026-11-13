@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Salón de Estudio - Estado Conectado</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          colors: {
+            app: {
+              bg: '#2B2833',
+              card: '#25222D',
+              box: '#1D1A24',
+              text: '#F3F1F8',
+              success: '#57D58A',
+              border: '#3C3847',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #2B2833;
+      color: #F3F1F8;
+      font-family: 'Noto Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen w-full flex flex-col items-center justify-start antialiased select-none">
+<!-- BEGIN: MainContainer -->
+<!-- Contenedor general en formato escritorio (ancho de referencia de hasta 1440px) -->
+<main class="w-full max-w-[1440px] min-h-screen flex flex-col p-6 sm:p-10 lg:p-14" data-purpose="desktop-viewport">
+<!-- BEGIN: HeaderSection -->
+<!-- Encabezado con título principal -->
+<header class="w-full mb-8 lg:mb-12" data-purpose="app-header">
+<h1 class="text-2xl lg:text-3xl font-bold tracking-tight text-[#F3F1F8]">
+        Salón de Estudio
+      </h1>
+</header>
+<!-- END: HeaderSection -->
+<!-- BEGIN: ContentCard -->
+<!-- Tarjeta central de superficie técnica con borde y esquinas redondeadas -->
+<section class="w-full flex-1 flex flex-col bg-[#25222D] border-[1.5px] border-[#3C3847] rounded-[10px] shadow-2xl overflow-hidden min-h-[500px]" data-purpose="status-card">
+<!-- Barra superior interior de la tarjeta -->
+<div class="w-full px-8 py-5 border-b border-[#34303F] flex items-center" data-purpose="card-header">
+<span class="text-lg lg:text-xl font-semibold text-[#F3F1F8]">
+          Salón de Estudio
+        </span>
+</div>
+<!-- Zona central con estado y mensaje de Firestore -->
+<div class="flex-1 flex flex-col items-center justify-center p-8 sm:p-12 text-center" data-purpose="status-content">
+<!-- Píldora de estado de conexión exitosa -->
+<div aria-live="polite" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#183424] text-[#57D58A] mb-5 border border-[#235836]/40" data-purpose="connection-badge" role="status">
+<span aria-hidden="true" class="w-2.5 h-2.5 rounded-full bg-[#57D58A]"></span>
+<span class="text-sm font-medium tracking-wide">Conectado a la API</span>
+</div>
+<!-- Título descriptivo de Firestore -->
+<h2 class="text-base sm:text-[16px] font-semibold text-[#F3F1F8] mb-5 tracking-normal">
+          Dato leído de Firestore
+        </h2>
+<!-- Contenedor del dato leído con contraste oscuro y comillas requeridas -->
+<div class="w-full max-w-xl bg-[#1D1A24] border border-[#2e2a38] px-6 py-4 rounded-[10px] shadow-inner" data-purpose="firestore-message-box">
+<p class="text-sm sm:text-base text-[#F3F1F8] font-normal leading-relaxed">
+            «Hola desde Firestore: el Salón de Estudio ya funciona»
+          </p>
+</div>
+</div>
+</section>
+<!-- END: ContentCard -->
+</main>
+<!-- END: MainContainer -->
+</body></html>

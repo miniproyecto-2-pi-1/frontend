@@ -8,12 +8,13 @@ import { ThemeToggle } from "./ThemeToggle";
 export function LayoutApp() {
   const { pathname } = useLocation();
   const principal = useFocoAlNavegar(pathname);
-  const { usuario, salir } = useSesion();
+  const { usuario, cerrarSesion } = useSesion();
   const navegar = useNavigate();
 
-  function cerrarSesion() {
-    salir();
+  // Primero se sale de la zona privada (si no, RutaPrivada mandaría al ingreso) y luego se cierra la sesión.
+  function salir() {
     navegar("/", { replace: true });
+    void cerrarSesion().catch(() => undefined);
   }
 
   return (
@@ -53,7 +54,7 @@ export function LayoutApp() {
                 <span className="font-bold">{usuario.username}</span>
               </span>
             )}
-            <button type="button" onClick={cerrarSesion} className="btn-secundario">
+            <button type="button" onClick={salir} className="btn-secundario">
               Cerrar sesión
             </button>
           </div>

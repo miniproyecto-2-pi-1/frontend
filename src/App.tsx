@@ -3,6 +3,7 @@ import { LayoutApp } from "./components/LayoutApp";
 import { LayoutPublico } from "./components/LayoutPublico";
 import { Ayuda } from "./pages/Ayuda";
 import { BaseTecnica } from "./pages/BaseTecnica";
+import { ElegirUsername } from "./pages/ElegirUsername";
 import { Ingreso } from "./pages/Ingreso";
 import { Inicio } from "./pages/Inicio";
 import { MisSalas } from "./pages/MisSalas";
@@ -10,7 +11,7 @@ import { NoEncontrada } from "./pages/NoEncontrada";
 import { Perfil } from "./pages/Perfil";
 import { Registro } from "./pages/Registro";
 import { Sala } from "./pages/Sala";
-import { RutaPrivada } from "./sesion/SesionContext";
+import { RutaPrivada, RutaSinUsername } from "./sesion/Rutas";
 
 // Una ruta por cada pantalla del mapa del sitio, en dos grupos:
 // públicas (antes de ingresar) y privadas (con sesión iniciada).
@@ -23,6 +24,14 @@ export function App() {
         <Route path="registro" element={<Registro />} />
         <Route path="ayuda" element={<Ayuda />} />
         <Route path="base-tecnica" element={<BaseTecnica />} />
+        <Route
+          path="elegir-username"
+          element={
+            <RutaSinUsername>
+              <ElegirUsername />
+            </RutaSinUsername>
+          }
+        />
         <Route path="*" element={<NoEncontrada />} />
       </Route>
       <Route
