@@ -177,7 +177,10 @@ export function Registro() {
           </p>
         )}
 
+        <p className="text-suave">Todos los campos son obligatorios.</p>
+
         <Campo
+          requerido
           id="nombres"
           etiqueta="Nombres"
           autoComplete="given-name"
@@ -186,6 +189,7 @@ export function Registro() {
           error={errores.nombres}
         />
         <Campo
+          requerido
           id="apellidos"
           etiqueta="Apellidos"
           autoComplete="family-name"
@@ -194,6 +198,7 @@ export function Registro() {
           error={errores.apellidos}
         />
         <Campo
+          requerido
           id="username"
           etiqueta="Nombre de usuario"
           autoComplete="off"
@@ -205,6 +210,7 @@ export function Registro() {
           ayuda="De 3 a 20 letras, números o guion bajo."
         />
         <Campo
+          requerido
           id="correo"
           etiqueta="Correo electrónico"
           type="email"
@@ -217,6 +223,7 @@ export function Registro() {
           error={errorCorreo}
         />
         <Campo
+          requerido
           id="clave"
           etiqueta="Contraseña"
           type={verClave ? "text" : "password"}
@@ -229,7 +236,6 @@ export function Registro() {
             <button
               type="button"
               onClick={() => setVerClave((v) => !v)}
-              aria-pressed={verClave}
               aria-controls="clave"
               className="min-h-10 rounded-md px-3 font-bold text-enlace"
             >
@@ -255,6 +261,9 @@ export function Registro() {
           )}
           {enviando ? "Creando cuenta…" : "Crear cuenta"}
         </button>
+        <p role="status" className="sr-only">
+          {enviando ? "Creando cuenta…" : ""}
+        </p>
 
         <SeparadorO />
         <BotonGoogle google={google} deshabilitado={enviando} />

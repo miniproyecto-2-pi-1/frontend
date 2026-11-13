@@ -127,7 +127,10 @@ export function Ingreso() {
           </div>
         )}
 
+        <p className="text-suave">Todos los campos son obligatorios.</p>
+
         <Campo
+          requerido
           id="correo"
           etiqueta="Correo electrónico"
           type="email"
@@ -140,6 +143,7 @@ export function Ingreso() {
           error={errores.correo}
         />
         <Campo
+          requerido
           id="clave"
           etiqueta="Contraseña"
           type={verClave ? "text" : "password"}
@@ -151,7 +155,6 @@ export function Ingreso() {
             <button
               type="button"
               onClick={() => setVerClave((v) => !v)}
-              aria-pressed={verClave}
               aria-controls="clave"
               className="min-h-10 rounded-md px-3 font-bold text-enlace"
             >
@@ -175,6 +178,9 @@ export function Ingreso() {
           )}
           {enviando ? "Ingresando…" : "Entrar"}
         </button>
+        <p role="status" className="sr-only">
+          {enviando ? "Ingresando…" : ""}
+        </p>
 
         <SeparadorO />
         <BotonGoogle google={google} deshabilitado={enviando} />

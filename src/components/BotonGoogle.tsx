@@ -30,6 +30,9 @@ export function BotonGoogle({ google, deshabilitado = false }: { google: ReturnT
 
   return (
     <div className="flex flex-col gap-3">
+      <p role="status" className="sr-only">
+        {ocupado ? texto : ""}
+      </p>
       {error && (
         <div role="alert" className="rounded-lg border-[1.5px] border-error bg-fondo p-3 text-error">
           <p className="flex items-start gap-1.5 font-medium">
