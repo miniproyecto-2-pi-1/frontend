@@ -144,7 +144,10 @@ export function ElegirUsername() {
           </p>
         )}
 
+        <p className="text-suave">Todos los campos son obligatorios.</p>
+
         <Campo
+          requerido
           id="username"
           etiqueta="Nombre de usuario"
           autoComplete="off"
@@ -156,6 +159,7 @@ export function ElegirUsername() {
           ayuda="De 3 a 20 letras, números o guion bajo. Así te verán tus compañeros."
         />
         <Campo
+          requerido
           id="nombres"
           etiqueta="Nombres"
           autoComplete="given-name"
@@ -164,6 +168,7 @@ export function ElegirUsername() {
           error={errores.nombres}
         />
         <Campo
+          requerido
           id="apellidos"
           etiqueta="Apellidos"
           autoComplete="family-name"
@@ -188,6 +193,9 @@ export function ElegirUsername() {
           )}
           {enviando ? "Guardando…" : "Continuar"}
         </button>
+        <p role="status" className="sr-only">
+          {enviando ? "Guardando…" : ""}
+        </p>
 
         <p className="text-center">
           ¿No es tu cuenta?{" "}
