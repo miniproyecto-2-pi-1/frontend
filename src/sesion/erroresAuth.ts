@@ -20,7 +20,8 @@ function mensajeDe(c: string): Omit<ErrorAuth, "codigo"> {
     case "auth/invalid-login-credentials":
     case "auth/wrong-password":
     case "auth/user-not-found":
-      return { campo: "general", mensaje: "Correo o contraseña incorrectos." };
+      // Mismo mensaje para los tres casos: no se revela si el correo existe (US-03).
+      return { campo: "general", mensaje: CREDENCIALES_INCORRECTAS };
     case "auth/invalid-email":
       return { campo: "correo", mensaje: "Escribe un correo válido, por ejemplo nombre@correo.com." };
     case "auth/email-already-in-use":
@@ -30,7 +31,7 @@ function mensajeDe(c: string): Omit<ErrorAuth, "codigo"> {
     case "auth/user-disabled":
       return { campo: "general", mensaje: "Esta cuenta está deshabilitada." };
     case "auth/too-many-requests":
-      return { campo: "general", mensaje: "Hiciste demasiados intentos. Espera unos minutos e inténtalo de nuevo." };
+      return { campo: "general", mensaje: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo." };
     case "auth/popup-closed-by-user":
     case "auth/cancelled-popup-request":
     case "auth/user-cancelled":
@@ -51,5 +52,10 @@ function mensajeDe(c: string): Omit<ErrorAuth, "codigo"> {
       return { campo: "general", mensaje: "No pudimos completar la operación. Inténtalo de nuevo." };
   }
 }
+
+export const CREDENCIALES_INCORRECTAS = "Correo o contraseña incorrectos";
+
+// Fallas de conexión: la pantalla puede ofrecer «Reintentar».
+export const esErrorDeRed = (error: ErrorAuth) => error.codigo === "auth/network-request-failed";
 
 export const SIN_FIREBASE = "El ingreso no está disponible: falta la configuración de Firebase (revisa .env.local).";
