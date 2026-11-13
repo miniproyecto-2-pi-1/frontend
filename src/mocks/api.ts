@@ -11,6 +11,9 @@ import { PATRON_USERNAME, TOTAL_AVATARES, type DatosRegistro, type DatosUsername
 //   - 409 EMAIL_TAKEN:    registra un perfil con un correo que ya tenga perfil (el de «admin» es admin@correo.com).
 //   - 400 VALIDATION:     envía nombres o apellidos vacíos, un username inválido o un avatar fuera de rango.
 //
+// Flujo de Google (US-02): GET /users/me responde 404 PROFILE_INCOMPLETE hasta que se envía
+// POST /users/me/username con { username, nombres, apellidos, avatar }.
+//
 // Este archivo solo se carga con import() dinámico cuando el modo mock está activo, así no entra en producción.
 
 const CLAVE = "mockUsuarios";
@@ -77,7 +80,10 @@ function validarUsername(valor: unknown): string | null {
   return null;
 }
 
-function crearUsuario(uid: string, correo: string, cuerpo: Partial<Record<keyof DatosRegistro, unknown>>): RespuestaCruda {
+type CuerpoPerfil = Partial<Record<keyof DatosRegistro | keyof DatosUsername, unknown>>;
+
+// Las mismas reglas para el registro manual y para completar el perfil tras Google.
+function validarPerfil(cuerpo: CuerpoPerfil): Record<string, string> {
   const campos: Record<string, string> = {};
   if (typeof cuerpo.nombres !== "string" || !cuerpo.nombres.trim()) campos.nombres = "Escribe tus nombres.";
   if (typeof cuerpo.apellidos !== "string" || !cuerpo.apellidos.trim()) campos.apellidos = "Escribe tus apellidos.";
@@ -86,7 +92,13 @@ function crearUsuario(uid: string, correo: string, cuerpo: Partial<Record<keyof 
   const avatar = cuerpo.avatar ?? 0;
   if (typeof avatar !== "number" || !Number.isInteger(avatar) || avatar < 0 || avatar >= TOTAL_AVATARES)
     campos.avatar = "Elige uno de los avatares disponibles.";
+  return campos;
+}
+
+function crearUsuario(uid: string, correo: string, cuerpo: CuerpoPerfil): RespuestaCruda {
+  const campos = validarPerfil(cuerpo);
   if (Object.keys(campos).length > 0) return error(400, "VALIDATION", "Revisa los campos marcados.", campos);
+  const avatar = cuerpo.avatar ?? 0;
 
   const usuarios = leer();
   const username = (cuerpo.username as string).trim();
@@ -107,9 +119,14 @@ function crearUsuario(uid: string, correo: string, cuerpo: Partial<Record<keyof 
   return responder(201, nuevo);
 }
 
-function elegirUsername(uid: string, correo: string, nombreVisible: string, cuerpo: Partial<Record<keyof DatosUsername, unknown>>): RespuestaCruda {
-  const errorUsername = validarUsername(cuerpo.username);
-  if (errorUsername) return error(400, "VALIDATION", "Revisa los campos marcados.", { username: errorUsername });
+function elegirUsername(uid: string, correo: string, cuerpo: CuerpoPerfil): RespuestaCruda {
+  const campos = validarPerfil(cuerpo);
+  if (Object.keys(campos).length > 0) return error(400, "VALIDATION", "Revisa los campos marcados.", campos);
+  const datos = {
+    nombres: (cuerpo.nombres as string).trim(),
+    apellidos: (cuerpo.apellidos as string).trim(),
+    avatar: (cuerpo.avatar ?? 0) as number,
+  };
 
   const usuarios = leer();
   const username = (cuerpo.username as string).trim();
@@ -118,16 +135,15 @@ function elegirUsername(uid: string, correo: string, nombreVisible: string, cuer
 
   const actual = usuarios.find((u) => u.uid === uid);
   if (actual) {
-    const actualizado = { ...actual, username };
+    const actualizado = { ...actual, ...datos, username };
     guardar(usuarios.map((u) => (u.uid === uid ? actualizado : u)));
     return responder(200, actualizado);
   }
   if (usuarios.some((u) => u.correo.toLowerCase() === correo.toLowerCase()))
     return error(409, "EMAIL_TAKEN", "Este correo ya está registrado.");
 
-  // Perfil nuevo (por ejemplo, tras ingresar con Google): nombres y apellidos salen del nombre de la cuenta.
-  const [nombres = "", ...resto] = nombreVisible.trim().split(/\s+/);
-  const nuevo: Usuario = { uid, correo, username, nombres: nombres || username, apellidos: resto.join(" "), avatar: 0 };
+  // Perfil nuevo tras ingresar con Google.
+  const nuevo: Usuario = { uid, correo, username, ...datos };
   guardar([...usuarios, nuevo]);
   return responder(201, nuevo);
 }
@@ -157,5 +173,5 @@ export async function responderMock(ruta: string, init: RequestInit): Promise<Re
     return perfil ? responder(200, perfil) : error(404, "PROFILE_INCOMPLETE", "Elige un nombre de usuario para continuar.");
   }
   if (camino === "/api/v1/users") return crearUsuario(uid, correo, leerCuerpo(init));
-  return elegirUsername(uid, correo, usuarioFirebase.displayName ?? "", leerCuerpo(init));
+  return elegirUsername(uid, correo, leerCuerpo(init));
 }
