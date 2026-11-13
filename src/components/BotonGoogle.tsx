@@ -44,10 +44,13 @@ export function BotonGoogle({ google, deshabilitado = false }: { google: ReturnT
       )}
       <button
         type="button"
-        onClick={() => void continuarConGoogle()}
-        disabled={ocupado || deshabilitado}
+        // aria-disabled (no disabled) para que el foco se quede en el botón mientras la ventana está abierta.
+        onClick={() => {
+          if (!ocupado && !deshabilitado) void continuarConGoogle();
+        }}
+        aria-disabled={ocupado || deshabilitado}
         aria-busy={ocupado}
-        className="btn-secundario w-full disabled:cursor-wait disabled:opacity-80"
+        className="btn-secundario w-full aria-disabled:cursor-wait aria-disabled:opacity-80"
       >
         <LogoGoogle />
         {texto}
