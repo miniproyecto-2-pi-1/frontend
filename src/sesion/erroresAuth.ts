@@ -44,8 +44,10 @@ function mensajeDe(c: string): Omit<ErrorAuth, "codigo"> {
     case "auth/account-exists-with-different-credential":
       return { campo: "general", mensaje: "Ya existe una cuenta con este correo. Ingresa con tu correo y contraseña." };
     case "auth/unauthorized-domain":
-    case "auth/operation-not-allowed":
       return { campo: "general", mensaje: "El ingreso con Google no está disponible en este momento. Usa tu correo y contraseña." };
+    case "auth/operation-not-allowed":
+      // Puede venir del ingreso con correo o con Google: el mensaje no nombra ninguno.
+      return { campo: "general", mensaje: "Este método de ingreso no está disponible en este momento. Prueba con otro." };
     case "auth/network-request-failed":
       return { campo: "general", mensaje: "No pudimos conectar. Revisa tu conexión e inténtalo de nuevo." };
     default:
