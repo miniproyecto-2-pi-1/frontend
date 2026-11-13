@@ -68,7 +68,7 @@ export function ElegirUsername() {
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
-    if (enviando) return;
+    if (enviando || saliendo) return; // los botones usan aria-disabled para no perder el foco
     const locales = Object.fromEntries(
       Object.entries({
         nombres: validarNombres(valores.nombres),
@@ -102,6 +102,7 @@ export function ElegirUsername() {
 
   // «Usar otra cuenta»: cierra la sesión de Google y vuelve al ingreso.
   async function usarOtraCuenta() {
+    if (enviando || saliendo) return;
     setSaliendo(true);
     try {
       await cerrarSesion();
@@ -174,8 +175,8 @@ export function ElegirUsername() {
 
         <button
           type="submit"
-          className="btn-principal w-full disabled:cursor-wait disabled:opacity-80"
-          disabled={enviando || saliendo}
+          className="btn-principal w-full aria-disabled:cursor-wait aria-disabled:opacity-80"
+          aria-disabled={enviando || saliendo}
           aria-busy={enviando}
         >
           {enviando && (
@@ -192,7 +193,7 @@ export function ElegirUsername() {
           <button
             type="button"
             onClick={() => void usarOtraCuenta()}
-            disabled={enviando || saliendo}
+            aria-disabled={enviando || saliendo}
             className="font-bold text-enlace underline"
           >
             Usar otra cuenta

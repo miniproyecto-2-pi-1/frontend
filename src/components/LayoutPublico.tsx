@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useSesion } from "../sesion/SesionContext";
+import { useSalir } from "../sesion/useSalir";
 import { PieDePagina, SaltarAlContenido, useFocoAlNavegar } from "./Estructura";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -8,10 +9,10 @@ import { ThemeToggle } from "./ThemeToggle";
 export function LayoutPublico() {
   const { pathname } = useLocation();
   const principal = useFocoAlNavegar(pathname);
-  const { estado, cerrarSesion } = useSesion();
+  const { estado } = useSesion();
   // Con sesión (aunque falte el nombre de usuario) se ofrece volver a la app o cerrar sesión.
   const conSesion = estado === "listo" || estado === "sinUsername";
-  const salir = () => void cerrarSesion().catch(() => undefined);
+  const salir = useSalir();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -48,7 +49,7 @@ export function LayoutPublico() {
                 <Link to="/salas" className="btn-principal">
                   Ir a Mis salas
                 </Link>
-                <button type="button" onClick={salir} className="btn-secundario">
+                <button type="button" onClick={() => void salir()} className="btn-secundario">
                   Cerrar sesión
                 </button>
               </>

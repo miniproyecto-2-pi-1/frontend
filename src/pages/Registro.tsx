@@ -95,7 +95,7 @@ export function Registro() {
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
-    if (enviando) return;
+    if (enviando || google.ocupado) return; // el botón usa aria-disabled para no perder el foco
     const n = validar(valores);
     if (Object.keys(n).length === 0 && !auth) n.general = SIN_FIREBASE;
     if (Object.keys(n).length > 0 || !auth) {
@@ -242,8 +242,8 @@ export function Registro() {
 
         <button
           type="submit"
-          className="btn-principal w-full disabled:cursor-wait disabled:opacity-80"
-          disabled={enviando || google.ocupado}
+          className="btn-principal w-full aria-disabled:cursor-wait aria-disabled:opacity-80"
+          aria-disabled={enviando || google.ocupado}
           aria-busy={enviando}
         >
           {enviando && (
