@@ -1,67 +1,37 @@
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useSesion } from "../sesion/SesionContext";
 import { PieDePagina, SaltarAlContenido, useFocoAlNavegar } from "./Estructura";
+import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
-// Estructura de las pantallas públicas (antes de ingresar): inicio, ingreso, registro, ayuda,
-// base técnica y página no encontrada.
+// Pantallas que ya son el formulario de entrada: en ellas el encabezado no repite «Ingresar».
+const SIN_ACCION = ["/ingreso", "/registro", "/elegir-username"];
+
+// Estructura de las pantallas públicas: inicio, ingreso, registro, elegir username, ayuda, base técnica y 404.
+// Encabezado del prototipo: logo «S» + «Salón de Estudio». En celular solo el logo y el botón de tema;
+// en escritorio, además, «Ingresar» (o «Ir a Mis salas» con sesión).
 export function LayoutPublico() {
   const { pathname } = useLocation();
   const principal = useFocoAlNavegar(pathname);
-  const { estado, cerrarSesion } = useSesion();
-  // Con sesión (aunque falte el nombre de usuario) se ofrece volver a la app o cerrar sesión.
-  const conSesion = estado === "listo" || estado === "sinUsername";
-  const salir = () => void cerrarSesion().catch(() => undefined);
+  const { estado } = useSesion();
+  const mostrarAccion = !SIN_ACCION.includes(pathname);
 
   return (
     <div className="flex min-h-screen flex-col">
       <SaltarAlContenido />
-      <header className="border-b border-borde">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-          <Link to="/" className="text-lg font-bold text-texto no-underline">
-            Salón de Estudio
-          </Link>
-          <nav aria-label="Principal" className="mr-auto">
-            <ul className="flex gap-5">
-              {[
-                { a: "/", texto: "Inicio", fin: true },
-                { a: "/ayuda", texto: "Ayuda", fin: false },
-              ].map((e) => (
-                <li key={e.a}>
-                  <NavLink
-                    to={e.a}
-                    end={e.fin}
-                    className={({ isActive }) =>
-                      `inline-block py-2 text-texto underline-offset-4 hover:underline ${isActive ? "font-bold underline" : ""}`
-                    }
-                  >
-                    {e.texto}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="flex flex-wrap items-center gap-2">
-            <ThemeToggle />
-            {conSesion ? (
-              <>
-                <Link to="/salas" className="btn-principal">
-                  Ir a Mis salas
-                </Link>
-                <button type="button" onClick={salir} className="btn-secundario">
-                  Cerrar sesión
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/ingreso" className="btn-secundario">
-                  Ingresar
-                </Link>
-                <Link to="/registro" className="btn-principal">
-                  Crear cuenta
-                </Link>
-              </>
+      <header className="border-b-[1.5px] border-borde">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-8">
+          <Logo />
+          <div className="flex shrink-0 items-center gap-3">
+            {mostrarAccion && (
+              <Link
+                to={estado === "listo" ? "/salas" : "/ingreso"}
+                className="btn-secundario hidden sm:inline-flex"
+              >
+                {estado === "listo" ? "Ir a Mis salas" : "Ingresar"}
+              </Link>
             )}
+            <ThemeToggle />
           </div>
         </div>
       </header>

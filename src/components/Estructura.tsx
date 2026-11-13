@@ -27,31 +27,16 @@ export function useFocoAlNavegar(ruta: string): RefObject<HTMLElement | null> {
   return principal;
 }
 
+// Pie de una línea, como el prototipo. La ruta /base-tecnica sigue existiendo aunque ya no tenga enlace aquí.
 export function PieDePagina() {
   return (
-    <footer className="border-t border-borde">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-4 text-suave">
-        <p>Salón de Estudio · Proyecto Integrador I, Univalle</p>
-        <nav aria-label="Pie de página">
-          <ul className="flex gap-5">
-            <li>
-              <Link to="/ayuda" className="text-enlace underline">
-                Ayuda
-              </Link>
-            </li>
-            <li>
-              <Link to="/base-tecnica" className="text-enlace underline">
-                Base técnica
-              </Link>
-            </li>
-            <li>
-              <Link to="/404" className="text-enlace underline">
-                Página 404
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      </div>
+    <footer>
+      <p className="mx-auto max-w-6xl px-4 py-5 text-center text-sm text-suave">
+        <Link to="/ayuda" className="text-enlace underline">
+          Ayuda
+        </Link>{" "}
+        · Salón de Estudio
+      </p>
     </footer>
   );
 }

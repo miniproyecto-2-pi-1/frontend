@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useSesion } from "./SesionContext";
+import { IconoError } from "../components/IconoError";
 
 // Mientras se conoce la sesión. El servidor (plan gratuito de Render) puede tardar hasta un minuto en despertar.
 // Si GET /users/me falla por red o por el servidor, se muestra el error con «Reintentar».
@@ -11,7 +12,10 @@ function CargandoSesion() {
     return (
       <div className="mx-auto max-w-md px-4 py-16">
         <div role="alert" className="tarjeta">
-          <p className="font-bold text-error">No pudimos conectar con el servidor</p>
+          <p className="flex items-start gap-1.5 font-medium text-error">
+            <IconoError />
+            <span>No pudimos conectar con el servidor</span>
+          </p>
           <p className="mb-4 text-suave">{errorConexion.message}</p>
           <button type="button" className="btn-principal" onClick={reintentar}>
             Reintentar
@@ -42,20 +46,23 @@ function CargandoSesion() {
 export function RutaPrivada({ children }: { children: ReactNode }) {
   const { estado } = useSesion();
   const ubicacion = useLocation();
+  const desde = ubicacion.pathname + ubicacion.search + ubicacion.hash;
 
   if (estado === "cargando") return <CargandoSesion />;
-  if (estado === "sinUsername") return <Navigate to="/elegir-username" replace />;
-  if (estado === "anonimo")
-    return <Navigate to="/ingreso" replace state={{ desde: ubicacion.pathname + ubicacion.search + ubicacion.hash }} />;
+  // Con sesión pero sin username, cualquier ruta privada lleva a elegirlo; después se vuelve a la ruta pedida.
+  if (estado === "sinUsername") return <Navigate to="/elegir-username" replace state={{ desde }} />;
+  if (estado === "anonimo") return <Navigate to="/ingreso" replace state={{ desde }} />;
   return <>{children}</>;
 }
 
 // /elegir-username solo se abre cuando falta el nombre de usuario ("sinUsername").
 export function RutaSinUsername({ children }: { children: ReactNode }) {
   const { estado } = useSesion();
+  const ubicacion = useLocation();
+  const desde = (ubicacion.state as { desde?: string } | null)?.desde ?? "/salas";
 
   if (estado === "cargando") return <CargandoSesion />;
   if (estado === "anonimo") return <Navigate to="/ingreso" replace />;
-  if (estado === "listo") return <Navigate to="/salas" replace />;
+  if (estado === "listo") return <Navigate to={desde} replace />;
   return <>{children}</>;
 }
