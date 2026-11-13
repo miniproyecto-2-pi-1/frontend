@@ -16,12 +16,30 @@ type CampoRegistro = "nombres" | "apellidos" | "username" | "correo" | "clave";
 type Errores = Partial<Record<CampoRegistro | "general", string>>;
 
 const CAMPOS_API: readonly string[] = ["nombres", "apellidos", "username"];
+const CORREO_REGISTRADO = "Este correo ya está registrado.";
+
+// Validación en el navegador: cada campo con su propio mensaje (US-01, datos inválidos).
+function validar(v: Record<CampoRegistro, string>): Errores {
+  const n: Errores = {};
+  if (!v.nombres.trim()) n.nombres = "Escribe tus nombres.";
+  if (!v.apellidos.trim()) n.apellidos = "Escribe tus apellidos.";
+  const username = v.username.trim();
+  if (!username) n.username = "Elige un nombre de usuario.";
+  else if (!PATRON_USERNAME.test(username)) n.username = "Usa de 3 a 20 letras, números o guion bajo, sin espacios.";
+  const correo = v.correo.trim();
+  if (!correo) n.correo = "Escribe tu correo electrónico.";
+  else if (!/^\S+@\S+\.\S+$/.test(correo)) n.correo = "Escribe un correo válido, por ejemplo nombre@correo.com.";
+  if (!v.clave) n.clave = "Elige una contraseña.";
+  else if (v.clave.length < 8 || !/[A-Za-z]/.test(v.clave) || !/\d/.test(v.clave))
+    n.clave = "La contraseña debe tener al menos 8 caracteres, con letras y números.";
+  return n;
+}
 
 // Convierte un error de la API en errores del formulario.
 function erroresDeApi(error: unknown): Errores {
   if (!(error instanceof ApiError)) return { general: "No pudimos crear tu cuenta. Inténtalo de nuevo." };
   if (error.code === "USERNAME_TAKEN") return { username: error.message };
-  if (error.code === "EMAIL_TAKEN") return { correo: error.message };
+  if (error.code === "EMAIL_TAKEN") return { correo: CORREO_REGISTRADO };
   if (error.code === "VALIDATION" && error.fields) {
     const errores: Errores = {};
     for (const [campo, mensaje] of Object.entries(error.fields)) {
@@ -33,61 +51,69 @@ function erroresDeApi(error: unknown): Errores {
   return { general: error.message };
 }
 
-// Registro manual (TS-01): crea la cuenta en Firebase Auth y luego el perfil con POST /api/v1/users.
+// Registro manual (US-01): crea la cuenta en Firebase Auth y luego el perfil con POST /api/v1/users.
 // La unicidad del nombre de usuario y del correo la decide el servidor.
+// Referencia visual: docs/prototipo/registro-*.
 export function Registro() {
   useTitulo("Registro");
   const { perfilListo } = useSesion();
   const navegar = useNavigate();
   const formulario = useRef<HTMLFormElement>(null);
+  const alerta = useRef<HTMLParagraphElement>(null);
 
-  const [valores, setValores] = useState({ nombres: "", apellidos: "", username: "", correo: "", clave: "" });
+  const [valores, setValores] = useState<Record<CampoRegistro, string>>({ nombres: "", apellidos: "", username: "", correo: "", clave: "" });
   const [avatar, setAvatar] = useState(0);
+  const [verClave, setVerClave] = useState(false);
   const [errores, setErrores] = useState<Errores>({});
   const [intentos, setIntentos] = useState(0);
   const [enviando, setEnviando] = useState(false);
 
+  // Tras un intento fallido, el foco va al primer campo con error; si solo hay error general, al aviso.
   useEffect(() => {
-    if (intentos > 0) formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+    if (intentos === 0) return;
+    const campo = formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    if (campo) campo.focus();
+    else alerta.current?.focus();
   }, [intentos]);
 
-  const cambiar = (campo: keyof typeof valores) => (e: { target: { value: string } }) =>
+  const cambiar = (campo: CampoRegistro) => (e: { target: { value: string } }) =>
     setValores((v) => ({ ...v, [campo]: e.target.value }));
+
+  function mostrarErrores(n: Errores) {
+    setErrores(n);
+    setIntentos((x) => x + 1);
+  }
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
-    const n: Errores = {};
-    if (!valores.nombres.trim()) n.nombres = "Escribe tus nombres.";
-    if (!valores.apellidos.trim()) n.apellidos = "Escribe tus apellidos.";
-    const usuario = valores.username.trim();
-    if (!usuario) n.username = "Elige un nombre de usuario.";
-    else if (!PATRON_USERNAME.test(usuario))
-      n.username = "Usa de 3 a 20 letras, números o guion bajo, sin espacios.";
-    if (!valores.correo.trim()) n.correo = "Escribe tu correo electrónico.";
-    else if (!/^\S+@\S+\.\S+$/.test(valores.correo.trim())) n.correo = "Escribe un correo válido, por ejemplo nombre@correo.com.";
-    if (!valores.clave) n.clave = "Elige una contraseña.";
-    else if (valores.clave.length < 8 || !/[A-Za-z]/.test(valores.clave) || !/\d/.test(valores.clave))
-      n.clave = "La contraseña debe tener al menos 8 caracteres, con letras y números.";
+    if (enviando) return;
+    const n = validar(valores);
     if (Object.keys(n).length === 0 && !auth) n.general = SIN_FIREBASE;
-
-    setErrores(n);
-    setIntentos((x) => x + 1);
-    if (Object.keys(n).length > 0 || !auth) return;
+    if (Object.keys(n).length > 0 || !auth) {
+      mostrarErrores(n);
+      return;
+    }
+    setErrores({});
 
     const correo = valores.correo.trim();
-    const datos: DatosRegistro = { nombres: valores.nombres.trim(), apellidos: valores.apellidos.trim(), username: usuario, avatar };
+    const datos: DatosRegistro = {
+      nombres: valores.nombres.trim(),
+      apellidos: valores.apellidos.trim(),
+      username: valores.username.trim(),
+      avatar,
+    };
 
     setEnviando(true);
     try {
-      // Si un intento anterior ya creó la cuenta (y falló el perfil, p. ej. usuario ocupado), no se crea otra vez.
+      // Si un intento anterior ya creó la cuenta en Auth y falló el perfil (p. ej. 409 USERNAME_TAKEN),
+      // no se vuelve a crear: se reintenta solo el POST.
       const actual = auth.currentUser;
       if (!actual || actual.email?.toLowerCase() !== correo.toLowerCase()) {
         try {
           await createUserWithEmailAndPassword(auth, correo, valores.clave);
         } catch (error) {
-          const { campo, mensaje } = traducirErrorAuth(error);
-          setErrores({ [campo]: mensaje });
-          setIntentos((x) => x + 1);
+          const { campo, mensaje, codigo } = traducirErrorAuth(error);
+          mostrarErrores({ [campo]: codigo === "auth/email-already-in-use" ? CORREO_REGISTRADO : mensaje });
           return;
         }
       }
@@ -96,51 +122,116 @@ export function Registro() {
         perfilListo(perfil);
         navegar("/salas", { replace: true });
       } catch (error) {
-        setErrores(erroresDeApi(error));
-        setIntentos((x) => x + 1);
+        mostrarErrores(erroresDeApi(error));
       }
     } finally {
       setEnviando(false);
     }
   }
 
-  return (
-    <div className="mx-auto max-w-md">
-      <h1 className="mb-2 text-3xl font-bold">Crea tu cuenta</h1>
-      <p className="mb-6 text-suave">Para entrar a tus salas de estudio.</p>
+  // Con el correo ya registrado se ofrece ir al ingreso, llevando el correo escrito.
+  const errorCorreo =
+    errores.correo === CORREO_REGISTRADO ? (
+      <>
+        {CORREO_REGISTRADO}{" "}
+        <Link to="/ingreso" state={{ correo: valores.correo.trim() }} className="text-enlace underline">
+          Ir a iniciar sesión
+        </Link>
+      </>
+    ) : (
+      errores.correo
+    );
 
-      <form ref={formulario} onSubmit={enviar} className="tarjeta flex flex-col gap-4" noValidate>
+  return (
+    <div className="mx-auto w-full max-w-xl">
+      <h1 className="mb-1 text-3xl font-bold sm:text-center">Crea tu cuenta</h1>
+      <p className="mb-6 text-suave sm:text-center">Para entrar a tus salas de estudio.</p>
+
+      <form
+        ref={formulario}
+        onSubmit={enviar}
+        className="tarjeta flex flex-col gap-5 p-4 sm:p-8"
+        noValidate
+        aria-describedby={errores.general ? "registro-error" : undefined}
+      >
         {errores.general && (
-          <p role="alert" className="flex items-center gap-1 font-bold text-error">
-            <span aria-hidden="true">⚠</span> {errores.general}
+          <p
+            id="registro-error"
+            ref={alerta}
+            role="alert"
+            tabIndex={-1}
+            className="flex items-start gap-1 rounded-lg border-[1.5px] border-error bg-fondo p-3 font-bold text-error"
+          >
+            <span aria-hidden="true">⚠</span>
+            <span>{errores.general}</span>
           </p>
         )}
-        <Campo id="nombres" etiqueta="Nombres" autoComplete="given-name" value={valores.nombres} onChange={cambiar("nombres")} error={errores.nombres} />
-        <Campo id="apellidos" etiqueta="Apellidos" autoComplete="family-name" value={valores.apellidos} onChange={cambiar("apellidos")} error={errores.apellidos} />
+
+        <Campo
+          id="nombres"
+          etiqueta="Nombres"
+          autoComplete="given-name"
+          value={valores.nombres}
+          onChange={cambiar("nombres")}
+          error={errores.nombres}
+        />
+        <Campo
+          id="apellidos"
+          etiqueta="Apellidos"
+          autoComplete="family-name"
+          value={valores.apellidos}
+          onChange={cambiar("apellidos")}
+          error={errores.apellidos}
+        />
         <Campo
           id="username"
           etiqueta="Nombre de usuario"
-          autoComplete="username"
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
           value={valores.username}
           onChange={cambiar("username")}
           error={errores.username}
           ayuda="De 3 a 20 letras, números o guion bajo."
         />
-        <Campo id="correo" etiqueta="Correo electrónico" type="email" autoComplete="email" value={valores.correo} onChange={cambiar("correo")} error={errores.correo} />
+        <Campo
+          id="correo"
+          etiqueta="Correo electrónico"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          value={valores.correo}
+          onChange={cambiar("correo")}
+          error={errorCorreo}
+        />
         <Campo
           id="clave"
           etiqueta="Contraseña"
-          type="password"
+          type={verClave ? "text" : "password"}
           autoComplete="new-password"
           value={valores.clave}
           onChange={cambiar("clave")}
           error={errores.clave}
           ayuda="Mínimo 8 caracteres, con letras y números."
+          accion={
+            <button
+              type="button"
+              onClick={() => setVerClave((v) => !v)}
+              aria-pressed={verClave}
+              aria-controls="clave"
+              className="min-h-10 rounded-md px-3 font-bold text-enlace"
+            >
+              {verClave ? "Ocultar" : "Mostrar"}
+              <span className="sr-only"> contraseña</span>
+            </button>
+          }
         />
 
         <fieldset>
           <legend className="mb-2 font-bold">Elige tu avatar</legend>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-6 justify-items-center gap-1 sm:flex sm:justify-between">
             {NOMBRES_AVATAR.map((nombre, i) => (
               <label key={nombre} className="cursor-pointer">
                 <input
@@ -151,8 +242,8 @@ export function Registro() {
                   onChange={() => setAvatar(i)}
                   className="peer sr-only"
                 />
-                <span className="block rounded-full p-0.5 peer-checked:ring-4 peer-checked:ring-enlace peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-enlace">
-                  <Avatar nombre={valores.nombres || "Tú"} color={i} tam={40} />
+                <span className="block rounded-full p-0.5 peer-checked:ring-[3px] peer-checked:ring-enlace peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-enlace">
+                  <Avatar nombre={valores.nombres || "Tú"} color={i} tam={38} />
                 </span>
                 <span className="sr-only">{nombre}</span>
               </label>
@@ -160,12 +251,24 @@ export function Registro() {
           </div>
         </fieldset>
 
-        <button type="submit" className="btn-principal" disabled={enviando} aria-busy={enviando}>
-          Crear cuenta
+        <button
+          type="submit"
+          className="btn-principal w-full disabled:cursor-wait disabled:opacity-80"
+          disabled={enviando}
+          aria-busy={enviando}
+        >
+          {enviando && (
+            <span
+              aria-hidden="true"
+              className="inline-block size-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+            />
+          )}
+          {enviando ? "Creando cuenta…" : "Crear cuenta"}
         </button>
+
         <p className="text-center">
           ¿Ya tienes cuenta?{" "}
-          <Link to="/ingreso" className="text-enlace underline">
+          <Link to="/ingreso" className="font-bold text-enlace underline">
             Inicia sesión
           </Link>
         </p>
