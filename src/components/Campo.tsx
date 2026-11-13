@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, ReactNode } from "react";
+import { IconoError } from "./IconoError";
 
 interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
   id: string;
@@ -42,8 +43,8 @@ export function Campo({ id, etiqueta, error, ayuda, accion, ...resto }: Props) {
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} className="mt-1 flex items-start gap-1 font-bold text-error">
-          <span aria-hidden="true">⚠</span>
+        <p id={`${id}-error`} className="mt-1 flex items-start gap-1.5 text-sm font-medium text-error">
+          <IconoError />
           <span>{error}</span>
         </p>
       )}

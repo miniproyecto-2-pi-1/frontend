@@ -12,6 +12,7 @@ import { useSesion } from "../sesion/SesionContext";
 import { useIngresoGoogle } from "../sesion/useIngresoGoogle";
 import { type DatosRegistro, type Usuario } from "../tipos";
 import { validarApellidos, validarNombres, validarUsername } from "../validacion";
+import { IconoError } from "../components/IconoError";
 
 type CampoRegistro = "nombres" | "apellidos" | "username" | "correo" | "clave";
 type Errores = Partial<Record<CampoRegistro | "general", string>>;
@@ -169,9 +170,9 @@ export function Registro() {
             ref={alerta}
             role="alert"
             tabIndex={-1}
-            className="flex items-start gap-1 rounded-lg border-[1.5px] border-error bg-fondo p-3 font-bold text-error"
+            className="flex items-start gap-1.5 rounded-lg border-[1.5px] border-error bg-fondo p-3 font-medium text-error"
           >
-            <span aria-hidden="true">⚠</span>
+            <IconoError />
             <span>{errores.general}</span>
           </p>
         )}

@@ -8,6 +8,7 @@ import { useTitulo } from "../hooks/useTitulo";
 import { esErrorDeRed, SIN_FIREBASE, traducirErrorAuth } from "../sesion/erroresAuth";
 import { useSesion } from "../sesion/SesionContext";
 import { useIngresoGoogle } from "../sesion/useIngresoGoogle";
+import { IconoError } from "../components/IconoError";
 
 interface Errores {
   correo?: string;
@@ -113,8 +114,8 @@ export function Ingreso() {
             tabIndex={-1}
             className="rounded-lg border-[1.5px] border-error bg-fondo p-3 text-error"
           >
-            <p className="flex items-start gap-1 font-bold">
-              <span aria-hidden="true">⚠</span>
+            <p className="flex items-start gap-1.5 font-medium">
+              <IconoError />
               <span>{errores.general}</span>
             </p>
             {sinRed && (

@@ -8,6 +8,7 @@ import { useTitulo } from "../hooks/useTitulo";
 import { useSesion } from "../sesion/SesionContext";
 import type { DatosUsername, Usuario } from "../tipos";
 import { separarNombre, validarApellidos, validarNombres, validarUsername } from "../validacion";
+import { IconoError } from "../components/IconoError";
 
 type CampoPerfil = "nombres" | "apellidos" | "username";
 type Errores = Partial<Record<CampoPerfil | "general", string>>;
@@ -136,9 +137,9 @@ export function ElegirUsername() {
             ref={alerta}
             role="alert"
             tabIndex={-1}
-            className="flex items-start gap-1 rounded-lg border-[1.5px] border-error bg-fondo p-3 font-bold text-error"
+            className="flex items-start gap-1.5 rounded-lg border-[1.5px] border-error bg-fondo p-3 font-medium text-error"
           >
-            <span aria-hidden="true">⚠</span>
+            <IconoError />
             <span>{errores.general}</span>
           </p>
         )}
