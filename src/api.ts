@@ -47,6 +47,9 @@ export interface RespuestaCruda {
   json: () => Promise<unknown>;
 }
 
+// Con VITE_USE_MOCKS=true las rutas de usuarios se responden en el navegador (src/mocks/api.ts).
+const USAR_MOCKS = import.meta.env.VITE_USE_MOCKS === "true";
+
 // El plan gratuito de Render puede tardar hasta un minuto en despertar.
 const ESPERA_MAXIMA_MS = 65_000;
 
@@ -99,6 +102,11 @@ async function pedir(ruta: string, opciones: OpcionesApi, signal: AbortSignal): 
     body: conCuerpo ? JSON.stringify(opciones.body) : undefined,
     signal,
   };
+  if (USAR_MOCKS) {
+    const { responderMock } = await import("./mocks/api");
+    const respuesta = await responderMock(ruta, init);
+    if (respuesta) return respuesta;
+  }
   return fetch(`${API_URL}${ruta}`, init);
 }
 
