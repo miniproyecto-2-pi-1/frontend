@@ -2,7 +2,7 @@ import { useTitulo } from "../hooks/useTitulo";
 
 const PREGUNTAS = [
   { p: "¿Cómo creo una sala?", r: "Desde Mis salas, con el botón Nueva sala. Recibirás un ID de sala para compartir con tu grupo." },
-  { p: "¿Cómo me uno a una sala?", r: "Escribe el ID de sala que te compartieron en el campo de Mis salas y pulsa Unirme." },
+  { p: "¿Cómo me uno a una sala?", r: "Con el ID de sala que te compartió quien la creó. Esta opción estará disponible muy pronto." },
   { p: "¿Mi micrófono y mi cámara se activan solos?", r: "No. Siempre empiezan apagados y los enciendes tú con sus botones." },
 ];
 

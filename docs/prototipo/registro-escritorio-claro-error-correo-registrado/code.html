@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Registro - Salón de Estudio</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              primary: '#6D3FE0',
+              hover: '#5B35C4',
+              surface: '#F4F2F9',
+              text: '#2B2833',
+              secondary: '#5A5469',
+              error: '#B3261E',
+              link: '#5B35C4',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-rules">
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #FFFFFF;
+      color: #2B2833;
+    }
+    /* Estilo exacto para bordes de 1.5px continuos según guía visual */
+    .custom-input {
+      border: 1.5px solid #2B2833;
+      border-radius: 8px;
+    }
+    .custom-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #5B35C4;
+      border-color: #5B35C4;
+    }
+    .custom-input-error {
+      border: 1.5px solid #B3261E;
+      border-radius: 8px;
+    }
+    .custom-input-error:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #B3261E;
+      border-color: #B3261E;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-white selection:bg-brand-primary selection:text-white">
+<!-- BEGIN: MainContent -->
+<main class="w-full max-w-[540px] flex flex-col items-center">
+<!-- Header / Título de pantalla -->
+<div class="text-center mb-6" data-purpose="page-title-block">
+<h1 class="text-2xl font-bold text-[#2B2833] tracking-tight mb-2">Crea tu cuenta</h1>
+<p class="text-base text-[#5A5469]">Para entrar a tus salas de estudio.</p>
+</div>
+<!-- BEGIN: RegisterCard -->
+<div class="w-full bg-[#F4F2F9] rounded-[10px] p-6 sm:p-8" data-purpose="register-card">
+<form class="space-y-4" data-purpose="registration-form" onsubmit="event.preventDefault();">
+<!-- Campo: Nombres -->
+<div>
+<label class="block text-xs font-bold text-[#2B2833] mb-1.5" for="nombres">Nombres</label>
+<input class="custom-input w-full px-3.5 py-2.5 bg-white text-base text-[#2B2833] transition" id="nombres" name="nombres" type="text" value="Camila"/>
+</div>
+<!-- Campo: Apellidos -->
+<div>
+<label class="block text-xs font-bold text-[#2B2833] mb-1.5" for="apellidos">Apellidos</label>
+<input class="custom-input w-full px-3.5 py-2.5 bg-white text-base text-[#2B2833] transition" id="apellidos" name="apellidos" type="text" value="Torres"/>
+</div>
+<!-- Campo: Nombre de usuario -->
+<div>
+<label class="block text-xs font-bold text-[#2B2833] mb-1.5" for="usuario">Nombre de usuario</label>
+<input class="custom-input w-full px-3.5 py-2.5 bg-white text-base text-[#2B2833] transition" id="usuario" name="usuario" type="text" value="camila_t"/>
+<p class="text-xs text-[#5A5469] mt-1.5">De 3 a 20 letras, números o guion bajo.</p>
+</div>
+<!-- Campo: Correo electrónico con estado de error -->
+<div>
+<label class="block text-xs font-bold text-[#2B2833] mb-1.5" for="email">Correo electrónico</label>
+<input aria-describedby="email-error-msg" aria-invalid="true" class="custom-input-error w-full px-3.5 py-2.5 bg-white text-base text-[#2B2833] transition" id="email" name="email" type="email" value="camila.torres@correounivalle.edu.co"/>
+<!-- Mensaje de error con icono advertencia y enlace -->
+<div class="flex items-center gap-1.5 mt-1.5 text-xs text-[#B3261E] font-medium" data-purpose="email-error-message" id="email-error-msg">
+<svg aria-hidden="true" class="w-4 h-4 shrink-0 text-[#B3261E]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+<span>
+              Este correo ya está registrado. 
+              <a class="underline font-bold text-[#5B35C4] hover:text-[#47289b] focus:outline-none focus:ring-1 focus:ring-[#5B35C4] rounded" href="#">Inicia sesión</a>
+</span>
+</div>
+</div>
+<!-- Campo: Contraseña -->
+<div>
+<label class="block text-xs font-bold text-[#2B2833] mb-1.5" for="password">Contraseña</label>
+<input class="custom-input w-full px-3.5 py-2.5 bg-white text-base text-[#2B2833] tracking-wider transition" id="password" name="password" type="password" value="••••••••••••"/>
+<p class="text-xs text-[#5A5469] mt-1.5">Mínimo 8 caracteres, con letras y números.</p>
+</div>
+<!-- BEGIN: AvatarSelector -->
+<div class="pt-1" data-purpose="avatar-selector">
+<span class="block text-xs font-bold text-[#2B2833] mb-2.5">Elige tu avatar</span>
+<div class="flex items-center gap-2.5 flex-wrap">
+<!-- Avatar 1 -->
+<button class="w-10 h-10 rounded-full bg-[#5E35B1] text-white text-xs font-bold flex items-center justify-center transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5E35B1]" type="button">
+              CA
+            </button>
+<!-- Avatar 2 -->
+<button class="w-10 h-10 rounded-full bg-[#1B5E20] text-white text-xs font-bold flex items-center justify-center transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B5E20]" type="button">
+              CA
+            </button>
+<!-- Avatar 3 -->
+<button class="w-10 h-10 rounded-full bg-[#8E24AA] text-white text-xs font-bold flex items-center justify-center transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8E24AA]" type="button">
+              CA
+            </button>
+<!-- Avatar 4 -->
+<button class="w-10 h-10 rounded-full bg-[#00838F] text-white text-xs font-bold flex items-center justify-center transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00838F]" type="button">
+              CA
+            </button>
+<!-- Avatar 5 -->
+<button class="w-10 h-10 rounded-full bg-[#B71C1C] text-white text-xs font-bold flex items-center justify-center transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B71C1C]" type="button">
+              CA
+            </button>
+<!-- Avatar 6 (Seleccionado con aro de foco/resaltado) -->
+<button class="w-10 h-10 rounded-full bg-[#E65100] text-white text-xs font-bold flex items-center justify-center ring-[2px] ring-offset-[2.5px] ring-[#2B2833] transition hover:opacity-90 focus:outline-none" type="button">
+              CA
+            </button>
+</div>
+</div>
+<!-- END: AvatarSelector -->
+<!-- Botón Principal: Crear cuenta -->
+<div class="pt-2">
+<button class="w-full bg-[#6D3FE0] hover:bg-[#5B35C4] text-white font-bold py-3 px-4 rounded-[8px] transition duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6D3FE0] text-base" type="submit">
+            Crear cuenta
+          </button>
+</div>
+<!-- Separador 'o' -->
+<div class="relative flex py-1 items-center justify-center">
+<div class="flex-grow border-t border-[#D5D1DF]"></div>
+<span class="flex-shrink mx-4 text-xs text-[#5A5469]">o</span>
+<div class="flex-grow border-t border-[#D5D1DF]"></div>
+</div>
+<!-- Botón Secundario: Registrarse con Google -->
+<div>
+<button class="w-full bg-white hover:bg-gray-50 text-[#2B2833] font-bold py-2.5 px-4 rounded-[8px] border-[1.5px] border-[#2B2833] flex items-center justify-center gap-2.5 transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6D3FE0] text-sm" type="button">
+<svg aria-hidden="true" class="w-4 h-4 shrink-0" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.67v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.16z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+            Registrarse con Google
+          </button>
+</div>
+<!-- Enlace inferior de Inicio de Sesión -->
+<div class="text-center pt-2">
+<p class="text-sm text-[#2B2833]">
+            ¿Ya tienes cuenta? 
+            <a class="font-bold text-[#5B35C4] hover:text-[#47289b] ml-1 transition focus:outline-none underline" href="#">Inicia sesión</a>
+</p>
+</div>
+</form>
+</div>
+<!-- END: RegisterCard -->
+<!-- Nota inferior de sprint / prototipo -->
+<div class="mt-6 text-center max-w-[480px]">
+<p class="text-xs text-[#5A5469] leading-relaxed">
+        Demostración del Sprint 0: ya hay datos de ejemplo escritos, solo pulsa Crear cuenta.
+      </p>
+</div>
+</main>
+<!-- END: MainContent -->
+</body></html>

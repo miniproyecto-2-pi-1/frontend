@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Salón de Estudio - Estado de Error</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            app: {
+              bg: '#2B2833',
+              card: '#25222D',
+              border: '#3E3A4A',
+              text: '#F3F1F8',
+              muted: '#BDB8CC',
+              error: '#FF8AA0',
+              purple: '#6D3FE0',
+              'purple-hover': '#5E34C7',
+              'purple-active': '#4F28AD'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+<!-- Custom Base & Focus Styles -->
+<style data-purpose="theme-styles">
+    body {
+      background-color: #2B2833;
+      color: #F3F1F8;
+      font-family: 'Noto Sans', sans-serif;
+    }
+
+    /* Accessibility focus ring with appropriate contrast */
+    .focus-ring:focus-visible {
+      outline: 2px solid #FF8AA0;
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col antialiased bg-[#2B2833] text-[#F3F1F8]">
+<!-- BEGIN: MainHeader -->
+<!-- Header / Barra superior alineada con el estilo de la plataforma -->
+<header class="w-full bg-[#25222D] border-b border-[#3E3A4A]/50 py-4 px-8 md:px-12 flex items-center justify-between shadow-sm" data-purpose="app-header">
+<div class="flex items-center space-x-3">
+<!-- Título de la aplicación -->
+<h1 class="text-xl md:text-2xl font-semibold text-[#F3F1F8] tracking-tight">
+        Salón de Estudio
+      </h1>
+</div>
+<!-- Indicador contextual del entorno -->
+<div class="text-xs text-[#BDB8CC] font-medium tracking-wide uppercase px-2.5 py-1 rounded bg-[#2B2833] border border-[#3E3A4A]/60">
+      Base Técnica
+    </div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<!-- Contenedor principal centrado optimizado para pantallas Desktop de 1440px -->
+<main class="flex-1 flex items-center justify-center p-6 md:p-12 w-full max-w-[1440px] mx-auto" data-purpose="main-layout">
+<!-- BEGIN: ErrorCard -->
+<!-- Tarjeta central con fondo de superficie #25222D, borde sutil 1.5px y esquinas redondeadas de 10px -->
+<section aria-labelledby="error-heading" class="w-full max-w-[620px] bg-[#25222D] rounded-[10px] border-[1.5px] border-[#3E3A4A] shadow-2xl p-8 sm:p-12 text-center flex flex-col items-center justify-center transition-all duration-200" data-purpose="error-card">
+<!-- Contenedor de ícono con color de error #FF8AA0 -->
+<div aria-hidden="true" class="mb-5 flex items-center justify-center text-[#FF8AA0]" data-purpose="status-icon">
+<svg class="w-12 h-12 stroke-[1.75]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<!-- Círculo exterior -->
+<circle cx="12" cy="12" r="10"></circle>
+<!-- Signo de exclamación: barra vertical y punto -->
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+</div>
+<!-- Título de error con contraste accesible WCAG AA -->
+<h2 class="text-[18px] font-semibold text-[#F3F1F8] leading-snug mb-2 tracking-normal" id="error-heading">
+        No pudimos cargar los datos
+      </h2>
+<!-- Mensaje explicativo / Subtexto -->
+<p class="text-[14px] text-[#BDB8CC] max-w-sm mb-7 leading-relaxed font-normal">
+        Revisa tu conexión e inténtalo de nuevo.
+      </p>
+<!-- Botón de acción principal 'Reintentar' -->
+<button class="focus-ring inline-flex items-center justify-center px-6 py-2.5 rounded-[8px] bg-[#6D3FE0] hover:bg-[#5E34C7] active:bg-[#4F28AD] text-white text-[15px] font-medium transition-colors duration-150 shadow-md cursor-pointer select-none" data-purpose="retry-action" id="retry-button" type="button">
+<span>Reintentar</span>
+</button>
+</section>
+<!-- END: ErrorCard -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: InteractionLogic -->
+<script data-purpose="button-interactions">
+    // Comportamiento simulado del botón reintentar
+    document.getElementById('retry-button')?.addEventListener('click', function() {
+      const btn = this;
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.classList.add('opacity-75', 'cursor-wait');
+      btn.innerHTML = '<span>Reintentando...</span>';
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75', 'cursor-wait');
+        btn.innerHTML = originalText;
+      }, 1500);
+    });
+  </script>
+<!-- END: InteractionLogic -->
+</body></html>

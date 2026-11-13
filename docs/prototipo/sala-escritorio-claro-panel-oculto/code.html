@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cálculo II - Sala</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              purple: '#6D3FE0',
+              'purple-dark': '#5b32c4',
+              surface: '#F4F2F9',
+              'surface-tile': '#E5E2F0',
+              text: '#2B2833',
+              'green-bg': '#E6F8EE',
+              'green-text': '#198754',
+              danger: '#B92828'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Patterns and Component Styling -->
+<style data-purpose="striped-background">
+    /* Subtle diagonal stripes for Juan's video tile simulation */
+    .bg-stripes-diagonal {
+      background-color: #EAE6F4;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        #F2EFF9,
+        #F2EFF9 14px,
+        #E3DFEE 14px,
+        #E3DFEE 28px
+      );
+    }
+  </style>
+<style data-purpose="typography">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-2 sm:p-6 text-brand-text antialiased selection:bg-purple-100">
+<!-- BEGIN: MainContainer -->
+<!-- Main application card reflecting the 1440px wide aspect desktop layout container -->
+<div class="w-full max-w-[1100px] aspect-[1086/1138] max-h-[96vh] bg-white border border-[#DDD9E8] rounded-[24px] shadow-sm flex overflow-hidden">
+<!-- BEGIN: MainContentArea -->
+<!-- Left interactive room canvas area taking maximum width -->
+<main class="flex-1 flex flex-col p-5 sm:p-7 min-w-0" data-purpose="meeting-room-main">
+<!-- BEGIN: RoomHeader -->
+<header class="flex items-center justify-between pb-4 sm:pb-5">
+<!-- Room Title -->
+<h1 class="text-xl sm:text-[22px] font-bold tracking-tight text-[#2B2833]">
+          Cálculo II
+        </h1>
+<!-- Header Actions: Status Indicator & Panel Toggle Button -->
+<div class="flex items-center gap-3">
+<!-- Connection Status Badge -->
+<div class="flex items-center gap-2 bg-[#E3F8EB] text-[#0E8A42] font-semibold text-xs sm:text-sm px-3.5 py-1.5 rounded-full" data-purpose="status-badge">
+<span class="w-2.5 h-2.5 rounded-full bg-[#0E8A42] inline-block"></span>
+<span>Conectado</span>
+</div>
+<!-- Show Panel Button -->
+<button aria-label="Mostrar panel lateral" class="flex items-center gap-2 border-2 border-brand-purple text-brand-purple hover:bg-brand-purple/5 transition-colors font-semibold text-xs sm:text-sm px-4 py-1.5 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-purple/30" data-purpose="toggle-panel-button" type="button">
+<!-- Panel Icon -->
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
+<line x1="9" x2="9" y1="3" y2="21"></line>
+</svg>
+<span>Mostrar panel</span>
+</button>
+</div>
+</header>
+<!-- END: RoomHeader -->
+<!-- BEGIN: VideoGrid -->
+<!-- 2x2 Video Tile Grid for participants -->
+<section class="flex-1 grid grid-cols-2 grid-rows-2 gap-3 sm:gap-4 my-1 min-h-0" data-purpose="video-grid">
+<!-- Tile 1: Camila (Camera off) -->
+<div class="relative bg-brand-surface-tile rounded-[18px] flex items-center justify-center overflow-hidden border border-transparent" data-purpose="participant-card-camila">
+<!-- User Avatar Circle -->
+<div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-brand-purple flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-sm">
+            CA
+          </div>
+<!-- Participant Info Badge -->
+<div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-medium text-brand-text px-3 py-1.5 rounded-xl shadow-xs border border-black/5">
+            Camila (tú) · cámara apagada
+          </div>
+</div>
+<!-- Tile 2: Juan (Camera on - diagonal striped texture) -->
+<div class="relative bg-stripes-diagonal rounded-[18px] flex items-center justify-center overflow-hidden border border-transparent" data-purpose="participant-card-juan">
+<!-- User Avatar Circle -->
+<div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-brand-purple flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-sm">
+            JU
+          </div>
+<!-- Participant Info Badge -->
+<div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-medium text-brand-text px-3 py-1.5 rounded-xl shadow-xs border border-black/5">
+            Juan · cámara encendida
+          </div>
+</div>
+<!-- Tile 3: María (Without microphone) -->
+<div class="relative bg-brand-surface-tile rounded-[18px] flex items-center justify-center border border-[#DDD9E8]/40 overflow-hidden" data-purpose="participant-card-maria">
+<!-- User Avatar Circle -->
+<div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-brand-purple flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-sm">
+            MA
+          </div>
+<!-- Participant Info Badge -->
+<div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-medium text-brand-text px-3 py-1.5 rounded-xl shadow-xs border border-black/5">
+            María · sin micrófono
+          </div>
+</div>
+<!-- Tile 4: Pablo (Sharing screen - highlighted purple border) -->
+<div class="relative bg-brand-surface-tile rounded-[18px] flex items-center justify-center border-[3.5px] border-brand-purple overflow-hidden" data-purpose="participant-card-pablo">
+<!-- User Avatar Circle -->
+<div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-brand-purple flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-sm">
+            PA
+          </div>
+<!-- Participant Info Badge -->
+<div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-medium text-brand-text px-3 py-1.5 rounded-xl shadow-xs border border-black/5">
+            Pablo · presentando pantalla
+          </div>
+</div>
+</section>
+<!-- END: VideoGrid -->
+<!-- BEGIN: MediaControlsBar -->
+<!-- Bottom Control Bar with Actions -->
+<footer class="pt-4 sm:pt-6 flex justify-center items-center gap-6 sm:gap-10" data-purpose="meeting-controls">
+<!-- Control 1: Microphone (Off) -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Micrófono apagado" class="w-12 h-12 rounded-full border-2 border-brand-purple text-brand-purple flex items-center justify-center hover:bg-brand-purple/10 active:scale-95 transition" type="button">
+<!-- Microphone Off / Normal Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="23"></line>
+<line x1="8" x2="16" y1="23" y2="23"></line>
+</svg>
+</button>
+<span class="text-[11px] sm:text-xs text-brand-text font-medium whitespace-nowrap">Micrófono apagado</span>
+</div>
+<!-- Control 2: Camera (Off) -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Cámara apagada" class="w-12 h-12 rounded-full border-2 border-brand-purple text-brand-purple flex items-center justify-center hover:bg-brand-purple/10 active:scale-95 transition" type="button">
+<!-- Video Camera Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polygon points="23 7 16 12 23 17 23 7"></polygon>
+<rect height="14" rx="2" ry="2" width="15" x="1" y="5"></rect>
+</svg>
+</button>
+<span class="text-[11px] sm:text-xs text-brand-text font-medium whitespace-nowrap">Cámara apagada</span>
+</div>
+<!-- Control 3: Share Screen -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Compartir pantalla" class="w-12 h-12 rounded-full border border-gray-300 text-brand-purple flex items-center justify-center hover:bg-brand-purple/10 active:scale-95 transition" type="button">
+<!-- Screen Share / Upload Screen Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" width="20" x="2" y="3"></rect>
+<line x1="8" x2="16" y1="21" y2="21"></line>
+<line x1="12" x2="12" y1="17" y2="21"></line>
+<path d="M12 7l-3 3h2v4h2v-4h2z" fill="currentColor" stroke="none"></path>
+</svg>
+</button>
+<span class="text-[11px] sm:text-xs text-brand-text font-medium whitespace-nowrap">Compartir pantalla</span>
+</div>
+<!-- Control 4: Leave Room -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Salir de la sala" class="w-12 h-12 rounded-full bg-[#B92828] text-white flex items-center justify-center hover:bg-red-700 active:scale-95 transition shadow-sm" type="button">
+<!-- Close / Hang Up Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
+<line x1="18" x2="6" y1="6" y2="18"></line>
+<line x1="6" x2="18" y1="6" y2="18"></line>
+</svg>
+</button>
+<span class="text-[11px] sm:text-xs text-brand-text font-medium whitespace-nowrap">Salir de la sala</span>
+</div>
+</footer>
+<!-- END: MediaControlsBar -->
+</main>
+<!-- END: MainContentArea -->
+<!-- BEGIN: CollapsedRightSidebar -->
+<!-- Narrow collapsed right quick-access utility navigation bar -->
+<aside aria-label="Accesos rápidos" class="w-16 sm:w-20 border-l border-[#DDD9E8] bg-white flex flex-col items-center pt-5 sm:pt-6 gap-7" data-purpose="collapsed-sidebar">
+<!-- Button: Expand Panel Action -->
+<button aria-label="Expandir panel lateral" class="w-11 h-11 border-2 border-brand-purple rounded-xl flex items-center justify-center text-brand-purple hover:bg-brand-purple/5 transition-colors focus:outline-none" title="Mostrar panel" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
+<line x1="9" x2="9" y1="3" y2="21"></line>
+</svg>
+</button>
+<!-- Button: Participants -->
+<button aria-label="Ver participantes" class="text-brand-purple/90 hover:text-brand-purple hover:bg-brand-purple/5 p-2 rounded-xl transition" title="Participantes" type="button">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+<circle cx="9" cy="7" r="4"></circle>
+<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+</svg>
+</button>
+<!-- Button: Chat / Messages -->
+<button aria-label="Abrir chat" class="text-brand-purple/90 hover:text-brand-purple hover:bg-brand-purple/5 p-2 rounded-xl transition" title="Chat" type="button">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+</svg>
+</button>
+<!-- Button: Search -->
+<button aria-label="Buscar en la sala" class="text-brand-purple/90 hover:text-brand-purple hover:bg-brand-purple/5 p-2 rounded-xl transition" title="Buscar" type="button">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+</button>
+</aside>
+<!-- END: CollapsedRightSidebar -->
+</div>
+<!-- END: MainContainer -->
+</body></html>

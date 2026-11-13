@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Nueva sala - Salón de Estudio</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: '#6D3FE0',
+            'brand-hover': '#5B35C4',
+            surface: '#25222D',
+            bg: '#2B2833',
+            txt: '#F3F1F8',
+            'txt-sec': '#BDB8CC',
+            link: '#C4B1FF',
+            err: '#FF8AA0',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+    }
+    .border-15 {
+      border-width: 1.5px;
+      border-style: solid;
+    }
+  </style>
+</head>
+<body class="bg-[#2B2833] text-txt antialiased h-full flex flex-col justify-center items-center m-0 p-0 overflow-hidden">
+<!-- Mobile Screen Container (390px true mobile canvas) -->
+<div class="relative w-full max-w-[390px] h-full max-h-[844px] bg-[#2B2833] overflow-hidden flex flex-col">
+<!-- PANTALLA DE FONDO ATENUADA: "Mis salas" Móvil Oscuro -->
+<div aria-hidden="true" class="w-full h-full filter opacity-25 pointer-events-none select-none px-4 pt-6 space-y-4">
+<!-- Barra superior -->
+<div class="flex items-center justify-between pb-3 border-b border-15 border-[#3E394A]">
+<span class="text-base font-bold text-txt">Salón de Estudio</span>
+<div class="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center font-bold text-xs">CA</div>
+</div>
+<!-- Botón crear sala atenuado -->
+<div class="w-full py-2.5 rounded-[8px] bg-brand text-white text-xs font-semibold text-center">+ Nueva sala</div>
+<!-- Input código atenuado -->
+<div class="w-full py-2 px-3 bg-surface rounded-[8px] border-15 border-[#4F495E] text-xs text-txt-sec">Introduce un código</div>
+<!-- Lista de salas -->
+<div class="pt-2">
+<div class="text-xs font-bold text-txt mb-2">Tus salas</div>
+<div class="rounded-[10px] border-15 border-[#3E394A] overflow-hidden mb-3 bg-surface">
+<div class="bg-brand text-white p-2.5 text-xs font-bold">Cálculo II</div>
+<div class="p-2 text-[10px] text-txt-sec">3 conectadas</div>
+</div>
+<div class="rounded-[10px] border-15 border-[#3E394A] overflow-hidden bg-surface">
+<div class="bg-[#207A3F] text-white p-2.5 text-xs font-bold">Proyecto Integrador</div>
+<div class="p-2 text-[10px] text-txt-sec">Nadie conectado</div>
+</div>
+</div>
+</div>
+<!-- OVERLAY CON DIÁLOGO MODAL: Centrado, full width menos 16px márgenes a cada lado -->
+<div class="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center px-4 z-50">
+<div class="w-full bg-[#25222D] rounded-[10px] p-5 border-15 border-[#3E394A] shadow-2xl">
+<!-- Título: 20px bold Noto Sans -->
+<h2 class="text-[20px] font-bold text-txt leading-snug tracking-tight mb-4">Nueva sala</h2>
+<form onsubmit="event.preventDefault();">
+<div class="mb-2">
+<!-- Label del campo -->
+<label class="block text-xs font-semibold text-txt mb-1.5" for="room-name-mobile-dark">Nombre de la sala</label>
+<!-- Input con borde 1.5px y rounded 8px -->
+<input class="w-full px-3 py-2 bg-[#2B2833] text-txt rounded-[8px] border-15 border-[#5A5469] focus:border-brand focus:ring-0 focus:outline-none text-xs transition-colors" id="room-name-mobile-dark" type="text" value="Cálculo II"/>
+</div>
+<!-- Texto descriptivo / Helper text -->
+<p class="text-[11px] text-txt-sec mb-5 leading-relaxed">
+            Al crearla recibirás un ID para compartir con tu grupo.
+          </p>
+<!-- Acciones abajo a la derecha -->
+<div class="flex items-center justify-end gap-4 pt-1">
+<button class="text-xs font-semibold text-link hover:underline transition-opacity" type="button">
+              Cancelar
+            </button>
+<button class="px-4 py-2 rounded-[8px] bg-[#6D3FE0] hover:bg-brand-hover text-white font-semibold text-xs shadow-sm transition-colors" type="submit">
+              Crear sala
+            </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</body></html>

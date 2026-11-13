@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cálculo II - Sala Virtual</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN with forms and container-queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Custom configuration for Tailwind -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              purple: '#6D3FE0',
+              'purple-dark': '#582ecc',
+              'purple-light': '#CEBDFF',
+              text: '#F3F1F8',
+              subtext: '#BDB8CC',
+              border: '#3A3546',
+              surface: '#25222D',
+              'surface-card': '#1D1A24',
+              'surface-input': '#17151F',
+              'input-border': '#3B3748',
+              green: '#57D58A',
+              'green-bg': 'rgba(87, 213, 138, 0.15)',
+              red: '#B3261E'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom CSS for specific patterns and styling details -->
+<style data-purpose="pattern-styles">
+    /* Subtle diagonal striped background for Juan's video tile in dark mode */
+    .bg-stripes-dark {
+      background-color: #1D1A24;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.04),
+        rgba(255, 255, 255, 0.04) 14px,
+        rgba(29, 26, 36, 0.9) 14px,
+        rgba(29, 26, 36, 0.9) 28px
+      );
+    }
+  </style>
+<style data-purpose="scrollbar-and-misc">
+    /* Custom thin scrollbar for smooth visual aesthetic */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3A3546;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-[#2B2833] min-h-screen p-3 md:p-6 flex items-center justify-center font-sans antialiased text-[#F3F1F8]">
+<!-- BEGIN: MainContainer -->
+<!-- Outer Window Container matching 07-sala-computador-oscuro -->
+<main class="w-full max-w-[1100px] bg-[#25222D] rounded-[24px] border-[1.5px] border-[#3A3546] shadow-xl p-5 md:p-6 flex flex-col gap-5" data-purpose="virtual-room-container">
+<!-- BEGIN: TopBar -->
+<header class="flex items-center justify-between pb-1" data-purpose="room-header">
+<!-- Title and Connection Status Badge -->
+<div class="flex items-center gap-6">
+<h1 class="text-xl md:text-[22px] font-bold tracking-tight text-[#F3F1F8]">Cálculo II</h1>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(87,213,138,0.15)] text-[#57D58A] text-sm font-semibold">
+<span class="w-2.5 h-2.5 rounded-full bg-[#57D58A] inline-block"></span>
+<span>Conectado</span>
+</div>
+</div>
+<!-- Hide Panel Action Button -->
+<div>
+<button aria-label="Ocultar panel lateral" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-[#6D3FE0] text-[#CEBDFF] text-sm font-semibold hover:bg-[#6D3FE0]/20 transition-colors focus:outline-none" type="button">
+<!-- Icon representing the side panel layout -->
+<svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
+<line x1="15" x2="15" y1="3" y2="21"></line>
+</svg>
+<span>Ocultar panel</span>
+</button>
+</div>
+</header>
+<!-- END: TopBar -->
+<!-- BEGIN: MainContentGrid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start" data-purpose="split-view-workspace">
+<!-- BEGIN: LeftVideoArea -->
+<section aria-label="Mosaicos de video" class="lg:col-span-8 flex flex-col justify-between h-full gap-5" data-purpose="video-tiles-section">
+<!-- 2x2 Video Tile Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Tile 1: Camila (tú) -->
+<article class="relative aspect-[4/4.5] sm:aspect-square bg-[#1D1A24] rounded-[10px] flex flex-col items-center justify-center border-[1.5px] border-[#3A3546] shadow-sm overflow-hidden" data-purpose="user-tile-camila">
+<!-- Center Avatar -->
+<div class="w-14 h-14 rounded-full bg-[#6D3FE0] text-white font-bold flex items-center justify-center text-lg shadow-sm">
+              CA
+            </div>
+<!-- Bottom Label Capsule -->
+<div class="absolute bottom-3 left-3 bg-[#25222D]/90 border border-[#3A3546] px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
+<span class="text-xs text-[#BDB8CC] font-medium">Camila (tú) · cámara apagada</span>
+</div>
+</article>
+<!-- Tile 2: Juan (striped background) -->
+<article class="relative aspect-[4/4.5] sm:aspect-square bg-stripes-dark rounded-[10px] flex flex-col items-center justify-center border-[1.5px] border-[#3A3546] shadow-sm overflow-hidden" data-purpose="user-tile-juan">
+<!-- Center Avatar -->
+<div class="w-14 h-14 rounded-full bg-[#6D3FE0] text-white font-bold flex items-center justify-center text-lg shadow-sm">
+              JU
+            </div>
+<!-- Bottom Label Capsule -->
+<div class="absolute bottom-3 left-3 bg-[#25222D]/90 border border-[#3A3546] px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
+<span class="text-xs text-[#BDB8CC] font-medium">Juan · cámara encendida</span>
+</div>
+</article>
+<!-- Tile 3: María -->
+<article class="relative aspect-[4/4.5] sm:aspect-square bg-[#1D1A24] rounded-[10px] flex flex-col items-center justify-center border-[1.5px] border-[#3A3546] shadow-sm overflow-hidden" data-purpose="user-tile-maria">
+<!-- Center Avatar -->
+<div class="w-14 h-14 rounded-full bg-[#6D3FE0] text-white font-bold flex items-center justify-center text-lg shadow-sm">
+              MA
+            </div>
+<!-- Bottom Label Capsule -->
+<div class="absolute bottom-3 left-3 bg-[#25222D]/90 border border-[#3A3546] px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
+<span class="text-xs text-[#BDB8CC] font-medium">María · sin micrófono</span>
+</div>
+</article>
+<!-- Tile 4: Pablo (Presenting screen with distinctive purple border) -->
+<article class="relative aspect-[4/4.5] sm:aspect-square bg-[#1D1A24] rounded-[10px] flex flex-col items-center justify-center border-[2.5px] border-[#6D3FE0] shadow-sm overflow-hidden" data-purpose="user-tile-pablo-presenting">
+<!-- Center Avatar -->
+<div class="w-14 h-14 rounded-full bg-[#6D3FE0] text-white font-bold flex items-center justify-center text-lg shadow-sm">
+              PA
+            </div>
+<!-- Bottom Label Capsule -->
+<div class="absolute bottom-3 left-3 bg-[#25222D]/90 border border-[#3A3546] px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
+<span class="text-xs text-[#BDB8CC] font-medium">Pablo · presentando pantalla</span>
+</div>
+</article>
+</div>
+<!-- BEGIN: CallControls -->
+<!-- Centered Bottom Control Toolbar -->
+<nav class="flex items-center justify-center gap-5 sm:gap-7 pt-2 pb-1" data-purpose="call-action-buttons">
+<!-- Control: Micrófono apagado -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Micrófono apagado" class="w-11 h-11 rounded-full bg-[#1D1A24] border-[1.5px] border-[#6D3FE0] text-[#CEBDFF] flex items-center justify-center hover:bg-[#6D3FE0]/20 transition focus:outline-none" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<span class="text-[11px] text-[#BDB8CC] font-medium text-center">Micrófono apagado</span>
+</div>
+<!-- Control: Cámara apagada -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Cámara apagada" class="w-11 h-11 rounded-full bg-[#1D1A24] border-[1.5px] border-[#6D3FE0] text-[#CEBDFF] flex items-center justify-center hover:bg-[#6D3FE0]/20 transition focus:outline-none" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<span class="text-[11px] text-[#BDB8CC] font-medium text-center">Cámara apagada</span>
+</div>
+<!-- Control: Compartir pantalla -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Compartir pantalla" class="w-11 h-11 rounded-full bg-[#1D1A24] border-[1.5px] border-[#3B3748] text-[#F3F1F8] flex items-center justify-center hover:bg-[#3B3748]/50 transition focus:outline-none" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" ry="2" width="20" x="2" y="3"></rect>
+<line x1="8" x2="16" y1="21" y2="21"></line>
+<line x1="12" x2="12" y1="17" y2="21"></line>
+<polyline points="9 9 12 6 15 9"></polyline>
+<line x1="12" x2="12" y1="6" y2="12"></line>
+</svg>
+</button>
+<span class="text-[11px] text-[#BDB8CC] font-medium text-center">Compartir pantalla</span>
+</div>
+<!-- Control: Salir de la sala -->
+<div class="flex flex-col items-center gap-1.5">
+<button aria-label="Salir de la sala" class="w-11 h-11 rounded-full bg-[#B3261E] text-white flex items-center justify-center hover:bg-red-700 transition shadow-sm focus:outline-none" type="button">
+<svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<span class="text-[11px] text-[#BDB8CC] font-medium text-center">Salir de la sala</span>
+</div>
+</nav>
+<!-- END: CallControls -->
+</section>
+<!-- END: LeftVideoArea -->
+<!-- BEGIN: RightSidePanel -->
+<aside class="lg:col-span-4 border-[1.5px] border-[#3A3546] rounded-2xl p-4 flex flex-col justify-between gap-5 bg-[#201D29] min-h-[660px]" data-purpose="sidebar-people-chat">
+<!-- Top Half: Personas Section -->
+<div class="flex flex-col gap-3.5">
+<!-- Accordion Title -->
+<div class="flex items-center gap-1.5 text-[#F3F1F8] font-bold text-base cursor-pointer">
+<svg class="w-4 h-4 stroke-[2.5] text-[#F3F1F8]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+<span>Personas</span>
+<span class="font-normal text-[#BDB8CC] text-sm">· 4 en línea</span>
+</div>
+<!-- Search Input -->
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#BDB8CC]">
+<svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+</span>
+<input class="w-full pl-10 pr-3.5 py-1.5 text-sm bg-[#17151F] border-[1.5px] border-[#3B3748] rounded-full placeholder-[#BDB8CC] text-[#F3F1F8] focus:outline-none focus:ring-1 focus:ring-[#6D3FE0] focus:border-[#6D3FE0]" placeholder="Buscar participante" type="text"/>
+</div>
+<!-- Participants List -->
+<ul class="flex flex-col gap-2.5 pt-1">
+<!-- Participant: Camila -->
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center">
+                  CA
+                </div>
+<div class="flex flex-col">
+<span class="text-xs font-bold leading-tight text-[#F3F1F8]">Camila (tú)</span>
+<span class="text-[11px] text-[#BDB8CC] leading-tight">cámara apagada</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-semibold text-[#57D58A]">
+<span class="w-2 h-2 rounded-full bg-[#57D58A] inline-block"></span>
+<span>En línea</span>
+</div>
+</li>
+<!-- Participant: Juan -->
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center">
+                  JU
+                </div>
+<div class="flex flex-col">
+<span class="text-xs font-bold leading-tight text-[#F3F1F8]">Juan</span>
+<span class="text-[11px] text-[#BDB8CC] leading-tight">cámara encendida</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-semibold text-[#57D58A]">
+<span class="w-2 h-2 rounded-full bg-[#57D58A] inline-block"></span>
+<span>En línea</span>
+</div>
+</li>
+<!-- Participant: María -->
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center">
+                  MA
+                </div>
+<div class="flex flex-col">
+<span class="text-xs font-bold leading-tight text-[#F3F1F8]">María</span>
+<span class="text-[11px] text-[#BDB8CC] leading-tight">sin micrófono</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-semibold text-[#57D58A]">
+<span class="w-2 h-2 rounded-full bg-[#57D58A] inline-block"></span>
+<span>En línea</span>
+</div>
+</li>
+<!-- Participant: Pablo -->
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center">
+                  PA
+                </div>
+<div class="flex flex-col">
+<span class="text-xs font-bold leading-tight text-[#F3F1F8]">Pablo</span>
+<span class="text-[11px] text-[#BDB8CC] leading-tight">presentando pantalla</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-semibold text-[#57D58A]">
+<span class="w-2 h-2 rounded-full bg-[#57D58A] inline-block"></span>
+<span>En línea</span>
+</div>
+</li>
+</ul>
+</div>
+<!-- Horizontal Divider -->
+<hr class="border-t border-[#3A3546] -mx-4"/>
+<!-- Bottom Half: Chat Section -->
+<div class="flex flex-col flex-1 justify-between gap-4">
+<!-- Chat Header with Expand Chevron and Search Icon -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-[#F3F1F8] font-bold text-base cursor-pointer">
+<svg class="w-4 h-4 stroke-[2.5] text-[#F3F1F8]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+<span>Chat</span>
+</div>
+<button aria-label="Buscar en chat" class="text-[#CEBDFF] hover:text-[#6D3FE0] focus:outline-none" type="button">
+<svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+</button>
+</div>
+<!-- Messages Stream -->
+<div class="flex flex-col gap-4 text-xs">
+<!-- Day Separator -->
+<div class="text-center text-[#BDB8CC] text-xs font-normal">
+              Ayer
+            </div>
+<!-- Message 1: Juan -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                JU
+              </div>
+<div class="flex flex-col">
+<div class="flex items-baseline gap-1.5">
+<span class="font-bold text-[#F3F1F8]">Juan</span>
+<span class="text-[#BDB8CC] text-[11px]">ayer 21:40</span>
+</div>
+<p class="text-[#F3F1F8] text-xs leading-relaxed mt-0.5">
+                  Mañana repasamos integrales a las 4.
+                </p>
+</div>
+</div>
+<!-- Message 2: María -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                MA
+              </div>
+<div class="flex flex-col">
+<div class="flex items-baseline gap-1.5">
+<span class="font-bold text-[#F3F1F8]">María</span>
+<span class="text-[#BDB8CC] text-[11px]">ayer 21:42</span>
+</div>
+<p class="text-[#F3F1F8] text-xs leading-relaxed mt-0.5">
+                  Perfecto. Yo llevo los ejercicios.
+                </p>
+</div>
+</div>
+<!-- Message 3: Camila -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-full bg-[#6D3FE0] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                CA
+              </div>
+<div class="flex flex-col">
+<div class="flex items-baseline gap-1.5">
+<span class="font-bold text-[#F3F1F8]">Camila</span>
+<span class="text-[#BDB8CC] text-[11px]">10:03</span>
+</div>
+<p class="text-[#F3F1F8] text-xs leading-relaxed mt-0.5">
+                  Ya llegué.<br/>¿Empezamos con el ejercicio 3?
+                </p>
+</div>
+</div>
+</div>
+<!-- Chat Input and Send Button -->
+<footer class="pt-2">
+<form action="#" class="flex items-center gap-2.5" method="POST" onsubmit="event.preventDefault();">
+<div class="flex-1">
+<textarea class="w-full text-xs text-[#F3F1F8] placeholder-[#BDB8CC] bg-[#17151F] border-[1.5px] border-[#3B3748] rounded-2xl p-2.5 resize-none focus:outline-none focus:ring-1 focus:ring-[#6D3FE0] focus:border-[#6D3FE0] leading-tight" placeholder="Escribe un mensaje" rows="2"></textarea>
+</div>
+<button aria-label="Enviar mensaje" class="w-10 h-10 rounded-full bg-[#6D3FE0] text-white flex items-center justify-center hover:bg-[#582ecc] transition shadow-sm flex-shrink-0 focus:outline-none" type="submit">
+<!-- Paper Airplane Icon -->
+<svg class="w-4 h-4 transform rotate-45 -mr-0.5" fill="currentColor" viewbox="0 0 20 20">
+<path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+</svg>
+</button>
+</form>
+</footer>
+</div>
+</aside>
+<!-- END: RightSidePanel -->
+</div>
+<!-- END: MainContentGrid -->
+</main>
+<!-- END: MainContainer -->
+</body></html>

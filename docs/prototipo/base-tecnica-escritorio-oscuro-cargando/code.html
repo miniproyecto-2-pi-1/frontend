@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Salón de Estudio - Cargando</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Custom Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          colors: {
+            backgroundDark: '#2B2833',
+            cardSurface: '#25222D',
+            accentPurple: '#6D3FE0',
+            textLight: '#F3F1F8',
+            textMuted: '#BDB8CC',
+            cardBorder: 'rgba(243, 241, 248, 0.08)',
+            dividerBorder: 'rgba(243, 241, 248, 0.06)',
+          },
+          borderRadius: {
+            'custom': '10px',
+          },
+          borderWidth: {
+            '1.5': '1.5px',
+          }
+        }
+      }
+    };
+  </script>
+<!-- Custom Styles for Spinner Animation and Keyframes -->
+<style data-purpose="custom-animations">
+    @keyframes spin-loader {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loader-ring {
+      width: 44px;
+      height: 44px;
+      border: 3.5px solid rgba(109, 63, 224, 0.2);
+      border-top-color: #6D3FE0;
+      border-radius: 50%;
+      animation: spin-loader 0.85s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+    }
+  </style>
+</head>
+<body class="bg-backgroundDark font-sans text-textLight min-h-screen flex flex-col antialiased selection:bg-accentPurple selection:text-white">
+<!-- BEGIN: ApplicationLayout -->
+<div class="w-full max-w-[1440px] mx-auto min-h-screen flex flex-col justify-between p-6 md:p-10 lg:p-12">
+<!-- Top System / View Area (Main Content Shell) -->
+<main class="w-full flex-1 flex flex-col items-center justify-center my-auto">
+<!-- BEGIN: StudyRoomCard -->
+<!-- Contenedor principal con fondo #25222D, bordes 1.5px y border-radius de 10px -->
+<section class="w-full max-w-4xl bg-cardSurface rounded-custom border-1.5 border-cardBorder shadow-2xl flex flex-col overflow-hidden transition-all duration-300" data-purpose="loading-card">
+<!-- Card Header: Título Salón de Estudio -->
+<header class="w-full px-8 py-5 border-b border-dividerBorder flex items-center justify-between">
+<h1 class="text-textLight font-semibold text-lg sm:text-xl tracking-tight">
+            Salón de Estudio
+          </h1>
+<!-- Indicador visual sutil de estado en vivo / carga -->
+<div aria-hidden="true" class="flex items-center gap-2">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-accentPurple/40 animate-pulse"></span>
+</div>
+</header>
+<!-- Card Body: Estado Cargando Centrado -->
+<div class="w-full min-h-[360px] md:min-h-[420px] flex flex-col items-center justify-center px-6 py-16 text-center">
+<!-- Elemento de Spinner Circular -->
+<div aria-busy="true" aria-live="polite" class="mb-6 flex items-center justify-center">
+<div aria-label="Cargando" class="loader-ring" role="status"></div>
+</div>
+<!-- Textos descriptivos de estado (WCAG AA Compliant) -->
+<h2 class="text-textLight text-[18px] font-semibold tracking-normal mb-1.5 leading-snug">
+            Cargando datos...
+          </h2>
+<p class="text-textMuted text-[14px] font-normal leading-relaxed">
+            Conectando con el servidor.
+          </p>
+</div>
+</section>
+<!-- END: StudyRoomCard -->
+</main>
+<!-- END: ApplicationLayout -->
+<!-- BEGIN: MinimalFooter -->
+<!-- Pie de página discreto con información técnica -->
+<footer class="w-full py-4 text-center">
+<p class="text-xs text-textMuted/60 font-normal">
+        Base técnica • Modo Oscuro • Salón de Estudio
+      </p>
+</footer>
+<!-- END: MinimalFooter -->
+</div>
+</body></html>

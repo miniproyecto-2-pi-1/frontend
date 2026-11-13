@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base técnica - Computador - Claro (Éxito)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #FFFFFF;
+      color: #2B2833;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#FFFFFF] text-[#2B2833] flex flex-col justify-between p-8 antialiased selection:bg-[#6D3FE0] selection:text-white">
+  <!-- Encabezado de la página -->
+  <header class="w-full max-w-5xl mx-auto flex items-center justify-between py-2">
+    <h1 class="text-2xl font-bold tracking-tight text-[#2B2833]">Salón de Estudio</h1>
+    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F4F2F9] text-[#5A5469] border border-[#5A5469]/20">BASE TÉCNICA</span>
+  </header>
+
+  <!-- Contenedor central con tarjeta de estado -->
+  <main class="w-full max-w-2xl mx-auto my-auto flex flex-col items-center justify-center">
+    <div class="w-full bg-[#F4F2F9] rounded-[10px] border border-[#5A5469]/20 p-12 flex flex-col items-center justify-center text-center shadow-sm">
+      <!-- Píldora de estado de éxito según guía visual -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E8F8EE] border border-[#1F7A3F]/30 text-[#1F7A3F] text-xs font-semibold mb-6">
+        <span class="w-2 h-2 rounded-full bg-[#1F7A3F]"></span>
+        <span>Conectado a la API</span>
+      </div>
+
+      <h2 class="text-sm font-semibold text-[#5A5469] mb-3">Dato leído de Firestore</h2>
+
+      <!-- Caja con dato recuperado -->
+      <div class="w-full max-w-lg bg-[#FFFFFF] border border-[#5A5469]/20 rounded-[8px] py-3.5 px-6 shadow-xs">
+        <p class="text-sm font-medium text-[#2B2833]">«Hola desde Firestore: el Salón de Estudio ya funciona»</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Pie de página limpio y sin bordes -->
+  <footer class="w-full text-center py-4 mt-auto">
+    <p class="text-sm text-[#5A5469]">Base técnica · Modo Claro · Salón de Estudio</p>
+  </footer>
+</body>
+</html>

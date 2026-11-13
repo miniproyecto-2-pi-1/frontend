@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Computador - Claro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: '#6D3FE0',
+            'brand-hover': '#5B35C4',
+            bgLight: '#FFFFFF',
+            textLight: '#2B2833',
+            textSecLight: '#5A5469',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: #FFFFFF;
+      color: #2B2833;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#6D3FE0] selection:text-white">
+  <!-- Encabezado Desktop -->
+  <header class="w-full px-8 py-4 flex items-center justify-between border-b border-transparent">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-[#6D3FE0] flex items-center justify-center text-white font-bold text-lg shadow-sm">
+        S
+      </div>
+      <span class="font-bold text-xl text-[#2B2833] tracking-tight">Salón de Estudio</span>
+    </div>
+  </header>
+
+  <!-- Contenido Central Centrado -->
+  <main class="flex-1 flex flex-col items-center justify-center px-6 text-center">
+    <div class="max-w-md mx-auto flex flex-col items-center">
+      <!-- 404 Grande en Morado -->
+      <span class="text-[100px] md:text-[120px] font-bold text-[#6D3FE0] leading-none select-none tracking-tight">
+        404
+      </span>
+
+      <!-- Título -->
+      <h1 class="text-2xl md:text-3xl font-bold text-[#2B2833] mt-3 mb-2 tracking-tight">
+        Página no encontrada
+      </h1>
+
+      <!-- Descripción -->
+      <p class="text-base text-[#5A5469] mb-8 leading-relaxed max-w-sm">
+        La dirección no existe o la sala ya no está disponible.
+      </p>
+
+      <!-- Botón Principal -->
+      <a href="#mis-salas" class="inline-flex items-center justify-center px-6 py-3 bg-[#6D3FE0] hover:bg-[#5B35C4] text-white font-medium text-base rounded-[8px] transition-all duration-150 shadow-sm active:scale-[0.98]">
+        Ir a Mis salas
+      </a>
+    </div>
+  </main>
+
+  <!-- Pie de página sin bordes -->
+  <footer class="w-full py-6 text-center">
+    <p class="text-sm text-[#5A5469]">
+      Ayuda · Salón de Estudio
+    </p>
+  </footer>
+
+
+
+
+</body></html>
