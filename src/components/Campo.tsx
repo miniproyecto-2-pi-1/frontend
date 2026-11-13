@@ -4,7 +4,7 @@ import { IconoError } from "./IconoError";
 interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
   id: string;
   etiqueta: string;
-  // Puede incluir un enlace (por ejemplo «Ir a iniciar sesión» cuando el correo ya existe).
+  // Puede incluir un enlace (por ejemplo «Inicia sesión» cuando el correo ya existe).
   error?: ReactNode;
   ayuda?: string;
   // Control dentro del campo, a la derecha (por ejemplo el botón «Mostrar» de la contraseña).

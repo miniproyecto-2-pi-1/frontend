@@ -139,13 +139,13 @@ export function Registro() {
     }
   }
 
-  // Con el correo ya registrado se ofrece ir al ingreso, llevando el correo escrito.
+  // Con el correo ya registrado se ofrece ir al ingreso, llevando el correo escrito (texto del prototipo).
   const errorCorreo =
     errores.correo === CORREO_REGISTRADO ? (
       <>
         {CORREO_REGISTRADO}{" "}
         <Link to="/ingreso" state={{ correo: valores.correo.trim() }} className="text-enlace underline">
-          Ir a iniciar sesión
+          Inicia sesión
         </Link>
       </>
     ) : (
