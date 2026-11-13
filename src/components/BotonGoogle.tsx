@@ -1,4 +1,5 @@
 import { useIngresoGoogle } from "../sesion/useIngresoGoogle";
+import { IconoError } from "./IconoError";
 
 // Logo de Google (decorativo: el texto del botón ya dice «Google»).
 function LogoGoogle() {
@@ -31,8 +32,8 @@ export function BotonGoogle({ google, deshabilitado = false }: { google: ReturnT
     <div className="flex flex-col gap-3">
       {error && (
         <div role="alert" className="rounded-lg border-[1.5px] border-error bg-fondo p-3 text-error">
-          <p className="flex items-start gap-1 font-bold">
-            <span aria-hidden="true">⚠</span>
+          <p className="flex items-start gap-1.5 font-medium">
+            <IconoError />
             <span>{error}</span>
           </p>
           {puedeReintentar && (

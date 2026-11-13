@@ -1,9 +1,10 @@
 import type { InputHTMLAttributes, ReactNode } from "react";
+import { IconoError } from "./IconoError";
 
 interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
   id: string;
   etiqueta: string;
-  // Puede incluir un enlace (por ejemplo «Ir a iniciar sesión» cuando el correo ya existe).
+  // Puede incluir un enlace (por ejemplo «Inicia sesión» cuando el correo ya existe).
   error?: ReactNode;
   ayuda?: string;
   // Control dentro del campo, a la derecha (por ejemplo el botón «Mostrar» de la contraseña).
@@ -42,8 +43,8 @@ export function Campo({ id, etiqueta, error, ayuda, accion, ...resto }: Props) {
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} className="mt-1 flex items-start gap-1 font-bold text-error">
-          <span aria-hidden="true">⚠</span>
+        <p id={`${id}-error`} className="mt-1 flex items-start gap-1.5 text-sm font-medium text-error">
+          <IconoError />
           <span>{error}</span>
         </p>
       )}

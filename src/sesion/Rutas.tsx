@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useSesion } from "./SesionContext";
+import { IconoError } from "../components/IconoError";
 
 // Mientras se conoce la sesión. El servidor (plan gratuito de Render) puede tardar hasta un minuto en despertar.
 // Si GET /users/me falla por red o por el servidor, se muestra el error con «Reintentar».
@@ -11,7 +12,10 @@ function CargandoSesion() {
     return (
       <div className="mx-auto max-w-md px-4 py-16">
         <div role="alert" className="tarjeta">
-          <p className="font-bold text-error">No pudimos conectar con el servidor</p>
+          <p className="flex items-start gap-1.5 font-medium text-error">
+            <IconoError />
+            <span>No pudimos conectar con el servidor</span>
+          </p>
           <p className="mb-4 text-suave">{errorConexion.message}</p>
           <button type="button" className="btn-principal" onClick={reintentar}>
             Reintentar

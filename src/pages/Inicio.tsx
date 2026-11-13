@@ -8,7 +8,7 @@ export function Inicio() {
       <h1 className="mb-4 text-balance text-4xl font-bold leading-tight sm:text-5xl">
         Estudia en grupo, con video y chat
       </h1>
-      <p className="mb-8 text-lg text-suave">Crea una sala, comparte el código y estudien juntos.</p>
+      <p className="mb-8 text-lg text-suave">Crea una sala, comparte el código y estudia con tu grupo.</p>
       <div className="flex flex-wrap justify-center gap-3">
         <Link to="/registro" className="btn-principal">
           Crear cuenta
