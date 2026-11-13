@@ -10,7 +10,8 @@ import { useTitulo } from "../hooks/useTitulo";
 import { SIN_FIREBASE, traducirErrorAuth } from "../sesion/erroresAuth";
 import { useSesion } from "../sesion/SesionContext";
 import { useIngresoGoogle } from "../sesion/useIngresoGoogle";
-import { PATRON_USERNAME, type DatosRegistro, type Usuario } from "../tipos";
+import { type DatosRegistro, type Usuario } from "../tipos";
+import { validarApellidos, validarNombres, validarUsername } from "../validacion";
 
 type CampoRegistro = "nombres" | "apellidos" | "username" | "correo" | "clave";
 type Errores = Partial<Record<CampoRegistro | "general", string>>;
@@ -21,18 +22,17 @@ const CORREO_REGISTRADO = "Este correo ya está registrado.";
 // Validación en el navegador: cada campo con su propio mensaje (US-01, datos inválidos).
 function validar(v: Record<CampoRegistro, string>): Errores {
   const n: Errores = {};
-  if (!v.nombres.trim()) n.nombres = "Escribe tus nombres.";
-  if (!v.apellidos.trim()) n.apellidos = "Escribe tus apellidos.";
-  const username = v.username.trim();
-  if (!username) n.username = "Elige un nombre de usuario.";
-  else if (!PATRON_USERNAME.test(username)) n.username = "Usa de 3 a 20 letras, números o guion bajo, sin espacios.";
+  n.nombres = validarNombres(v.nombres);
+  n.apellidos = validarApellidos(v.apellidos);
+  n.username = validarUsername(v.username);
   const correo = v.correo.trim();
   if (!correo) n.correo = "Escribe tu correo electrónico.";
   else if (!/^\S+@\S+\.\S+$/.test(correo)) n.correo = "Escribe un correo válido, por ejemplo nombre@correo.com.";
   if (!v.clave) n.clave = "Elige una contraseña.";
   else if (v.clave.length < 8 || !/[A-Za-z]/.test(v.clave) || !/\d/.test(v.clave))
     n.clave = "La contraseña debe tener al menos 8 caracteres, con letras y números.";
-  return n;
+  // Solo quedan las claves con error, para poder contar los errores con Object.keys.
+  return Object.fromEntries(Object.entries(n).filter(([, mensaje]) => mensaje)) as Errores;
 }
 
 // Convierte un error de la API en errores del formulario.
