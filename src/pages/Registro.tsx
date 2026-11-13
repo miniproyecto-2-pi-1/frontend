@@ -2,17 +2,15 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
-import { Avatar } from "../components/Avatar";
 import { BotonGoogle, SeparadorO } from "../components/BotonGoogle";
 import { Campo } from "../components/Campo";
+import { SelectorAvatar } from "../components/SelectorAvatar";
 import { auth } from "../firebase";
 import { useTitulo } from "../hooks/useTitulo";
 import { SIN_FIREBASE, traducirErrorAuth } from "../sesion/erroresAuth";
 import { useSesion } from "../sesion/SesionContext";
 import { useIngresoGoogle } from "../sesion/useIngresoGoogle";
 import { PATRON_USERNAME, type DatosRegistro, type Usuario } from "../tipos";
-
-const NOMBRES_AVATAR = ["Morado", "Verde", "Magenta", "Turquesa", "Rojo", "Ámbar"];
 
 type CampoRegistro = "nombres" | "apellidos" | "username" | "correo" | "clave";
 type Errores = Partial<Record<CampoRegistro | "general", string>>;
@@ -240,27 +238,7 @@ export function Registro() {
           }
         />
 
-        <fieldset>
-          <legend className="mb-2 font-bold">Elige tu avatar</legend>
-          <div className="grid grid-cols-6 justify-items-center gap-1 sm:flex sm:justify-between">
-            {NOMBRES_AVATAR.map((nombre, i) => (
-              <label key={nombre} className="cursor-pointer">
-                <input
-                  type="radio"
-                  name="avatar"
-                  value={i}
-                  checked={avatar === i}
-                  onChange={() => setAvatar(i)}
-                  className="peer sr-only"
-                />
-                <span className="block rounded-full p-0.5 peer-checked:ring-[3px] peer-checked:ring-enlace peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-enlace">
-                  <Avatar nombre={valores.nombres || "Tú"} color={i} tam={38} />
-                </span>
-                <span className="sr-only">{nombre}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <SelectorAvatar valor={avatar} onCambio={setAvatar} nombre={valores.nombres} />
 
         <button
           type="submit"
