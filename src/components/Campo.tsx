@@ -9,15 +9,18 @@ interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
   ayuda?: string;
   // Control dentro del campo, a la derecha (por ejemplo el botón «Mostrar» de la contraseña).
   accion?: ReactNode;
+  // Marca el campo como obligatorio para los lectores de pantalla (WCAG 3.3.2).
+  requerido?: boolean;
 }
 
 // Campo de formulario accesible: etiqueta ligada, ayuda y error asociados al campo (WCAG 3.3.1, 3.3.2).
-export function Campo({ id, etiqueta, error, ayuda, accion, ...resto }: Props) {
+export function Campo({ id, etiqueta, error, ayuda, accion, requerido, ...resto }: Props) {
   const ids = [ayuda ? `${id}-ayuda` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ");
   const entrada = (
     <input
       id={id}
       className={`campo${accion ? " pr-24" : ""}`}
+      aria-required={requerido ? true : undefined}
       aria-invalid={error ? true : undefined}
       aria-describedby={ids || undefined}
       style={error ? { borderColor: "var(--error)" } : undefined}
