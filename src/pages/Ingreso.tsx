@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { BotonGoogle, SeparadorO } from "../components/BotonGoogle";
 import { Campo } from "../components/Campo";
 import { useTitulo } from "../hooks/useTitulo";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { SIN_FIREBASE, traducirErrorAuth } from "../sesion/erroresAuth";
 import { useSesion } from "../sesion/SesionContext";
+import { useIngresoGoogle } from "../sesion/useIngresoGoogle";
 
 interface Errores {
   correo?: string;
@@ -13,7 +15,7 @@ interface Errores {
   general?: string;
 }
 
-// Ingreso con correo y contraseña en Firebase Auth (TS-01). Cuando la sesión queda lista,
+// Ingreso con correo y contraseña (TS-01) o con Google (US-02). Cuando la sesión queda lista,
 // vuelve a la ruta privada que se pidió; si falta el nombre de usuario, va a /elegir-username.
 export function Ingreso() {
   useTitulo("Ingreso");
@@ -31,16 +33,18 @@ export function Ingreso() {
   const [intentos, setIntentos] = useState(0);
   const [enviando, setEnviando] = useState(false);
   const formulario = useRef<HTMLFormElement>(null);
+  const google = useIngresoGoogle();
 
   // Tras un intento fallido, el foco va al primer campo con error.
   useEffect(() => {
     if (intentos > 0) formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
   }, [intentos]);
 
-  // También cubre a quien ya tenía sesión y abre /ingreso.
+  // Sirve para el correo, para Google y para quien ya tenía sesión y abre /ingreso.
+  // Sin perfil, va a elegir el nombre de usuario y conserva la ruta de origen para después.
   useEffect(() => {
     if (estado === "listo") navegar(desde, { replace: true });
-    else if (estado === "sinUsername") navegar("/elegir-username", { replace: true });
+    else if (estado === "sinUsername") navegar("/elegir-username", { replace: true, state: { desde } });
   }, [estado, desde, navegar]);
 
   async function enviar(e: FormEvent) {
@@ -106,9 +110,11 @@ export function Ingreso() {
             Mostrar contraseña
           </button>
         </div>
-        <button type="submit" className="btn-principal" disabled={enviando} aria-busy={enviando}>
+        <button type="submit" className="btn-principal" disabled={enviando || google.ocupado} aria-busy={enviando}>
           Ingresar
         </button>
+        <SeparadorO />
+        <BotonGoogle google={google} deshabilitado={enviando} />
         <p className="text-center">
           ¿No tienes cuenta?{" "}
           <Link to="/registro" className="text-enlace underline">
