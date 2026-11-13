@@ -27,7 +27,7 @@ export function Ingreso() {
   const estadoRuta = ubicacion.state as { desde?: string; correo?: string } | null;
   const desde = estadoRuta?.desde ?? "/salas";
 
-  // Desde el registro («Ir a iniciar sesión») llega el correo ya escrito.
+  // Desde el registro («Inicia sesión» en el aviso de correo ya registrado) llega el correo ya escrito.
   const [correo, setCorreo] = useState(estadoRuta?.correo ?? "");
   const [clave, setClave] = useState("");
   const [verClave, setVerClave] = useState(false);
@@ -90,7 +90,8 @@ export function Ingreso() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md sm:pt-6">
+    // En pantallas altas la tarjeta queda centrada en vertical, como el prototipo; en celular empieza arriba.
+    <div className="mx-auto flex w-full max-w-md flex-col [@media(min-width:640px)_and_(min-height:700px)]:min-h-[calc(100dvh-12rem)] [@media(min-width:640px)_and_(min-height:700px)]:justify-center">
       <form
         ref={formulario}
         onSubmit={enviar}
