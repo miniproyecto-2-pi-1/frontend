@@ -2,7 +2,7 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useDesplegable } from "../hooks/useDesplegable";
 import { useSesion } from "../sesion/SesionContext";
 import { useSalir } from "../sesion/useSalir";
-import { Avatar } from "./Avatar";
+import { Avatar, iniciales } from "./Avatar";
 import { PieDePagina, SaltarAlContenido, useFocoAlNavegar } from "./Estructura";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
@@ -73,7 +73,8 @@ export function LayoutApp() {
             <div ref={cuenta.contenedor} className="relative">
               <button
                 {...cuenta.propsBoton}
-                aria-label={usuario ? `Menú de la cuenta de ${usuario.username}` : "Menú de la cuenta"}
+                // El nombre empieza por las iniciales que se ven en el avatar (WCAG 2.5.3, etiqueta en el nombre).
+                aria-label={`${iniciales(nombreCompleto || "Tú")}, menú de la cuenta${usuario ? ` de ${usuario.username}` : ""}`}
                 className="inline-flex rounded-full"
               >
                 <Avatar nombre={nombreCompleto || "Tú"} color={usuario?.avatar ?? 0} tam={40} />

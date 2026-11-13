@@ -24,14 +24,14 @@ export function useDesplegable(ruta: string) {
     const alTeclear = (e: KeyboardEvent) => {
       if (e.key === "Escape") cerrar(true);
     };
-    // Clic afuera: se cierra. Si el clic no dejó el foco en otro control, vuelve al botón.
+    // Clic afuera: se cierra y el foco vuelve al botón, salvo que el clic haya caído en otro control
+    // (un campo, un enlace, un botón): ahí el foco se queda donde la persona lo puso.
     const alPulsar = (e: PointerEvent) => {
-      if (raiz?.contains(e.target as Node)) return;
+      const objetivo = e.target as Element;
+      if (raiz?.contains(objetivo)) return;
       setAbierto(false);
-      requestAnimationFrame(() => {
-        const activo = document.activeElement;
-        if (!activo || activo === document.body || raiz?.contains(activo)) boton.current?.focus();
-      });
+      if (objetivo.closest?.("a, button, input, select, textarea, label, [contenteditable='true']")) return;
+      requestAnimationFrame(() => boton.current?.focus());
     };
     // Salir con Tab o Shift+Tab: se cierra sin mover el foco.
     const alSalirFoco = (e: FocusEvent) => {
