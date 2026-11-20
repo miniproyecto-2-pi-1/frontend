@@ -1,54 +1,435 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
+import {Link,useNavigate} from "react-router-dom";
+import {ApiError,apiFetch} from "../api";
+import { Campo } from "../components/Campo";
+import { ModalAccesible } from "../components/ModalAccesible";
 import { useTitulo } from "../hooks/useTitulo";
-import { useSesion } from "../sesion/SesionContext";
 
-// Mis salas (US-03): por ahora siempre está vacía, porque crear y unirse a salas llega en los Sprints 2 y 3.
-// El prototipo (docs/prototipo/mis-salas-*) solo muestra la lista con salas: el estado vacío sigue ese mismo estilo.
+export type SalaPropia = {
+  id: string;
+  nombre: string;
+  creadaEn?: string;
+  esAdministrador?: boolean;
+};
+
+const MAX_NOMBRE = 50;
+
+const errorConexion =
+  "No pudimos cargar tus salas. Revisa tu conexión e inténtalo de nuevo.";
+
+function esAbort(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.name === "AbortError"
+  );
+}
+
 export function MisSalas() {
   useTitulo("Mis salas");
-  const { usuario } = useSesion();
-  const [avisoCrear, setAvisoCrear] = useState(false);
+
+  const navegar = useNavigate();
+
+  const [salas, setSalas] =
+    useState<SalaPropia[]>([]);
+
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [errorCarga, setErrorCarga] =
+    useState("");
+
+  const [reintento, setReintento] =
+    useState(0);
+
+  const [modal, setModal] =
+    useState(false);
+
+  const [nombre, setNombre] =
+    useState("");
+
+  const [errorNombre, setErrorNombre] =
+    useState("");
+
+  const [errorCrear, setErrorCrear] =
+    useState("");
+
+  const [creando, setCreando] =
+    useState(false);
+
+  const [mensajeCopia, setMensajeCopia] =
+    useState("");
+
+  const abrirRef =
+    useRef<HTMLButtonElement>(null);
+
+  const entradaRef =
+    useRef<HTMLInputElement>(null);
+
+  const cerrarModal = useCallback(() => {
+    if (!creando) {
+      setModal(false);
+      setNombre("");
+      setErrorNombre("");
+      setErrorCrear("");
+    }
+  }, [creando]);
+
+  useEffect(() => {
+    const control = new AbortController();
+
+    setCargando(true);
+    setErrorCarga("");
+
+    apiFetch<
+      SalaPropia[] | { salas: SalaPropia[] }
+    >(
+      "/api/v1/rooms",
+      {
+        signal: control.signal,
+      }
+    )
+      .then((respuesta) => {
+        const listado = Array.isArray(respuesta)
+          ? respuesta
+          : respuesta?.salas;
+
+        if (!Array.isArray(listado)) {
+          throw new Error(
+            "Respuesta inválida de la API de salas."
+          );
+        }
+
+        setSalas(listado);
+      })
+      .catch((e: unknown) => {
+        if (
+          !control.signal.aborted &&
+          !esAbort(e)
+        ) {
+          setErrorCarga(errorConexion);
+        }
+      })
+      .finally(() => {
+        if (!control.signal.aborted) {
+          setCargando(false);
+        }
+      });
+
+    return () => control.abort();
+  }, [reintento]);
+
+  async function crear(evento: FormEvent) {
+    evento.preventDefault();
+
+    if (creando) return;
+
+    const limpio = nombre.trim();
+
+    if (
+      limpio.length < 1 ||
+      limpio.length > MAX_NOMBRE
+    ) {
+      setErrorNombre(
+        "Escribe un nombre de 1 a 50 caracteres."
+      );
+
+      entradaRef.current?.focus();
+      return;
+    }
+
+    setCreando(true);
+    setErrorNombre("");
+    setErrorCrear("");
+
+    try {
+      const sala = await apiFetch<SalaPropia>(
+        "/api/v1/rooms",
+        {
+          method: "POST",
+          body: {
+            nombre: limpio,
+          },
+        }
+      );
+
+      if (
+        typeof sala.id !== "string" ||
+        !sala.id
+      ) {
+        throw new Error(
+          "No se recibió el ID de la sala."
+        );
+      }
+
+      setSalas((actuales) => [
+        sala,
+        ...actuales,
+      ]);
+
+      setModal(false);
+
+      navegar(
+        `/salas/${encodeURIComponent(sala.id)}`,
+        {
+          state: {
+            salaCreada: true,
+            sala,
+          },
+        }
+      );
+    } catch (error) {
+      if (
+        error instanceof ApiError &&
+        error.code === "VALIDATION" &&
+        error.fields?.nombre
+      ) {
+        setErrorNombre(
+          error.fields.nombre
+        );
+      } else if (
+        error instanceof ApiError &&
+        error.code === "PROFILE_INCOMPLETE"
+      ) {
+        setErrorCrear(
+          "Debes elegir tu nombre de usuario para crear salas."
+        );
+      } else {
+        setErrorCrear(
+          "No pudimos crear la sala. Inténtalo de nuevo."
+        );
+      }
+    } finally {
+      setCreando(false);
+    }
+  }
+
+  async function copiar(id: string) {
+    try {
+      await navigator.clipboard.writeText(id);
+
+      setMensajeCopia(
+        `ID copiado: ${id}`
+      );
+    } catch {
+      setMensajeCopia(
+        "No pudimos copiar el ID. Inténtalo de nuevo."
+      );
+    }
+  }
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto w-full max-w-5xl">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Mis salas</h1>
-          {usuario && <p className="text-suave">Hola, {usuario.nombres}.</p>}
+          <h1 className="text-3xl font-bold">
+            Mis salas
+          </h1>
+
+          <p className="text-suave">
+            Las salas de estudio que creaste.
+          </p>
         </div>
-        {/* Crear salas llega en el Sprint 2: el botón no navega a ninguna pantalla, solo lo avisa. */}
+
         <button
+          ref={abrirRef}
+          className="btn-principal w-full sm:w-auto"
           type="button"
-          className="btn-principal"
-          aria-describedby={avisoCrear ? "aviso-crear" : undefined}
-          onClick={() => setAvisoCrear(true)}
+          onClick={() => {
+            setModal(true);
+            setErrorNombre("");
+            setErrorCrear("");
+          }}
         >
-          <span aria-hidden="true">+</span> Nueva sala
+          <span aria-hidden="true">
+            +
+          </span>{" "}
+          Nueva sala
         </button>
       </div>
 
-      <p id="aviso-crear" role="status" className={avisoCrear ? "mb-6 rounded-lg border border-borde bg-superficie p-3" : "sr-only"}>
-        {avisoCrear ? "Crear salas estará disponible muy pronto." : ""}
-      </p>
+      {mensajeCopia && (
+        <p
+          role="status"
+          aria-live="polite"
+          className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
+        >
+          ✓ {mensajeCopia}
+        </p>
+      )}
 
-      <section aria-labelledby="titulo-vacio" className="tarjeta flex flex-col items-center px-6 py-12 text-center">
-        <span aria-hidden="true" className="mb-4 inline-flex size-16 items-center justify-center rounded-full bg-fondo text-3xl">
-          📚
-        </span>
-        <h2 id="titulo-vacio" className="mb-2 text-xl font-bold">
-          Aún no tienes salas
-        </h2>
-        <p className="max-w-md text-suave">
-          Cuando crees una sala o te unas a una con su código, aparecerá aquí para que entres con un clic.
-        </p>
-        <p className="mt-6 text-sm text-suave">
-          ¿Quieres ver cómo es una sala?{" "}
-          <Link to="/salas/K7P2-91XQ" className="font-bold text-enlace underline">
-            Abre la sala de prueba
-          </Link>
-        </p>
-      </section>
+      {cargando ? (
+        <div
+          role="status"
+          aria-live="polite"
+        >
+          <p className="mb-4 font-semibold text-suave">
+            ◌ Conectando… Cargando tus salas…
+          </p>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[0, 1, 2].map((n) => (
+              <div
+                key={n}
+                className="tarjeta animate-pulse space-y-3 bg-superficie"
+              >
+                <div className="h-4 w-2/3 rounded bg-borde" />
+                <div className="h-4 w-1/3 rounded bg-borde" />
+                <div className="h-4 w-1/2 rounded bg-borde" />
+                <div className="h-10 w-24 rounded bg-borde" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : errorCarga ? (
+        <div role="alert">
+          <p className="mb-4 rounded-lg bg-red-100 p-4 font-medium text-red-800 dark:bg-red-950 dark:text-red-200">
+            {errorCarga}
+          </p>
+
+          <button
+            type="button"
+            className="btn-secundario"
+            onClick={() =>
+              setReintento((v) => v + 1)
+            }
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : salas.length === 0 ? (
+        <section
+          aria-labelledby="sin-salas"
+          className="rounded-lg border-2 border-dashed border-borde px-5 py-12 text-center"
+        >
+          <h2
+            id="sin-salas"
+            className="mb-2 text-xl font-bold"
+          >
+            Aún no tienes salas
+          </h2>
+
+          <p className="mx-auto max-w-lg text-suave">
+            Crea una sala para estudiar con tu grupo.
+            Aparecerá aquí con su ID para que lo compartas.
+          </p>
+        </section>
+      ) : (
+        <ul
+          aria-label="Salas que creaste"
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {salas.map((sala) => (
+            <li
+              key={sala.id}
+              className="tarjeta min-w-0 bg-superficie"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <h2 className="min-w-0 break-words text-lg font-bold">
+                  {sala.nombre}
+                </h2>
+
+                {sala.esAdministrador !== false && (
+                  <span className="shrink-0 rounded-full border border-enlace px-2 py-0.5 text-xs font-semibold text-enlace">
+                    Administrador
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-4 text-sm text-suave">
+                ID de la sala
+              </p>
+
+              <p className="mt-1 break-all font-mono font-semibold">
+                {sala.id}
+              </p>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Link
+                  className="btn-secundario"
+                  to={`/salas/${encodeURIComponent(sala.id)}`}
+                >
+                  Entrar
+                </Link>
+
+                <button
+                  type="button"
+                  className="min-h-11 px-2 font-semibold text-enlace underline"
+                  aria-label={`Copiar ID de ${sala.nombre}`}
+                  onClick={() =>
+                    void copiar(sala.id)
+                  }
+                >
+                  ▢ Copiar ID
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {modal && (
+        <ModalAccesible
+          titulo="Nueva sala"
+          descripcion="Ponle un nombre para que tu grupo la reconozca."
+          alCerrar={cerrarModal}
+          ocupado={creando}
+          iniciadorRef={abrirRef}
+        >
+          <form
+            noValidate
+            onSubmit={(e) =>
+              void crear(e)
+            }
+          >
+            <Campo
+              id="nombre-sala"
+              inputRef={entradaRef}
+              data-foco-inicial
+              etiqueta="Nombre de la sala"
+              requerido
+              value={nombre}
+              maxLength={51}
+              onChange={(e) => {
+                setNombre(e.target.value);
+                setErrorNombre("");
+                setErrorCrear("");
+              }}
+              ayuda={`Hasta 50 caracteres · ${nombre.length}/50`}
+              error={errorNombre}
+            />
+
+            {errorCrear && (
+              <p
+                role="alert"
+                className="mt-3 rounded-lg bg-red-100 p-3 text-red-800 dark:bg-red-950 dark:text-red-200"
+              >
+                {errorCrear}
+              </p>
+            )}
+
+            <div className="mt-5 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                className="btn-secundario"
+                disabled={creando}
+                onClick={cerrarModal}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                className="btn-principal disabled:opacity-60"
+                disabled={creando}
+              >
+                {creando
+                  ? "Creando sala…"
+                  : "Crear sala"}
+              </button>
+            </div>
+          </form>
+        </ModalAccesible>
+      )}
     </div>
   );
 }

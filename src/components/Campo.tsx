@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode, Ref } from "react";
 import { IconoError } from "./IconoError";
 
 interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
@@ -11,6 +11,7 @@ interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
   accion?: ReactNode;
   // Marca el campo como obligatorio para los lectores de pantalla (WCAG 3.3.2).
   requerido?: boolean;
+  inputRef?: Ref<HTMLInputElement>;
 }
 
 // Campo de formulario accesible: etiqueta ligada, ayuda y error asociados al campo (WCAG 3.3.1, 3.3.2).
