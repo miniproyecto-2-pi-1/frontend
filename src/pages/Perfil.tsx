@@ -271,24 +271,26 @@ export function Perfil() {
     setErrorEliminar("");
 
     try {
-      await apiFetch<null>(
-        "/api/v1/users/me",
-        {
-          method: "DELETE",
-        }
-      );
+      await apiFetch<null>("/api/v1/users/me", {
+        method: "DELETE",
+      });
 
       try {
         await cerrarSesion();
       } catch {
-        // El token de Firebase puede quedar invalidado.
+        // La API ya confirmó la eliminación.
       }
+
+      sessionStorage.setItem(
+        "salon-cuenta-eliminada",
+        "1"
+      );
 
       navegar("/ingreso", {
         replace: true,
         state: {
           aviso: "Tu cuenta fue eliminada.",
-        },
+      },
       });
     } catch {
       setErrorEliminar(mensajeBorrado);
