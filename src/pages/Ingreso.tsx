@@ -31,6 +31,25 @@ export function Ingreso() {
 
   const desde = estadoRuta?.desde ?? "/salas";
 
+  const [avisoEliminacion] = useState(() => {
+    const confirmado =
+      sessionStorage.getItem(
+        "salon-cuenta-eliminada"
+      ) === "1";
+
+    if (confirmado) {
+      sessionStorage.removeItem(
+        "salon-cuenta-eliminada"
+      );
+    }
+
+    return (
+      confirmado ||
+      estadoRuta?.aviso ===
+        "Tu cuenta fue eliminada."
+    );
+  });
+
   const [correo, setCorreo] = useState(
     estadoRuta?.correo ?? ""
   );
@@ -172,12 +191,18 @@ export function Ingreso() {
           </p>
         </div>
 
-        {estadoRuta?.aviso && (
+        {(avisoEliminacion ||
+          (estadoRuta?.aviso && !avisoEliminacion)) && (
           <p
             role="status"
+            aria-live="polite"
             className="rounded-lg bg-exito-fondo p-3 font-medium text-exito"
           >
-            ✓ {estadoRuta.aviso}
+            <span aria-hidden="true">✓ </span>
+
+            {avisoEliminacion
+              ? "Tu cuenta fue eliminada."
+              : estadoRuta?.aviso}
           </p>
         )}
 
