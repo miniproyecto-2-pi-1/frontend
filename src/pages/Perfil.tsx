@@ -1,9 +1,11 @@
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { auth } from "../firebase";
 import { Avatar } from "../components/Avatar";
 import { Campo } from "../components/Campo";
+import { ModalAccesible } from "../components/ModalAccesible";
 import { SelectorAvatar } from "../components/SelectorAvatar";
 import { useTitulo } from "../hooks/useTitulo";
 import { useSesion } from "../sesion/SesionContext";
@@ -20,6 +22,9 @@ type Datos = Pick<
 >;
 
 type Errores = Partial<Record<keyof Datos | "general", string>>;
+
+const mensajeBorrado =
+  "No pudimos eliminar tu cuenta. Revisa tu conexión e inténtalo de nuevo.";
 
 const desdeUsuario = (u: Usuario): Datos => ({
   nombres: u.nombres,
@@ -108,7 +113,9 @@ function erroresServidor(error: unknown): Errores {
 export function Perfil() {
   useTitulo("Mi perfil");
 
-  const { usuario, perfilListo } = useSesion();
+  const navegar = useNavigate();
+
+  const { usuario, perfilListo, cerrarSesion } = useSesion();
 
   const [datos, setDatos] = useState<Datos | null>(
     () => (usuario ? desdeUsuario(usuario) : null)
@@ -117,6 +124,12 @@ export function Perfil() {
   const [errores, setErrores] = useState<Errores>({});
   const [exito, setExito] = useState("");
   const [guardando, setGuardando] = useState(false);
+
+  const [modal, setModal] = useState(false);
+  const [eliminando, setEliminando] = useState(false);
+  const [errorEliminar, setErrorEliminar] = useState("");
+
+  const eliminarRef = useRef<HTMLButtonElement>(null);
 
   const formularioRef = useRef<HTMLFormElement>(null);
 
@@ -131,6 +144,12 @@ export function Perfil() {
       setErrores({});
     }
   }, [usuario]);
+
+  const cerrarModal = useCallback(() => {
+    if (!eliminando) {
+      setModal(false);
+    }
+  }, [eliminando]);
 
   function modificar(
     campo: Exclude<keyof Datos, "avatar">,
@@ -216,6 +235,39 @@ export function Perfil() {
       );
     } finally {
       setGuardando(false);
+    }
+  }
+
+  async function eliminar() {
+    if (eliminando) return;
+
+    setEliminando(true);
+    setErrorEliminar("");
+
+    try {
+      await apiFetch<null>(
+        "/api/v1/users/me",
+        {
+          method: "DELETE",
+        }
+      );
+
+      try {
+        await cerrarSesion();
+      } catch {
+        // El token de Firebase puede quedar invalidado.
+      }
+
+      navegar("/ingreso", {
+        replace: true,
+        state: {
+          aviso: "Tu cuenta fue eliminada.",
+        },
+      });
+    } catch {
+      setErrorEliminar(mensajeBorrado);
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -363,6 +415,79 @@ export function Perfil() {
           </button>
         </div>
       </form>
+
+      <section
+        aria-labelledby="zona-peligro"
+        className="mt-5 rounded-xl border border-error p-5"
+      >
+        <h2
+          id="zona-peligro"
+          className="mb-2 font-bold"
+        >
+          Zona de peligro
+        </h2>
+
+        <p className="mb-4 text-suave">
+          Eliminar tu cuenta borra tu perfil y todas
+          las salas que creaste. No se puede deshacer.
+        </p>
+
+        <button
+          ref={eliminarRef}
+          type="button"
+          className="btn-secundario border-error text-error"
+          onClick={() => {
+            setErrorEliminar("");
+            setModal(true);
+          }}
+        >
+          Eliminar cuenta
+        </button>
+      </section>
+
+      {modal && (
+        <ModalAccesible
+          titulo="¿Eliminar tu cuenta?"
+          descripcion="Se borrarán tu perfil y todas las salas que creaste, y tu nombre de usuario quedará libre para otras personas. Esta acción no se puede deshacer."
+          alCerrar={cerrarModal}
+          ocupado={eliminando}
+          iniciadorRef={eliminarRef}
+        >
+          {errorEliminar && (
+            <p
+              role="alert"
+              className="mb-4 rounded-lg bg-red-100 p-3 font-medium text-red-800 dark:bg-red-950 dark:text-red-200"
+            >
+              {errorEliminar}
+            </p>
+          )}
+
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              data-foco-inicial
+              className="btn-secundario"
+              disabled={eliminando}
+              onClick={cerrarModal}
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              className="btn-principal border-red-700 bg-red-700 hover:bg-red-800 disabled:opacity-60"
+              disabled={eliminando}
+              onClick={() => void eliminar()}
+            >
+              {eliminando
+                ? "Eliminando…"
+                : errorEliminar
+                  ? "Reintentar"
+                  : "Eliminar cuenta"}
+            </button>
+          </div>
+        </ModalAccesible>
+      )}
     </div>
   );
 }

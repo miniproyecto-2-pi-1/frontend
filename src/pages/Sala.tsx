@@ -1,25 +1,198 @@
-import { Link, useParams } from "react-router-dom";
-import { PantallaPendiente } from "../components/PantallaPendiente";
+import {useEffect,useState} from "react";
+import {Link,useLocation,useParams} from "react-router-dom";
+import {ApiError,apiFetch} from "../api";
 import { useTitulo } from "../hooks/useTitulo";
+import type { SalaPropia } from "./MisSalas";
 
 export function Sala() {
-  const { id } = useParams();
-  useTitulo("Sala");
+  const { id = "" } = useParams();
+  const ubicacion = useLocation();
+
+  const creada =
+    (
+      ubicacion.state as {
+        salaCreada?: boolean;
+      } | null
+    )?.salaCreada === true;
+
+  const [sala, setSala] =
+    useState<SalaPropia | null>(null);
+
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  const [mensaje, setMensaje] =
+    useState("");
+
+  const [intento, setIntento] =
+    useState(0);
+
+  useTitulo(
+    sala?.nombre ?? "Sala"
+  );
+
+  useEffect(() => {
+    const control = new AbortController();
+
+    setCargando(true);
+    setError("");
+
+    apiFetch<SalaPropia>(
+      `/api/v1/rooms/${encodeURIComponent(id)}`,
+      {
+        signal: control.signal,
+      }
+    )
+      .then(setSala)
+      .catch((e: unknown) => {
+        if (control.signal.aborted) return;
+
+        if (
+          e instanceof ApiError &&
+          (
+            e.code === "ROOM_NOT_FOUND" ||
+            e.status === 404
+          )
+        ) {
+          setError(
+            "Sala no encontrada. Revisa el ID."
+          );
+        } else {
+          setError(
+            "No pudimos cargar la sala. Revisa tu conexión e inténtalo de nuevo."
+          );
+        }
+      })
+      .finally(() => {
+        if (!control.signal.aborted) {
+          setCargando(false);
+        }
+      });
+
+    return () => control.abort();
+  }, [id, intento]);
+
+  async function copiar() {
+    try {
+      await navigator.clipboard.writeText(id);
+
+      setMensaje(
+        `ID copiado: ${id}`
+      );
+    } catch {
+      setMensaje(
+        "No pudimos copiar el ID. Inténtalo de nuevo."
+      );
+    }
+  }
+
   return (
-    <PantallaPendiente
-        titulo="Sala"
-        etapas={[
-          { sprint: "Sprint 3", historias: "US-10 y US-11", que: "Chat en tiempo real con historial." },
-          { sprint: "Sprint 4", historias: "US-09 y US-12", que: "Cuadrícula de personas y transmisión de audio y video." },
-          { sprint: "Sprint 5", historias: "US-13 y US-14", que: "Controles de micrófono y cámara, y compartir pantalla." },
-        ]}
+    <div className="mx-auto w-full max-w-2xl">
+      <Link
+        to="/salas"
+        className="mb-6 inline-block font-semibold text-enlace underline"
       >
-        <p className="mt-4 text-suave">ID de sala en la dirección: {id}</p>
-        <p className="mt-6">
-          <Link to="/salas" className="btn-secundario">
-            Volver a Mis salas
-          </Link>
+        ← Mis salas
+      </Link>
+
+      {cargando ? (
+        <p
+          role="status"
+          className="tarjeta"
+        >
+          Conectando… Cargando tu sala…
         </p>
-      </PantallaPendiente>
+      ) : error ? (
+        <div role="alert">
+          <p className="mb-4 rounded-lg bg-red-100 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">
+            {error}
+          </p>
+
+          <button
+            type="button"
+            className="btn-secundario"
+            onClick={() =>
+              setIntento((i) => i + 1)
+            }
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : sala ? (
+        <>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold">
+              {sala.nombre}
+            </h1>
+
+            {sala.esAdministrador !== false && (
+              <span className="rounded-full border border-enlace px-2 py-1 text-sm text-enlace">
+                Administrador
+              </span>
+            )}
+          </div>
+
+          {creada && (
+            <p
+              role="status"
+              className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
+            >
+              ✓ Sala creada. Eres su administrador.
+            </p>
+          )}
+
+          <section className="tarjeta mb-5 bg-superficie">
+            <p className="mb-2 text-sm text-suave">
+              ID de la sala
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <strong className="font-mono text-xl">
+                {sala.id}
+              </strong>
+
+              <button
+                type="button"
+                className="btn-secundario"
+                onClick={() =>
+                  void copiar()
+                }
+              >
+                ▢ Copiar ID
+              </button>
+            </div>
+
+            <p className="mt-3 text-sm text-suave">
+              Comparte este ID para que otras
+              personas se unan a la sala.
+            </p>
+          </section>
+
+          {mensaje && (
+            <p
+              role="status"
+              aria-live="polite"
+              className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
+            >
+              ✓ {mensaje}
+            </p>
+          )}
+
+          <section className="rounded-lg border-2 border-dashed border-borde px-5 py-12 text-center">
+            <h2 className="mb-2 font-bold">
+              Todavía no hay nadie más aquí
+            </h2>
+
+            <p className="text-suave">
+              Cuando alguien se una con el ID,
+              aparecerá en la sala.
+            </p>
+          </section>
+        </>
+      ) : null}
+    </div>
   );
 }
