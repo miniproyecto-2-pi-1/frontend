@@ -1,4 +1,5 @@
-import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
+
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { auth } from "../firebase";
@@ -44,11 +45,7 @@ function comprobar(d: Datos, google: boolean): Errores {
     errores.correo = "Escribe un correo electrónico válido.";
   }
 
-  if (
-    !Number.isInteger(d.avatar) ||
-    d.avatar < 0 ||
-    d.avatar > 5
-  ) {
+  if (!Number.isInteger(d.avatar) || d.avatar < 0 || d.avatar > 5) {
     errores.avatar = "Selecciona un avatar válido.";
   }
 
@@ -69,29 +66,25 @@ function comprobar(d: Datos, google: boolean): Errores {
 function erroresServidor(error: unknown): Errores {
   if (!(error instanceof ApiError)) {
     return {
-      general:
-        "No pudimos guardar tus cambios. Inténtalo de nuevo.",
+      general: "No pudimos guardar tus cambios. Inténtalo de nuevo.",
     };
   }
 
   if (error.code === "USERNAME_TAKEN") {
     return {
-      username:
-        "Ese nombre de usuario ya existe. Elige otro.",
+      username: "Ese nombre de usuario ya existe. Elige otro.",
     };
   }
 
   if (error.code === "EMAIL_TAKEN") {
     return {
-      correo:
-        "Ese correo ya está registrado. Usa otro.",
+      correo: "Ese correo ya está registrado. Usa otro.",
     };
   }
 
   if (error.code === "EMAIL_CHANGE_NOT_ALLOWED") {
     return {
-      correo:
-        "Ingresaste con Google; el correo no se puede cambiar aquí.",
+      correo: "Ingresaste con Google; el correo no se puede cambiar aquí.",
     };
   }
 
@@ -105,8 +98,7 @@ function erroresServidor(error: unknown): Errores {
 
   if (error.code === "PROFILE_INCOMPLETE") {
     return {
-      general:
-        "Debes elegir un nombre de usuario para continuar.",
+      general: "Debes elegir un nombre de usuario para continuar.",
     };
   }
 
@@ -123,11 +115,7 @@ export function Perfil() {
 
   const navegar = useNavigate();
 
-  const {
-    usuario,
-    perfilListo,
-    cerrarSesion,
-  } = useSesion();
+  const { usuario, perfilListo, cerrarSesion } = useSesion();
 
   const [datos, setDatos] = useState<Datos | null>(
     () => (usuario ? desdeUsuario(usuario) : null)
@@ -142,12 +130,12 @@ export function Perfil() {
   const [errorEliminar, setErrorEliminar] = useState("");
 
   const eliminarRef = useRef<HTMLButtonElement>(null);
+
   const formularioRef = useRef<HTMLFormElement>(null);
 
   const google =
     auth?.currentUser?.providerData.some(
-      (proveedor) =>
-        proveedor.providerId === "google.com"
+      (proveedor) => proveedor.providerId === "google.com"
     ) ?? false;
 
   useEffect(() => {
@@ -167,9 +155,7 @@ export function Perfil() {
     campo: Exclude<keyof Datos, "avatar">,
     valor: string
   ) {
-    setDatos((d) =>
-      d ? { ...d, [campo]: valor } : null
-    );
+    setDatos((d) => (d ? { ...d, [campo]: valor } : null));
 
     setErrores((e) => ({
       ...e,
@@ -191,17 +177,12 @@ export function Perfil() {
   async function guardar(e: FormEvent) {
     e.preventDefault();
 
-    if (
-      guardando ||
-      !datos ||
-      !usuario ||
-      !(
-        JSON.stringify(datos) !==
-        JSON.stringify(desdeUsuario(usuario))
-      )
-    ) {
-      return;
-    }
+    if (guardando || !datos || !usuario) return;
+
+    const pendiente =
+      JSON.stringify(datos) !== JSON.stringify(desdeUsuario(usuario));
+
+    if (!pendiente) return;
 
     const locales = comprobar(datos, google);
 
@@ -210,9 +191,7 @@ export function Perfil() {
 
       requestAnimationFrame(() =>
         formularioRef.current
-          ?.querySelector<HTMLElement>(
-            '[aria-invalid="true"]'
-          )
+          ?.querySelector<HTMLElement>('[aria-invalid="true"]')
           ?.focus()
       );
 
@@ -231,10 +210,7 @@ export function Perfil() {
         avatar: datos.avatar,
       };
 
-      if (
-        !google &&
-        datos.correo.trim() !== usuario.correo
-      ) {
+      if (!google && datos.correo.trim() !== usuario.correo) {
         body.correo = datos.correo.trim();
       }
 
@@ -254,9 +230,7 @@ export function Perfil() {
 
       requestAnimationFrame(() =>
         formularioRef.current
-          ?.querySelector<HTMLElement>(
-            '[aria-invalid="true"]'
-          )
+          ?.querySelector<HTMLElement>('[aria-invalid="true"]')
           ?.focus()
       );
     } finally {
@@ -300,20 +274,14 @@ export function Perfil() {
   if (!usuario || !datos) {
     return (
       <div className="mx-auto w-full max-w-xl">
-        <h1 className="mb-3 text-3xl font-bold">
-          Mi perfil
-        </h1>
-
-        <p className="text-suave">
-          Revisa y actualiza tus datos.
-        </p>
+        <h1 className="mb-3 text-3xl font-bold">Mi perfil</h1>
+        <p className="text-suave">Revisa y actualiza tus datos.</p>
 
         <div
           role="status"
           className="tarjeta mt-5 animate-pulse p-6"
         >
           Conectando… Cargando tu perfil…
-
           <div className="mt-4 h-4 w-2/3 rounded bg-borde" />
           <div className="mt-3 h-4 w-full rounded bg-borde" />
         </div>
@@ -322,15 +290,11 @@ export function Perfil() {
   }
 
   const pendiente =
-    JSON.stringify(datos) !==
-    JSON.stringify(desdeUsuario(usuario));
+    JSON.stringify(datos) !== JSON.stringify(desdeUsuario(usuario));
 
   return (
     <div className="mx-auto w-full max-w-xl">
-      <h1 className="text-3xl font-bold">
-        Mi perfil
-      </h1>
-
+      <h1 className="text-3xl font-bold">Mi perfil</h1>
       <p className="mb-5 text-suave">
         Revisa y actualiza tus datos.
       </p>
@@ -372,9 +336,7 @@ export function Perfil() {
               valor={datos.avatar}
               nombre={`${datos.nombres} ${datos.apellidos}`}
               onCambio={(avatar) => {
-                setDatos((d) =>
-                  d ? { ...d, avatar } : d
-                );
+                setDatos((d) => (d ? { ...d, avatar } : d));
                 setExito("");
               }}
             />
@@ -388,9 +350,7 @@ export function Perfil() {
             requerido
             autoComplete="given-name"
             value={datos.nombres}
-            onChange={(e) =>
-              modificar("nombres", e.target.value)
-            }
+            onChange={(e) => modificar("nombres", e.target.value)}
             error={errores.nombres}
           />
 
@@ -400,9 +360,7 @@ export function Perfil() {
             requerido
             autoComplete="family-name"
             value={datos.apellidos}
-            onChange={(e) =>
-              modificar("apellidos", e.target.value)
-            }
+            onChange={(e) => modificar("apellidos", e.target.value)}
             error={errores.apellidos}
           />
         </div>
@@ -416,9 +374,7 @@ export function Perfil() {
           autoCapitalize="none"
           spellCheck={false}
           value={datos.username}
-          onChange={(e) =>
-            modificar("username", e.target.value)
-          }
+          onChange={(e) => modificar("username", e.target.value)}
           error={errores.username}
         />
 
@@ -436,9 +392,7 @@ export function Perfil() {
               : undefined
           }
           value={datos.correo}
-          onChange={(e) =>
-            modificar("correo", e.target.value)
-          }
+          onChange={(e) => modificar("correo", e.target.value)}
           error={errores.correo}
         />
 
@@ -448,9 +402,7 @@ export function Perfil() {
             disabled={guardando || !pendiente}
             className="btn-principal disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {guardando
-              ? "Guardando…"
-              : "Guardar cambios"}
+            {guardando ? "Guardando…" : "Guardar cambios"}
           </button>
 
           <button
