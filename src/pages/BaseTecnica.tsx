@@ -123,7 +123,7 @@ export function BaseTecnica() {
               <span aria-hidden="true" className="size-2 rounded-full bg-exito" />
               Conectado a la API
             </p>
-            <p className="rounded-lg bg-fondo p-3 text-lg">«{estado.mensaje}»</p>
+            <p className="rounded-lg bg-lienzo p-3 text-lg">«{estado.mensaje}»</p>
             <p className="mt-3 text-suave">Última actualización: {formatearFecha(estado.actualizadoEn)}</p>
           </div>
         )}

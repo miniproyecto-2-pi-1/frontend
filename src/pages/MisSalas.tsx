@@ -329,66 +329,66 @@ export function MisSalas() {
           {salas.map((sala) => {
             const color = colorSala(sala.id);
             return (
-            <li
-              key={sala.id}
-              className="tarjeta min-w-0 overflow-hidden"
-            >
-              <div
-                aria-hidden="true"
-                className="-mx-5 -mt-5 mb-4 h-2"
-                style={{ background: color }}
-              />
-
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] font-bold text-white"
-                    style={{ background: color }}
-                  >
-                    {iniciales(sala.nombre)}
-                  </span>
-
-                  <h2 className="min-w-0 break-words text-lg font-bold">
-                    {sala.nombre}
-                  </h2>
+              <li
+                key={sala.id}
+                className="tarjeta min-w-0 overflow-hidden"
+              >
+                <div
+                  aria-hidden="true"
+                  className="-mx-5 -mt-5 mb-4 h-2"
+                  style={{ background: color }}
+                />
+  
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] font-bold text-white"
+                      style={{ background: color }}
+                    >
+                      {iniciales(sala.nombre)}
+                    </span>
+  
+                    <h2 className="min-w-0 break-words text-lg font-bold">
+                      {sala.nombre}
+                    </h2>
+                  </div>
+  
+                  {sala.esAdministrador !== false && (
+                    <span className="shrink-0 rounded-full border border-enlace bg-principal-suave px-2 py-0.5 text-xs font-semibold text-enlace">
+                      Administrador
+                    </span>
+                  )}
                 </div>
-
-                {sala.esAdministrador !== false && (
-                  <span className="shrink-0 rounded-full border border-enlace bg-principal-suave px-2 py-0.5 text-xs font-semibold text-enlace">
-                    Administrador
-                  </span>
-                )}
-              </div>
-
-              <p className="mt-4 text-sm text-suave">
-                ID de la sala
-              </p>
-
-              <p className="mt-1 break-all font-mono font-semibold">
-                {sala.id}
-              </p>
-
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Link
-                  className="btn-secundario"
-                  to={`/salas/${encodeURIComponent(sala.id)}`}
-                >
-                  Entrar
-                </Link>
-
-                <button
-                  type="button"
-                  className="min-h-11 px-2 font-semibold text-enlace underline"
-                  aria-label={`Copiar ID de ${sala.nombre}`}
-                  onClick={() =>
-                    void copiar(sala.id)
-                  }
-                >
-                  ▢ Copiar ID
-                </button>
-              </div>
-            </li>
+  
+                <p className="mt-4 text-sm text-suave">
+                  ID de la sala
+                </p>
+  
+                <p className="mt-1 break-all font-mono font-semibold">
+                  {sala.id}
+                </p>
+  
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Link
+                    className="btn-secundario"
+                    to={`/salas/${encodeURIComponent(sala.id)}`}
+                  >
+                    Entrar
+                  </Link>
+  
+                  <button
+                    type="button"
+                    className="min-h-11 px-2 font-semibold text-enlace underline"
+                    aria-label={`Copiar ID de ${sala.nombre}`}
+                    onClick={() =>
+                      void copiar(sala.id)
+                    }
+                  >
+                    ▢ Copiar ID
+                  </button>
+                </div>
+              </li>
             );
           })}
         </ul>
