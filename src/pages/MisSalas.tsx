@@ -1,6 +1,7 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
 import {Link,useNavigate} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
+import { colorAvatar, iniciales } from "../components/Avatar";
 import { Campo } from "../components/Campo";
 import { ModalAccesible } from "../components/ModalAccesible";
 import { useTitulo } from "../hooks/useTitulo";
@@ -16,6 +17,13 @@ const MAX_NOMBRE = 50;
 
 const errorConexion =
   "No pudimos cargar tus salas. Revisa tu conexión e inténtalo de nuevo.";
+
+// Hash simple del ID: la misma sala conserva su color en cada visita.
+function colorSala(id: string) {
+  let n = 0;
+  for (const c of id) n = (n * 31 + c.charCodeAt(0)) >>> 0;
+  return colorAvatar(n);
+}
 
 function esAbort(error: unknown) {
   return (
@@ -318,15 +326,33 @@ export function MisSalas() {
           aria-label="Salas que creaste"
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {salas.map((sala) => (
+          {salas.map((sala) => {
+            const color = colorSala(sala.id);
+            return (
             <li
               key={sala.id}
-              className="tarjeta min-w-0"
+              className="tarjeta min-w-0 overflow-hidden"
             >
+              <div
+                aria-hidden="true"
+                className="-mx-5 -mt-5 mb-4 h-2"
+                style={{ background: color }}
+              />
+
               <div className="flex items-start justify-between gap-2">
-                <h2 className="min-w-0 break-words text-lg font-bold">
-                  {sala.nombre}
-                </h2>
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] font-bold text-white"
+                    style={{ background: color }}
+                  >
+                    {iniciales(sala.nombre)}
+                  </span>
+
+                  <h2 className="min-w-0 break-words text-lg font-bold">
+                    {sala.nombre}
+                  </h2>
+                </div>
 
                 {sala.esAdministrador !== false && (
                   <span className="shrink-0 rounded-full border border-enlace px-2 py-0.5 text-xs font-semibold text-enlace">
@@ -363,7 +389,8 @@ export function MisSalas() {
                 </button>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
 
