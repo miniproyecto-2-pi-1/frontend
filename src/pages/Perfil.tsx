@@ -418,7 +418,7 @@ export function Perfil() {
 
       <section
         aria-labelledby="zona-peligro"
-        className="mt-5 rounded-xl border border-error p-5"
+        className="mt-5 rounded-xl border border-error bg-error-fondo p-5"
       >
         <h2
           id="zona-peligro"
