@@ -16,6 +16,9 @@
   --error: #b3261e;
   --exito: #1f7a3f;
   --exito-fondo: #ddf3e4;
+  --lienzo: #eee8fa; /* fondo de la página, detrás de encabezado y tarjetas */
+  --principal-suave: #ece6fd;
+  --error-fondo: #fbe9e7;
 }
 
 .dark {
@@ -30,6 +33,9 @@
   --error: #ff8aa0;
   --exito: #57d58a;
   --exito-fondo: #173a24;
+  --lienzo: #211e29;
+  --principal-suave: #3a2f5e;
+  --error-fondo: #3a1d24;
 }
 
 @theme inline {
@@ -44,6 +50,9 @@
   --color-error: var(--error);
   --color-exito: var(--exito);
   --color-exito-fondo: var(--exito-fondo);
+  --color-lienzo: var(--lienzo);
+  --color-principal-suave: var(--principal-suave);
+  --color-error-fondo: var(--error-fondo);
   --font-sans: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -55,7 +64,7 @@ html.dark {
 }
 
 body {
-  background: var(--fondo);
+  background: var(--lienzo);
   color: var(--texto);
   font-family: var(--font-sans);
   line-height: 1.6;
@@ -129,7 +138,8 @@ main:focus {
   .tarjeta {
     border-radius: 10px;
     border: 1px solid var(--borde);
-    background: var(--superficie);
+    background: var(--fondo);
+    box-shadow: 0 2px 8px rgba(69, 51, 115, 0.08);
     padding: 1.25rem;
   }
 }
