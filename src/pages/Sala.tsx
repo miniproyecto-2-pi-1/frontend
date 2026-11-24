@@ -144,7 +144,7 @@ export function Sala() {
             </p>
           )}
 
-          <section className="tarjeta mb-5 bg-superficie">
+          <section className="tarjeta mb-5">
             <p className="mb-2 text-sm text-suave">
               ID de la sala
             </p>

@@ -270,7 +270,7 @@ export function MisSalas() {
             {[0, 1, 2].map((n) => (
               <div
                 key={n}
-                className="tarjeta animate-pulse space-y-3 bg-superficie"
+                className="tarjeta animate-pulse space-y-3"
               >
                 <div className="h-4 w-2/3 rounded bg-borde" />
                 <div className="h-4 w-1/3 rounded bg-borde" />
@@ -321,7 +321,7 @@ export function MisSalas() {
           {salas.map((sala) => (
             <li
               key={sala.id}
-              className="tarjeta min-w-0 bg-superficie"
+              className="tarjeta min-w-0"
             >
               <div className="flex items-start justify-between gap-2">
                 <h2 className="min-w-0 break-words text-lg font-bold">

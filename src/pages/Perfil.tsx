@@ -322,7 +322,7 @@ export function Perfil() {
         ref={formularioRef}
         noValidate
         onSubmit={(e) => void guardar(e)}
-        className="tarjeta space-y-4 bg-superficie p-4 sm:p-6"
+        className="tarjeta space-y-4 p-4 sm:p-6"
       >
         <div className="flex items-center gap-4">
           <Avatar
