@@ -129,7 +129,7 @@ export function Sala() {
             </h1>
 
             {sala.esAdministrador !== false && (
-              <span className="rounded-full border border-enlace px-2 py-1 text-sm text-enlace">
+              <span className="rounded-full border border-enlace bg-principal-suave px-2 py-1 text-sm text-enlace">
                 Administrador
               </span>
             )}
@@ -144,7 +144,7 @@ export function Sala() {
             </p>
           )}
 
-          <section className="tarjeta mb-5 bg-superficie">
+          <section className="tarjeta mb-5">
             <p className="mb-2 text-sm text-suave">
               ID de la sala
             </p>

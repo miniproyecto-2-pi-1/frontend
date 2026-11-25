@@ -27,7 +27,9 @@ export function LayoutApp() {
   return (
     <div className="flex min-h-screen flex-col">
       <SaltarAlContenido />
-      <header className="border-b-[1.5px] border-borde">
+      <header className="border-b-[1.5px] border-borde bg-fondo">
+        {/* Franja decorativa con los colores del prototipo. */}
+        <div aria-hidden="true" className="h-[5px] bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-8">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {/* Navegación (☰) */}
