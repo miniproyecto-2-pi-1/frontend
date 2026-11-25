@@ -16,6 +16,8 @@ interface Props {
   acciones: AccionMenu[];
   // Sobre el color de una tarjeta (icono blanco) o sobre el fondo normal (icono de enlace).
   sobreColor?: boolean;
+  // Círculo con borde alrededor de los tres puntos (en el encabezado de la sala); sin él, solo los puntos (en las tarjetas).
+  contorno?: boolean;
   className?: string;
 }
 
@@ -38,7 +40,7 @@ const ICONOS = {
 
 // Botón de tres puntos (⋯) con las acciones de una sala. Usa el mismo menú desplegable que el de la cuenta
 // (useDesplegable): se abre con Enter o Espacio, se recorre con Tab, y Esc lo cierra devolviendo el foco al botón.
-export function MenuAcciones({ etiqueta, acciones, sobreColor = false, className = "" }: Props) {
+export function MenuAcciones({ etiqueta, acciones, sobreColor = false, contorno = false, className = "" }: Props) {
   const { pathname } = useLocation();
   const menu = useDesplegable(pathname);
 
@@ -49,7 +51,7 @@ export function MenuAcciones({ etiqueta, acciones, sobreColor = false, className
         aria-label={etiqueta}
         aria-haspopup="true"
         className={`inline-flex size-11 items-center justify-center rounded-full ${
-          sobreColor ? "text-white hover:bg-white/20" : "border-[1.5px] border-enlace text-enlace hover:bg-superficie"
+          sobreColor ? "text-white hover:bg-white/20" : `text-enlace hover:bg-superficie ${contorno ? "border-[1.5px] border-enlace" : ""}`
         } ${menu.abierto ? (sobreColor ? "bg-white/25" : "bg-superficie") : ""}`}
       >
         <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">

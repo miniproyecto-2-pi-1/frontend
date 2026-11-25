@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { EstadoConexionSala } from "../components/EstadoConexionSala";
+import { MenuAcciones } from "../components/MenuAcciones";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
+import { ModalEditarSala } from "../components/sala/ModalEditarSala";
 import { PanelChat } from "../components/sala/PanelChat";
 import { useHistorialSala } from "../hooks/useHistorialSala";
 import { useMensajesSala } from "../hooks/useMensajesSala";
@@ -25,6 +27,9 @@ export function Sala() {
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [intento, setIntento] = useState(0);
+  // Acciones del anfitrión (US-07): editar el nombre de la sala.
+  const [editando, setEditando] = useState(false);
+  const iniciadorRef = useRef<HTMLButtonElement | null>(null);
   // En pantallas angostas se ve una sola cosa a la vez: el chat o las personas.
   const [vista, setVista] = useState<"chat" | "personas">("chat");
 
@@ -116,6 +121,24 @@ export function Sala() {
                 ▢ Copiar ID
               </button>
             </span>
+
+            {sala.esAdministrador !== false && (
+              <MenuAcciones
+                className="ml-auto"
+                contorno
+                etiqueta={`Más acciones de la sala ${sala.nombre}`}
+                acciones={[
+                  {
+                    texto: "Editar sala",
+                    icono: "editar",
+                    alElegir: (boton) => {
+                      iniciadorRef.current = boton;
+                      setEditando(true);
+                    },
+                  },
+                ]}
+              />
+            )}
           </div>
 
           {creada && (
@@ -178,6 +201,19 @@ export function Sala() {
                 </aside>
               </div>
             </>
+          )}
+
+          {editando && (
+            <ModalEditarSala
+              sala={sala}
+              iniciadorRef={iniciadorRef}
+              alCerrar={() => setEditando(false)}
+              alGuardada={(actualizada) => {
+                setSala((actual) => (actual ? { ...actual, nombre: actualizada.nombre } : actual));
+                setMensaje(`Sala actualizada: «${actualizada.nombre}»`);
+                setEditando(false);
+              }}
+            />
           )}
         </>
       ) : null}
