@@ -45,7 +45,8 @@ export function MenuAcciones({ etiqueta, acciones, sobreColor = false, contorno 
   const menu = useDesplegable(pathname);
 
   return (
-    <div ref={menu.contenedor} className={`relative ${className}`}>
+    // Si quien lo usa lo posiciona con «absolute», ya es punto de referencia del panel; si no, se le da «relative».
+    <div ref={menu.contenedor} className={className.includes("absolute") ? className : `relative ${className}`}>
       <button
         {...menu.propsBoton}
         aria-label={etiqueta}
