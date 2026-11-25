@@ -38,13 +38,15 @@ export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }
     evento?.preventDefault();
     if (vacio || enviando || sinConexion) return;
 
+    const aEnviar = texto.trim();
     setEnviando(true);
     setErrorEnvio("");
+    setTexto(""); // el campo queda libre enseguida; si algo falla, el texto vuelve
     try {
-      await cliente.enviar(roomId, texto.trim());
-      setTexto("");
+      await cliente.enviar(roomId, aEnviar);
     } catch (error) {
-      // El texto se conserva para poder reintentar.
+      // Se devuelve el texto para poder reintentar, salvo que ya haya escrito otra cosa.
+      setTexto((actual) => (actual ? actual : aEnviar));
       setErrorEnvio(error instanceof Error ? error.message : "No pudimos enviar el mensaje. Inténtalo de nuevo.");
     } finally {
       setEnviando(false);
