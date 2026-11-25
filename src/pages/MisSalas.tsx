@@ -5,6 +5,7 @@ import { colorAvatar, iniciales } from "../components/Avatar";
 import { Campo } from "../components/Campo";
 import { ModalAccesible } from "../components/ModalAccesible";
 import { useTitulo } from "../hooks/useTitulo";
+import { tieneEspaciosSobrantes, validarCodigoSala } from "../validacionSala";
 
 export type SalaPropia = {
   id: string;
@@ -66,6 +67,18 @@ export function MisSalas() {
 
   const [mensajeCopia, setMensajeCopia] =
     useState("");
+
+  const [codigo, setCodigo] =
+    useState("");
+
+  const [errorCodigo, setErrorCodigo] =
+    useState("");
+
+  const [uniendo, setUniendo] =
+    useState(false);
+
+  const codigoRef =
+    useRef<HTMLInputElement>(null);
 
   const abrirRef =
     useRef<HTMLButtonElement>(null);
@@ -211,6 +224,57 @@ export function MisSalas() {
     }
   }
 
+  // US-08: unirse a una sala con su código. El texto se limpia (espacios, mayúsculas) antes de pedirla a la API.
+  async function unirse(evento: FormEvent) {
+    evento.preventDefault();
+
+    if (uniendo) return;
+
+    const resultado = validarCodigoSala(codigo);
+
+    if (!resultado.ok) {
+      setErrorCodigo(resultado.error);
+      codigoRef.current?.focus();
+      return;
+    }
+
+    setUniendo(true);
+    setErrorCodigo("");
+
+    try {
+      const sala = await apiFetch<SalaPropia>(
+        `/api/v1/rooms/${encodeURIComponent(resultado.id)}`
+      );
+
+      navegar(
+        `/salas/${encodeURIComponent(sala.id)}`,
+        {
+          state: {
+            sala,
+          },
+        }
+      );
+    } catch (error) {
+      if (
+        error instanceof ApiError &&
+        (error.code === "ROOM_NOT_FOUND" ||
+          error.status === 404)
+      ) {
+        setErrorCodigo(
+          "Sala no encontrada. Revisa el código."
+        );
+      } else {
+        setErrorCodigo(
+          "No pudimos unirte a la sala. Revisa tu conexión e inténtalo de nuevo."
+        );
+      }
+
+      codigoRef.current?.focus();
+    } finally {
+      setUniendo(false);
+    }
+  }
+
   async function copiar(id: string) {
     try {
       await navigator.clipboard.writeText(id);
@@ -254,6 +318,59 @@ export function MisSalas() {
           Nueva sala
         </button>
       </div>
+
+      <form
+        noValidate
+        aria-labelledby="titulo-unirse"
+        className="tarjeta mb-6"
+        onSubmit={(e) =>
+          void unirse(e)
+        }
+      >
+        <h2
+          id="titulo-unirse"
+          className="mb-3 text-lg font-bold"
+        >
+          Unirme a una sala
+        </h2>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <div className="min-w-0 flex-1">
+            <Campo
+              id="codigo-sala"
+              inputRef={codigoRef}
+              etiqueta="Código de la sala"
+              requerido
+              value={codigo}
+              placeholder="Ej. K7P2-91XQ"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              disabled={uniendo}
+              onChange={(e) => {
+                setCodigo(e.target.value);
+                setErrorCodigo("");
+              }}
+              ayuda={
+                tieneEspaciosSobrantes(codigo)
+                  ? "Quitamos los espacios al inicio y al final del código."
+                  : "Te lo comparte quien creó la sala."
+              }
+              error={errorCodigo}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn-principal w-full disabled:opacity-60 sm:mt-8 sm:w-auto"
+            disabled={uniendo}
+          >
+            {uniendo
+              ? "Uniéndome…"
+              : "Unirme"}
+          </button>
+        </div>
+      </form>
 
       {mensajeCopia && (
         <p
