@@ -1,7 +1,7 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
 import {Link,useLocation,useNavigate} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
-import { colorAvatar, iniciales } from "../components/Avatar";
+import { colorAvatar } from "../components/Avatar";
 import { Campo } from "../components/Campo";
 import { MenuAcciones } from "../components/MenuAcciones";
 import { ModalAccesible } from "../components/ModalAccesible";
@@ -478,43 +478,29 @@ export function MisSalas() {
         >
           {salas.map((sala) => {
             const color = colorSala(sala.id);
+            const anfitrion = sala.esAdministrador !== false;
             return (
               <li
                 key={sala.id}
-                className="tarjeta min-w-0"
+                className="tarjeta min-w-0 !p-0"
               >
+                {/* Encabezado de color con el nombre y el ID; el menú ⋯ va arriba a la derecha. */}
                 <div
-                  aria-hidden="true"
-                  className="-mx-5 -mt-5 mb-4 h-2 rounded-t-[9px]"
+                  className="relative rounded-t-[9px] px-4 py-3 text-white"
                   style={{ background: color }}
-                />
-  
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span
-                      aria-hidden="true"
-                      className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] font-bold text-white"
-                      style={{ background: color }}
-                    >
-                      {iniciales(sala.nombre)}
-                    </span>
+                >
+                  <h2 className="break-words pr-10 text-lg font-bold">
+                    {sala.nombre}
+                  </h2>
 
-                    <div className="min-w-0">
-                      <h2 className="break-words text-lg font-bold">
-                        {sala.nombre}
-                      </h2>
+                  <p className="font-mono text-sm tracking-wide">
+                    {sala.id}
+                  </p>
 
-                      {sala.esAdministrador !== false && (
-                        <p className="text-sm font-semibold text-enlace">
-                          Anfitrión
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {sala.esAdministrador !== false && (
+                  {anfitrion && (
                     <MenuAcciones
-                      className="-mr-2 -mt-1 shrink-0"
+                      sobreColor
+                      className="absolute right-1 top-1"
                       etiqueta={`Más acciones de la sala ${sala.nombre}`}
                       acciones={[
                         {
@@ -535,31 +521,36 @@ export function MisSalas() {
                   )}
                 </div>
 
-                <p className="mt-4 text-sm text-suave">
-                  ID de la sala
+                <p
+                  className={`px-4 py-3 font-semibold ${
+                    anfitrion ? "text-enlace" : "text-suave"
+                  }`}
+                >
+                  {anfitrion ? "Anfitrión" : "Invitado"}
                 </p>
-  
-                <p className="mt-1 break-all font-mono font-semibold">
-                  {sala.id}
-                </p>
-  
-                <div className="mt-4 flex flex-wrap items-center gap-2">
+
+                <div className="flex items-center justify-between border-t border-borde px-2">
                   <Link
-                    className="btn-secundario"
+                    className="inline-flex min-h-11 items-center px-2 font-bold text-enlace underline"
                     to={`/salas/${encodeURIComponent(sala.id)}`}
+                    aria-label={`Entrar a la sala ${sala.nombre}`}
                   >
                     Entrar
                   </Link>
-  
+
                   <button
                     type="button"
-                    className="min-h-11 px-2 font-semibold text-enlace underline"
+                    className="inline-flex min-h-11 items-center gap-1.5 px-2 font-semibold text-enlace underline"
                     aria-label={`Copiar ID de ${sala.nombre}`}
                     onClick={() =>
                       void copiar(sala.id)
                     }
                   >
-                    ▢ Copiar ID
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="11" height="11" rx="2" />
+                      <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+                    </svg>
+                    Copiar ID
                   </button>
                 </div>
               </li>
