@@ -133,7 +133,16 @@ export function Sala() {
             </p>
           ) : (
             <section aria-label="Chat de la sala" className="tarjeta h-[32rem] overflow-hidden p-0">
-              <PanelChat mensajes={mensajes} personas={[]} miUid={usuario?.uid ?? ""} />
+              {tiempoReal.cliente && (
+                <PanelChat
+                  cliente={tiempoReal.cliente}
+                  roomId={sala.id}
+                  estado={tiempoReal.estado}
+                  mensajes={mensajes}
+                  personas={[]}
+                  miUid={usuario?.uid ?? ""}
+                />
+              )}
             </section>
           )}
         </>

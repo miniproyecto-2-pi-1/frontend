@@ -1,9 +1,13 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Avatar } from "../Avatar";
+import type { ClienteSala, EstadoConexion } from "../../tiempoReal";
+import { MAXIMO_MENSAJE, type Mensaje, type Persona } from "../../tipos";
 import { horaCorta } from "../../utils/hora";
-import type { Mensaje, Persona } from "../../tipos";
 
 interface Props {
+  cliente: ClienteSala;
+  roomId: string;
+  estado: EstadoConexion;
   mensajes: Mensaje[];
   personas: Persona[];
   // uid de la persona que está usando la pantalla: sus mensajes se distinguen.
@@ -19,8 +23,42 @@ function colorDe(uid: string, personas: Persona[]): number {
   return n;
 }
 
-export function PanelChat({ mensajes, personas, miUid }: Props) {
+export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }: Props) {
   const contenedor = useRef<HTMLDivElement>(null);
+  const escritura = useRef<HTMLTextAreaElement>(null);
+  const [texto, setTexto] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [errorEnvio, setErrorEnvio] = useState("");
+
+  const sinConexion = estado !== "conectado";
+  // Un mensaje vacío o de solo espacios no se envía.
+  const vacio = texto.trim().length === 0;
+
+  async function enviar(evento?: FormEvent) {
+    evento?.preventDefault();
+    if (vacio || enviando || sinConexion) return;
+
+    setEnviando(true);
+    setErrorEnvio("");
+    try {
+      await cliente.enviar(roomId, texto.trim());
+      setTexto("");
+    } catch (error) {
+      // El texto se conserva para poder reintentar.
+      setErrorEnvio(error instanceof Error ? error.message : "No pudimos enviar el mensaje. Inténtalo de nuevo.");
+    } finally {
+      setEnviando(false);
+      escritura.current?.focus();
+    }
+  }
+
+  // Enter envía; Mayús + Enter hace un salto de línea.
+  function alPulsar(evento: KeyboardEvent<HTMLTextAreaElement>) {
+    if (evento.key === "Enter" && !evento.shiftKey && !evento.nativeEvent.isComposing) {
+      evento.preventDefault();
+      void enviar();
+    }
+  }
 
   // Al llegar mensajes, la lista baja hasta el último.
   useLayoutEffect(() => {
@@ -57,6 +95,48 @@ export function PanelChat({ mensajes, personas, miUid }: Props) {
           })}
         </ul>
       </div>
+
+      <form noValidate onSubmit={(e) => void enviar(e)} className="border-t border-borde p-3">
+        <div className="flex items-end gap-2">
+          <textarea
+            ref={escritura}
+            rows={1}
+            maxLength={MAXIMO_MENSAJE}
+            aria-label="Escribe un mensaje"
+            placeholder="Escribe un mensaje"
+            className="campo max-h-32 min-h-11 flex-1 resize-none [field-sizing:content]"
+            value={texto}
+            onChange={(e) => {
+              setTexto(e.target.value);
+              setErrorEnvio("");
+            }}
+            onKeyDown={alPulsar}
+          />
+
+          <button
+            type="submit"
+            aria-label="Enviar mensaje"
+            disabled={vacio || enviando || sinConexion}
+            className="btn-principal size-11 shrink-0 rounded-full !p-0 disabled:cursor-not-allowed disabled:border-borde disabled:bg-superficie disabled:text-suave"
+          >
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 2 11 13" />
+              <path d="M22 2l-7 20-4-9-9-4Z" />
+            </svg>
+          </button>
+        </div>
+
+        <p className="mt-1 text-xs text-suave">
+          {sinConexion ? "Sin conexión con la sala: no se pueden enviar mensajes." : "Enter envía · Mayús + Enter hace un salto de línea"}
+          {texto.length >= MAXIMO_MENSAJE * 0.9 && ` · ${texto.length}/${MAXIMO_MENSAJE}`}
+        </p>
+
+        {errorEnvio && (
+          <p role="alert" className="mt-2 rounded-lg bg-error-fondo p-2 text-sm font-medium text-error">
+            {errorEnvio}
+          </p>
+        )}
+      </form>
     </div>
   );
 }
