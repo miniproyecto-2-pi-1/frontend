@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { EstadoConexionSala } from "../components/EstadoConexionSala";
 import { MenuAcciones } from "../components/MenuAcciones";
+import { AvisoSalaEliminada } from "../components/sala/AvisoSalaEliminada";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
@@ -32,6 +33,8 @@ export function Sala() {
   // Acciones del anfitrión (US-07): editar el nombre de la sala.
   const [editando, setEditando] = useState(false);
   const [eliminando, setEliminando] = useState(false);
+  // El anfitrión eliminó la sala mientras estabas dentro (evento «sala-eliminada»).
+  const [eliminadaPorAnfitrion, setEliminadaPorAnfitrion] = useState(false);
   const iniciadorRef = useRef<HTMLButtonElement | null>(null);
   // En pantallas angostas se ve una sola cosa a la vez: el chat o las personas.
   const [vista, setVista] = useState<"chat" | "personas">("chat");
@@ -47,6 +50,25 @@ export function Sala() {
   // Personas conectadas y avisos de quién entra o sale (US-10).
   const miUid = usuario?.uid ?? "";
   const { personas, avisos } = useSalaPersonas(tiempoReal.cliente, miUid);
+
+  // Cambios que hace el anfitrión con la sala abierta: nuevo nombre o eliminación (US-07).
+  useEffect(() => {
+    const cliente = tiempoReal.cliente;
+    if (!cliente) return;
+    const quitarEliminada = cliente.alSalaEliminada(() => {
+      setEditando(false);
+      setEliminando(false);
+      setEliminadaPorAnfitrion(true);
+    });
+    const quitarActualizada = cliente.alSalaActualizada((nombre) => {
+      setSala((actual) => (actual ? { ...actual, nombre } : actual));
+      setMensaje(`El anfitrión cambió el nombre de la sala a «${nombre}»`);
+    });
+    return () => {
+      quitarEliminada();
+      quitarActualizada();
+    };
+  }, [tiempoReal.cliente]);
 
   useEffect(() => {
     const control = new AbortController();
@@ -213,6 +235,10 @@ export function Sala() {
                 </aside>
               </div>
             </>
+          )}
+
+          {eliminadaPorAnfitrion && (
+            <AvisoSalaEliminada nombre={sala.nombre} alIrAMisSalas={() => navegar("/salas", { replace: true })} />
           )}
 
           {eliminando && (
