@@ -1,11 +1,12 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
-import {Link,useNavigate} from "react-router-dom";
+import {Link,useLocation,useNavigate} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
 import { colorAvatar, iniciales } from "../components/Avatar";
 import { Campo } from "../components/Campo";
 import { MenuAcciones } from "../components/MenuAcciones";
 import { ModalAccesible } from "../components/ModalAccesible";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
+import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { useTitulo } from "../hooks/useTitulo";
 import { tieneEspaciosSobrantes, validarCodigoSala } from "../validacionSala";
 
@@ -40,6 +41,8 @@ export function MisSalas() {
 
   const navegar = useNavigate();
 
+  const ubicacion = useLocation();
+
   const [salas, setSalas] =
     useState<SalaPropia[]>([]);
 
@@ -67,8 +70,12 @@ export function MisSalas() {
   const [creando, setCreando] =
     useState(false);
 
+  // Avisos de la pantalla: ID copiado, sala actualizada y, si vienes de eliminar una sala dentro de ella, «Sala eliminada».
   const [aviso, setAviso] =
-    useState("");
+    useState(
+      () =>
+        (ubicacion.state as { aviso?: string } | null)?.aviso ?? ""
+    );
 
   const [codigo, setCodigo] =
     useState("");
@@ -113,6 +120,13 @@ export function MisSalas() {
       setErrorCrear("");
     }
   }, [creando]);
+
+  // El aviso que llegó con la navegación se muestra una vez; al recargar ya no vuelve a salir.
+  useEffect(() => {
+    if ((ubicacion.state as { aviso?: string } | null)?.aviso) {
+      window.history.replaceState({}, "");
+    }
+  }, [ubicacion.state]);
 
   useEffect(() => {
     const control = new AbortController();
@@ -509,6 +523,13 @@ export function MisSalas() {
                           alElegir: (boton) =>
                             abrirAccion("editar", sala, boton),
                         },
+                        {
+                          texto: "Eliminar sala",
+                          icono: "eliminar",
+                          peligro: true,
+                          alElegir: (boton) =>
+                            abrirAccion("eliminar", sala, boton),
+                        },
                       ]}
                     />
                   )}
@@ -609,6 +630,21 @@ export function MisSalas() {
             </div>
           </form>
         </ModalAccesible>
+      )}
+
+      {accion?.tipo === "eliminar" && (
+        <ModalEliminarSala
+          sala={accion.sala}
+          iniciadorRef={iniciadorRef}
+          alCerrar={() => setAccion(null)}
+          alEliminada={() => {
+            setSalas((actuales) =>
+              actuales.filter((s) => s.id !== accion.sala.id)
+            );
+            setAviso(`Sala «${accion.sala.nombre}» eliminada`);
+            setAccion(null);
+          }}
+        />
       )}
 
       {accion?.tipo === "editar" && (

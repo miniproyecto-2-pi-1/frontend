@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { EstadoConexionSala } from "../components/EstadoConexionSala";
 import { MenuAcciones } from "../components/MenuAcciones";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
+import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { PanelChat } from "../components/sala/PanelChat";
 import { useHistorialSala } from "../hooks/useHistorialSala";
 import { useMensajesSala } from "../hooks/useMensajesSala";
@@ -18,6 +19,7 @@ import type { SalaPropia } from "./MisSalas";
 export function Sala() {
   const { id = "" } = useParams();
   const ubicacion = useLocation();
+  const navegar = useNavigate();
   const { usuario } = useSesion();
 
   const creada = (ubicacion.state as { salaCreada?: boolean } | null)?.salaCreada === true;
@@ -29,6 +31,7 @@ export function Sala() {
   const [intento, setIntento] = useState(0);
   // Acciones del anfitrión (US-07): editar el nombre de la sala.
   const [editando, setEditando] = useState(false);
+  const [eliminando, setEliminando] = useState(false);
   const iniciadorRef = useRef<HTMLButtonElement | null>(null);
   // En pantallas angostas se ve una sola cosa a la vez: el chat o las personas.
   const [vista, setVista] = useState<"chat" | "personas">("chat");
@@ -136,6 +139,15 @@ export function Sala() {
                       setEditando(true);
                     },
                   },
+                  {
+                    texto: "Eliminar sala",
+                    icono: "eliminar",
+                    peligro: true,
+                    alElegir: (boton) => {
+                      iniciadorRef.current = boton;
+                      setEliminando(true);
+                    },
+                  },
                 ]}
               />
             )}
@@ -201,6 +213,15 @@ export function Sala() {
                 </aside>
               </div>
             </>
+          )}
+
+          {eliminando && (
+            <ModalEliminarSala
+              sala={sala}
+              iniciadorRef={iniciadorRef}
+              alCerrar={() => setEliminando(false)}
+              alEliminada={() => navegar("/salas", { replace: true, state: { aviso: `Sala «${sala.nombre}» eliminada` } })}
+            />
           )}
 
           {editando && (
