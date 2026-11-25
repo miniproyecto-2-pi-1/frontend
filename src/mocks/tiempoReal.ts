@@ -66,7 +66,7 @@ export function crearClienteMock(): ClienteSala {
     mensajes.forEach((oyente) => oyente(mensaje));
   };
 
-  window.salonMock = {
+  const ganchos: GanchosMock = {
     mensaje: (texto, username = "Juan") =>
       recibir(texto, otras.find((p) => p.username === username) ?? { uid: `mock-${username}`, username, avatar: 4 }),
     entra: (username) => {
@@ -81,6 +81,7 @@ export function crearClienteMock(): ClienteSala {
     eliminarSala: () => eliminada.forEach((oyente) => oyente()),
     estado: cambiarEstado,
   };
+  window.salonMock = ganchos;
 
   return {
     async unirse(roomId) {
@@ -125,7 +126,8 @@ export function crearClienteMock(): ClienteSala {
     },
     cerrar() {
       sala = "";
-      delete window.salonMock;
+      // Solo se quitan los ganchos propios: otra conexión (por ejemplo, la de React en desarrollo) puede haber puesto los suyos.
+      if (window.salonMock === ganchos) delete window.salonMock;
     },
   };
 }
