@@ -1,9 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Avatar } from "../Avatar";
 import type { ClienteSala, EstadoConexion } from "../../tiempoReal";
-import type { EstadoHistorial } from "../../hooks/useHistorialSala";
+import type { HistorialSala } from "../../hooks/useHistorialSala";
 import { MAXIMO_MENSAJE, type Mensaje, type Persona } from "../../tipos";
-import { horaCorta } from "../../utils/hora";
+import { etiquetaDia, horaCorta } from "../../utils/hora";
 
 interface Props {
   cliente: ClienteSala;
@@ -11,7 +11,7 @@ interface Props {
   estado: EstadoConexion;
   mensajes: Mensaje[];
   // Estado de la carga del historial (US-11).
-  historial: { estado: EstadoHistorial; error: string; reintentar: () => void };
+  historial: HistorialSala;
   personas: Persona[];
   // uid de la persona que está usando la pantalla: sus mensajes se distinguen.
   miUid: string;
@@ -35,6 +35,8 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
   // La lista solo baja sola si ya se estaba leyendo lo último; si no, se avisa con «mensajes nuevos».
   const alFinal = useRef(true);
   const ultimoId = useRef<string | null>(null);
+  // Altura de la lista justo antes de cargar mensajes anteriores: sirve para que lo que se leía no se mueva.
+  const anclaAltura = useRef<number | null>(null);
   const [nuevos, setNuevos] = useState(0);
 
   const sinConexion = estado !== "conectado";
@@ -67,6 +69,12 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
       evento.preventDefault();
       void enviar();
     }
+  }
+
+  async function cargarAnteriores() {
+    const cont = contenedor.current;
+    if (cont) anclaAltura.current = cont.scrollHeight;
+    await historial.cargarAnteriores();
   }
 
   function irAlFinal() {
@@ -102,10 +110,16 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
     ultimoId.current = ultimo?.id ?? null;
     if (!cont || !ultimo) return;
     if (ultimo.id === idPrevio) {
-      // No llegó nada al final: se agregaron mensajes más viejos (historial). Si se estaba al día, se queda abajo.
-      if (alFinal.current) cont.scrollTop = cont.scrollHeight;
+      // No llegó nada al final: se agregaron mensajes más viejos (historial).
+      if (anclaAltura.current !== null) {
+        cont.scrollTop += cont.scrollHeight - anclaAltura.current; // lo que se leía queda en su lugar
+        anclaAltura.current = null;
+      } else if (alFinal.current) {
+        cont.scrollTop = cont.scrollHeight;
+      }
       return;
     }
+    anclaAltura.current = null;
 
     const indicePrevio = idPrevio ? mensajes.findIndex((m) => m.id === idPrevio) : -1;
     const llegaron = indicePrevio >= 0 ? mensajes.length - 1 - indicePrevio : 0;
@@ -153,28 +167,55 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
             </div>
           )}
 
+          {historial.hayMas && mensajes.length > 0 && (
+            <div className="mb-4 text-center">
+              <button
+                type="button"
+                className="btn-secundario min-h-11 text-sm"
+                disabled={historial.cargandoAnteriores}
+                onClick={() => void cargarAnteriores()}
+              >
+                {historial.cargandoAnteriores ? "Cargando mensajes…" : "↑ Cargar mensajes anteriores"}
+              </button>
+              {historial.errorAnteriores && (
+                <p role="alert" className="mt-2 text-sm font-medium text-error">
+                  {historial.errorAnteriores}
+                </p>
+              )}
+            </div>
+          )}
+
           <ul role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions" className="space-y-4">
-            {mensajes.map((m) => {
+            {mensajes.map((m, i) => {
               const propio = m.uid === miUid;
+              const dia = etiquetaDia(m.creadoEn);
+              const diaNuevo = i === 0 || dia !== etiquetaDia(mensajes[i - 1].creadoEn);
               return (
-                <li key={m.id} className={`flex gap-2 ${propio ? "flex-row-reverse" : ""}`}>
-                  <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={32} />
-                  <div className={`min-w-0 max-w-[85%] ${propio ? "text-right" : ""}`}>
-                    <p className="text-sm">
-                      <strong>{propio ? "Tú" : m.username}</strong>{" "}
-                      <time dateTime={m.creadoEn} className="text-suave">
-                        {horaCorta(m.creadoEn)}
-                      </time>
-                    </p>
-                    <p
-                      className={`mt-0.5 inline-block whitespace-pre-wrap break-words rounded-xl px-3 py-2 text-left ${
-                        propio ? "bg-principal text-white" : "bg-superficie"
-                      }`}
-                    >
-                      {m.texto}
-                    </p>
-                  </div>
-                </li>
+                <Fragment key={m.id}>
+                  {diaNuevo && (
+                    <li className="flex justify-center">
+                      <span className="rounded-full border border-borde bg-fondo px-3 py-0.5 text-xs text-suave">{dia}</span>
+                    </li>
+                  )}
+                  <li className={`flex gap-2 ${propio ? "flex-row-reverse" : ""}`}>
+                    <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={32} />
+                    <div className={`min-w-0 max-w-[85%] ${propio ? "text-right" : ""}`}>
+                      <p className="text-sm">
+                        <strong>{propio ? "Tú" : m.username}</strong>{" "}
+                        <time dateTime={m.creadoEn} className="text-suave">
+                          {horaCorta(m.creadoEn)}
+                        </time>
+                      </p>
+                      <p
+                        className={`mt-0.5 inline-block whitespace-pre-wrap break-words rounded-xl px-3 py-2 text-left ${
+                          propio ? "bg-principal text-white" : "bg-superficie"
+                        }`}
+                      >
+                        {m.texto}
+                      </p>
+                    </div>
+                  </li>
+                </Fragment>
               );
             })}
           </ul>
