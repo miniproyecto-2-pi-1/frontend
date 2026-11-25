@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Avatar } from "../Avatar";
 import type { ClienteSala, EstadoConexion } from "../../tiempoReal";
+import type { EstadoHistorial } from "../../hooks/useHistorialSala";
 import { MAXIMO_MENSAJE, type Mensaje, type Persona } from "../../tipos";
 import { horaCorta } from "../../utils/hora";
 
@@ -9,6 +10,8 @@ interface Props {
   roomId: string;
   estado: EstadoConexion;
   mensajes: Mensaje[];
+  // Estado de la carga del historial (US-11).
+  historial: { estado: EstadoHistorial; error: string; reintentar: () => void };
   personas: Persona[];
   // uid de la persona que está usando la pantalla: sus mensajes se distinguen.
   miUid: string;
@@ -23,7 +26,7 @@ function colorDe(uid: string, personas: Persona[]): number {
   return n;
 }
 
-export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }: Props) {
+export function PanelChat({ cliente, roomId, estado, mensajes, historial, personas, miUid }: Props) {
   const contenedor = useRef<HTMLDivElement>(null);
   const escritura = useRef<HTMLTextAreaElement>(null);
   const [texto, setTexto] = useState("");
@@ -119,6 +122,37 @@ export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }
     <div className="flex h-full min-h-0 flex-col">
       <div className="relative min-h-0 flex-1">
         <div ref={contenedor} onScroll={alDesplazar} className="h-full overflow-y-auto p-4">
+          {historial.estado === "cargando" && mensajes.length === 0 && (
+            <div role="status" className="space-y-4" aria-label="Cargando mensajes">
+              <p className="text-center text-sm font-semibold text-suave">Cargando mensajes…</p>
+              {[0, 1, 2, 3].map((n) => (
+                <div key={n} aria-hidden="true" className="flex animate-pulse gap-2">
+                  <div className="size-8 shrink-0 rounded-full bg-borde" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-1/4 rounded bg-borde" />
+                    <div className="h-3 w-3/4 rounded bg-borde" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {historial.estado === "error" && (
+            <div role="alert" className="mb-4 rounded-lg bg-error-fondo p-3 text-sm font-medium text-error">
+              <p>{historial.error}</p>
+              <button type="button" className="btn-secundario mt-2 min-h-11" onClick={historial.reintentar}>
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {historial.estado === "listo" && mensajes.length === 0 && (
+            <div className="flex h-full flex-col items-center justify-center gap-1 px-4 py-10 text-center">
+              <p className="font-bold">Aún no hay mensajes</p>
+              <p className="text-sm text-suave">Escribe el primero para saludar a tu grupo.</p>
+            </div>
+          )}
+
           <ul role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions" className="space-y-4">
             {mensajes.map((m) => {
               const propio = m.uid === miUid;

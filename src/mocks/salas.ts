@@ -10,6 +10,8 @@ import { USUARIO_MOCK } from "./usuario";
 //   K7P2-91XQ «Cálculo II»           → la creó camila (anfitriona) y tiene 60 mensajes (para probar «cargar anteriores»).
 //   M4T8-27ZB «Proyecto Integrador»  → la creó camila y está vacía (para probar el historial vacío).
 //   R9D1-55LC «Física Mecánica»      → la creó otra persona (camila entra como invitada) y tiene 3 mensajes.
+//
+// Para probar el error del historial: en la consola, localStorage.setItem("mockFallaHistorial", "1") (y removeItem para quitarlo).
 
 interface SalaGuardada {
   id: string;
@@ -86,6 +88,14 @@ const leerMensajes = () =>
     "R9D1-55LC": semillaMensajes("R9D1-55LC", 3),
   }));
 
+function leerBandera(clave: string): boolean {
+  try {
+    return localStorage.getItem(clave) === "1";
+  } catch {
+    return false;
+  }
+}
+
 const uidActual = () => auth?.currentUser?.uid ?? USUARIO_MOCK.uid;
 
 const normalizarId = (id: string) => decodeURIComponent(id).trim().toUpperCase();
@@ -159,6 +169,7 @@ export function responderSalas(
 
   if (subruta === "messages") {
     if (metodo !== "GET") return null;
+    if (leerBandera("mockFallaHistorial")) return error(500, "INTERNAL_ERROR", "Ocurrió un error inesperado. Intenta de nuevo más tarde.");
     const todos = (leerMensajes()[id] ?? []).slice().sort((a, b) => a.creadoEn.localeCompare(b.creadoEn));
     const limite = Math.min(Math.max(Number(consulta.get("limite")) || POR_PAGINA, 1), 100);
     const antes = consulta.get("antes");

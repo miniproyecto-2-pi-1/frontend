@@ -35,7 +35,7 @@ export function Sala() {
   // Mensajes del chat (US-10).
   const { mensajes, fusionar } = useMensajesSala(tiempoReal.cliente);
   // Historial: los últimos mensajes guardados se piden al entrar a la sala (US-11).
-  useHistorialSala(sala?.id ?? "", tiempoReal.unida, fusionar);
+  const historial = useHistorialSala(sala?.id ?? "", tiempoReal.unida, fusionar);
   // Personas conectadas y avisos de quién entra o sale (US-10).
   const miUid = usuario?.uid ?? "";
   const { personas, avisos } = useSalaPersonas(tiempoReal.cliente, miUid);
@@ -166,6 +166,7 @@ export function Sala() {
                       roomId={sala.id}
                       estado={tiempoReal.estado}
                       mensajes={mensajes}
+                      historial={historial}
                       personas={personas}
                       miUid={miUid}
                     />
