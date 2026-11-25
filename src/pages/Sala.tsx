@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { EstadoConexionSala } from "../components/EstadoConexionSala";
+import { AvisosSala } from "../components/sala/AvisosSala";
+import { ListaPersonas } from "../components/sala/ListaPersonas";
 import { PanelChat } from "../components/sala/PanelChat";
 import { useMensajesSala } from "../hooks/useMensajesSala";
+import { useSalaPersonas } from "../hooks/useSalaPersonas";
 import { useSalaTiempoReal } from "../hooks/useSalaTiempoReal";
 import { useTitulo } from "../hooks/useTitulo";
 import { useSesion } from "../sesion/SesionContext";
@@ -21,6 +24,8 @@ export function Sala() {
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [intento, setIntento] = useState(0);
+  // En pantallas angostas se ve una sola cosa a la vez: el chat o las personas.
+  const [vista, setVista] = useState<"chat" | "personas">("chat");
 
   useTitulo(sala?.nombre ?? "Sala");
 
@@ -28,6 +33,9 @@ export function Sala() {
   const tiempoReal = useSalaTiempoReal(sala?.id ?? "", sala !== null);
   // Mensajes del chat (US-10).
   const { mensajes } = useMensajesSala(tiempoReal.cliente);
+  // Personas conectadas y avisos de quién entra o sale (US-10).
+  const miUid = usuario?.uid ?? "";
+  const { personas, avisos } = useSalaPersonas(tiempoReal.cliente, miUid);
 
   useEffect(() => {
     const control = new AbortController();
@@ -132,18 +140,40 @@ export function Sala() {
               Entrando a la sala…
             </p>
           ) : (
-            <section aria-label="Chat de la sala" className="tarjeta h-[32rem] overflow-hidden p-0">
-              {tiempoReal.cliente && (
-                <PanelChat
-                  cliente={tiempoReal.cliente}
-                  roomId={sala.id}
-                  estado={tiempoReal.estado}
-                  mensajes={mensajes}
-                  personas={[]}
-                  miUid={usuario?.uid ?? ""}
-                />
-              )}
-            </section>
+            <>
+              <AvisosSala avisos={avisos} />
+
+              <div className="mb-3 flex gap-2 lg:hidden">
+                <button type="button" className="btn-secundario flex-1" aria-pressed={vista === "chat"} onClick={() => setVista("chat")}>
+                  Chat
+                </button>
+                <button type="button" className="btn-secundario flex-1" aria-pressed={vista === "personas"} onClick={() => setVista("personas")}>
+                  Personas ({personas.length})
+                </button>
+              </div>
+
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+                <section
+                  aria-label="Chat de la sala"
+                  className={`tarjeta h-[32rem] overflow-hidden p-0 ${vista === "chat" ? "" : "hidden lg:block"}`}
+                >
+                  {tiempoReal.cliente && (
+                    <PanelChat
+                      cliente={tiempoReal.cliente}
+                      roomId={sala.id}
+                      estado={tiempoReal.estado}
+                      mensajes={mensajes}
+                      personas={personas}
+                      miUid={miUid}
+                    />
+                  )}
+                </section>
+
+                <aside className={`tarjeta lg:self-start ${vista === "personas" ? "" : "hidden lg:block"}`}>
+                  <ListaPersonas personas={personas} miUid={miUid} />
+                </aside>
+              </div>
+            </>
           )}
         </>
       ) : null}

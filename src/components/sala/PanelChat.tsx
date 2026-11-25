@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Avatar } from "../Avatar";
 import type { ClienteSala, EstadoConexion } from "../../tiempoReal";
 import { MAXIMO_MENSAJE, type Mensaje, type Persona } from "../../tipos";
@@ -80,6 +80,17 @@ export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }
     alFinal.current = cerca;
     if (cerca) setNuevos(0);
   }
+
+  // Si la lista cambia de tamaño (se cambia de pestaña o de ventana) y se estaba al día, se queda abajo.
+  useEffect(() => {
+    const cont = contenedor.current;
+    if (!cont || typeof ResizeObserver === "undefined") return;
+    const observador = new ResizeObserver(() => {
+      if (alFinal.current) cont.scrollTop = cont.scrollHeight;
+    });
+    observador.observe(cont);
+    return () => observador.disconnect();
+  }, []);
 
   useLayoutEffect(() => {
     const cont = contenedor.current;
