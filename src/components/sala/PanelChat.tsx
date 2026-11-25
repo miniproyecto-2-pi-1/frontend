@@ -29,6 +29,10 @@ export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState("");
+  // La lista solo baja sola si ya se estaba leyendo lo último; si no, se avisa con «mensajes nuevos».
+  const alFinal = useRef(true);
+  const ultimoId = useRef<string | null>(null);
+  const [nuevos, setNuevos] = useState(0);
 
   const sinConexion = estado !== "conectado";
   // Un mensaje vacío o de solo espacios no se envía.
@@ -62,40 +66,80 @@ export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }
     }
   }
 
-  // Al llegar mensajes, la lista baja hasta el último.
-  useLayoutEffect(() => {
+  function irAlFinal() {
     const cont = contenedor.current;
     if (cont) cont.scrollTop = cont.scrollHeight;
-  }, [mensajes]);
+    alFinal.current = true;
+    setNuevos(0);
+  }
+
+  function alDesplazar() {
+    const cont = contenedor.current;
+    if (!cont) return;
+    const cerca = cont.scrollHeight - cont.scrollTop - cont.clientHeight < 48;
+    alFinal.current = cerca;
+    if (cerca) setNuevos(0);
+  }
+
+  useLayoutEffect(() => {
+    const cont = contenedor.current;
+    const ultimo = mensajes[mensajes.length - 1];
+    const idPrevio = ultimoId.current;
+    ultimoId.current = ultimo?.id ?? null;
+    if (!cont || !ultimo || ultimo.id === idPrevio) return; // no llegó nada nuevo al final
+
+    const indicePrevio = idPrevio ? mensajes.findIndex((m) => m.id === idPrevio) : -1;
+    const llegaron = indicePrevio >= 0 ? mensajes.length - 1 - indicePrevio : 0;
+
+    if (idPrevio === null || alFinal.current || ultimo.uid === miUid) {
+      cont.scrollTop = cont.scrollHeight; // primera carga, lectura al día o mensaje propio: se baja
+      setNuevos(0);
+    } else {
+      setNuevos((n) => n + llegaron); // se está leyendo algo anterior: no se mueve la lista
+    }
+  }, [mensajes, miUid]);
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div ref={contenedor} className="min-h-0 flex-1 overflow-y-auto p-4">
-        <ul role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions" className="space-y-4">
-          {mensajes.map((m) => {
-            const propio = m.uid === miUid;
-            return (
-              <li key={m.id} className={`flex gap-2 ${propio ? "flex-row-reverse" : ""}`}>
-                <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={32} />
-                <div className={`min-w-0 max-w-[85%] ${propio ? "text-right" : ""}`}>
-                  <p className="text-sm">
-                    <strong>{propio ? "Tú" : m.username}</strong>{" "}
-                    <time dateTime={m.creadoEn} className="text-suave">
-                      {horaCorta(m.creadoEn)}
-                    </time>
-                  </p>
-                  <p
-                    className={`mt-0.5 inline-block whitespace-pre-wrap break-words rounded-xl px-3 py-2 text-left ${
-                      propio ? "bg-principal text-white" : "bg-superficie"
-                    }`}
-                  >
-                    {m.texto}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+      <div className="relative min-h-0 flex-1">
+        <div ref={contenedor} onScroll={alDesplazar} className="h-full overflow-y-auto p-4">
+          <ul role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions" className="space-y-4">
+            {mensajes.map((m) => {
+              const propio = m.uid === miUid;
+              return (
+                <li key={m.id} className={`flex gap-2 ${propio ? "flex-row-reverse" : ""}`}>
+                  <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={32} />
+                  <div className={`min-w-0 max-w-[85%] ${propio ? "text-right" : ""}`}>
+                    <p className="text-sm">
+                      <strong>{propio ? "Tú" : m.username}</strong>{" "}
+                      <time dateTime={m.creadoEn} className="text-suave">
+                        {horaCorta(m.creadoEn)}
+                      </time>
+                    </p>
+                    <p
+                      className={`mt-0.5 inline-block whitespace-pre-wrap break-words rounded-xl px-3 py-2 text-left ${
+                        propio ? "bg-principal text-white" : "bg-superficie"
+                      }`}
+                    >
+                      {m.texto}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {nuevos > 0 && (
+          <button
+            type="button"
+            onClick={irAlFinal}
+            className="absolute bottom-3 left-1/2 z-10 min-h-11 -translate-x-1/2 rounded-full bg-principal px-4 py-2 text-sm font-bold text-white shadow-lg"
+          >
+            <span aria-hidden="true">↓ </span>
+            {nuevos} {nuevos === 1 ? "mensaje nuevo" : "mensajes nuevos"}
+          </button>
+        )}
       </div>
 
       <form noValidate onSubmit={(e) => void enviar(e)} className="border-t border-borde p-3">
