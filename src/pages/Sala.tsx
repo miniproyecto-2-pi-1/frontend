@@ -6,6 +6,7 @@ import { MenuAcciones } from "../components/MenuAcciones";
 import { AvisoSalaEliminada } from "../components/sala/AvisoSalaEliminada";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
+import { MosaicoPersonas } from "../components/sala/MosaicoPersonas";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
 import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { PanelChat } from "../components/sala/PanelChat";
@@ -212,7 +213,23 @@ export function Sala() {
                 </button>
               </div>
 
-              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
+                {/* Mosaico de personas y botón para salir (en pantallas angostas va en la pestaña «Personas»). */}
+                <section aria-label="Participantes" className={vista === "personas" ? "" : "hidden lg:block"}>
+                  <MosaicoPersonas personas={personas} miUid={miUid} />
+
+                  <div className="mt-5 flex justify-center">
+                    <Link to="/salas" className="flex min-h-11 flex-col items-center gap-1 text-sm font-semibold text-texto no-underline">
+                      <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full bg-[#b3261e] text-white">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                      </span>
+                      Salir de la sala
+                    </Link>
+                  </div>
+                </section>
+
                 <section
                   aria-label="Chat de la sala"
                   className={`tarjeta h-[32rem] overflow-hidden p-0 ${vista === "chat" ? "" : "hidden lg:block"}`}
