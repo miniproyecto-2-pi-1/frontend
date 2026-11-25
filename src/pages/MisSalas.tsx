@@ -3,6 +3,7 @@ import {Link,useLocation,useNavigate} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
 import { colorAvatar } from "../components/Avatar";
 import { Campo } from "../components/Campo";
+import { IconoError } from "../components/IconoError";
 import { MenuAcciones } from "../components/MenuAcciones";
 import { ModalAccesible } from "../components/ModalAccesible";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
@@ -324,20 +325,13 @@ export function MisSalas() {
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">
-            Mis salas
-          </h1>
+      <h1 className="sr-only">Mis salas</h1>
 
-          <p className="text-suave">
-            Las salas de estudio que creaste.
-          </p>
-        </div>
-
+      {/* Una sola fila, como en el prototipo: crear una sala o unirse con un código. */}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start">
         <button
           ref={abrirRef}
-          className="btn-principal w-full sm:w-auto"
+          className="btn-principal min-h-14 w-full text-lg sm:w-72 sm:shrink-0"
           type="button"
           onClick={() => {
             setModal(true);
@@ -350,60 +344,80 @@ export function MisSalas() {
           </span>{" "}
           Nueva sala
         </button>
-      </div>
 
-      <form
-        noValidate
-        aria-labelledby="titulo-unirse"
-        className="tarjeta mb-6"
-        onSubmit={(e) =>
-          void unirse(e)
-        }
-      >
-        <h2
-          id="titulo-unirse"
-          className="mb-3 text-lg font-bold"
+        <form
+          noValidate
+          aria-label="Unirme a una sala"
+          className="min-w-0 flex-1"
+          onSubmit={(e) =>
+            void unirse(e)
+          }
         >
-          Unirme a una sala
-        </h2>
+          <label
+            htmlFor="codigo-sala"
+            className="sr-only"
+          >
+            Código de la sala
+          </label>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-          <div className="min-w-0 flex-1">
-            <Campo
+          <div
+            className={`flex items-center gap-2 rounded-lg border-[1.5px] bg-fondo p-1 pl-3 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace ${
+              errorCodigo
+                ? "border-error"
+                : "border-campo"
+            }`}
+          >
+            <input
               id="codigo-sala"
-              inputRef={codigoRef}
-              etiqueta="Código de la sala"
-              requerido
-              value={codigo}
-              placeholder="Ej. K7P2-91XQ"
+              ref={codigoRef}
+              type="text"
+              className="min-h-11 min-w-0 flex-1 bg-transparent text-texto outline-none placeholder:text-suave"
+              placeholder="Introduce un código"
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
               disabled={uniendo}
+              value={codigo}
+              aria-required="true"
+              aria-invalid={errorCodigo ? true : undefined}
+              aria-describedby="codigo-sala-ayuda"
               onChange={(e) => {
                 setCodigo(e.target.value);
                 setErrorCodigo("");
               }}
-              ayuda={
-                tieneEspaciosSobrantes(codigo)
-                  ? "Quitamos los espacios al inicio y al final del código."
-                  : "Te lo comparte quien creó la sala."
-              }
-              error={errorCodigo}
             />
+
+            <button
+              type="submit"
+              className="btn-principal disabled:opacity-60"
+              disabled={uniendo}
+            >
+              {uniendo
+                ? "Uniéndome…"
+                : "Unirme"}
+            </button>
           </div>
 
-          <button
-            type="submit"
-            className="btn-principal w-full disabled:opacity-60 sm:mt-8 sm:w-auto"
-            disabled={uniendo}
-          >
-            {uniendo
-              ? "Uniéndome…"
-              : "Unirme"}
-          </button>
-        </div>
-      </form>
+          {errorCodigo ? (
+            <p
+              id="codigo-sala-ayuda"
+              className="mt-1 flex items-start gap-1.5 text-sm font-medium text-error"
+            >
+              <IconoError />
+              <span>{errorCodigo}</span>
+            </p>
+          ) : (
+            <p
+              id="codigo-sala-ayuda"
+              className="mt-1 text-sm text-suave"
+            >
+              {tieneEspaciosSobrantes(codigo)
+                ? "Quitamos los espacios al inicio y al final del código."
+                : "Te lo comparte quien creó la sala."}
+            </p>
+          )}
+        </form>
+      </div>
 
       {aviso && (
         <p
@@ -472,6 +486,11 @@ export function MisSalas() {
           </p>
         </section>
       ) : (
+        <>
+        <h2 className="mb-3 font-semibold text-suave">
+          Tus salas
+        </h2>
+
         <ul
           aria-label="Salas que creaste"
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
@@ -557,6 +576,7 @@ export function MisSalas() {
             );
           })}
         </ul>
+        </>
       )}
 
       {modal && (
