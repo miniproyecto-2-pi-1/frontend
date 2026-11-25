@@ -97,7 +97,12 @@ export function PanelChat({ cliente, roomId, estado, mensajes, personas, miUid }
     const ultimo = mensajes[mensajes.length - 1];
     const idPrevio = ultimoId.current;
     ultimoId.current = ultimo?.id ?? null;
-    if (!cont || !ultimo || ultimo.id === idPrevio) return; // no llegó nada nuevo al final
+    if (!cont || !ultimo) return;
+    if (ultimo.id === idPrevio) {
+      // No llegó nada al final: se agregaron mensajes más viejos (historial). Si se estaba al día, se queda abajo.
+      if (alFinal.current) cont.scrollTop = cont.scrollHeight;
+      return;
+    }
 
     const indicePrevio = idPrevio ? mensajes.findIndex((m) => m.id === idPrevio) : -1;
     const llegaron = indicePrevio >= 0 ? mensajes.length - 1 - indicePrevio : 0;
