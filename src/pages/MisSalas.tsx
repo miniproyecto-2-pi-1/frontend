@@ -472,8 +472,8 @@ export function MisSalas() {
                   </div>
   
                   {sala.esAdministrador !== false && (
-                    <span className="shrink-0 rounded-full border border-enlace bg-principal-suave px-2 py-0.5 text-xs font-semibold text-enlace">
-                      Administrador
+                    <span className="shrink-0 text-sm font-semibold text-enlace">
+                      Anfitrión
                     </span>
                   )}
                 </div>

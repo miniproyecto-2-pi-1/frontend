@@ -1,6 +1,8 @@
 import {useEffect,useState} from "react";
 import {Link,useLocation,useParams} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
+import { EstadoConexionSala } from "../components/EstadoConexionSala";
+import { useSalaTiempoReal } from "../hooks/useSalaTiempoReal";
 import { useTitulo } from "../hooks/useTitulo";
 import type { SalaPropia } from "./MisSalas";
 
@@ -32,6 +34,12 @@ export function Sala() {
 
   useTitulo(
     sala?.nombre ?? "Sala"
+  );
+
+  // Con la sala cargada se abre el tiempo real y se entra a ella con su ID oficial (US-08).
+  const tiempoReal = useSalaTiempoReal(
+    sala?.id ?? "",
+    sala !== null
   );
 
   useEffect(() => {
@@ -128,9 +136,18 @@ export function Sala() {
               {sala.nombre}
             </h1>
 
-            {sala.esAdministrador !== false && (
-              <span className="rounded-full border border-enlace bg-principal-suave px-2 py-1 text-sm text-enlace">
-                Administrador
+            <EstadoConexionSala
+              estado={tiempoReal.estado}
+              unida={tiempoReal.unida}
+            />
+
+            {sala.esAdministrador !== false ? (
+              <span className="text-sm font-semibold text-enlace">
+                Anfitrión
+              </span>
+            ) : (
+              <span className="text-sm font-semibold text-suave">
+                Invitado
               </span>
             )}
           </div>
@@ -140,7 +157,7 @@ export function Sala() {
               role="status"
               className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
             >
-              ✓ Sala creada. Eres su administrador.
+              ✓ Sala creada. Eres su anfitrión.
             </p>
           )}
 
@@ -181,16 +198,39 @@ export function Sala() {
             </p>
           )}
 
-          <section className="rounded-lg border-2 border-dashed border-borde px-5 py-12 text-center">
-            <h2 className="mb-2 font-bold">
-              Todavía no hay nadie más aquí
-            </h2>
+          {tiempoReal.errorUnirse ? (
+            <div role="alert">
+              <p className="mb-4 rounded-lg bg-error-fondo p-4 font-medium text-error">
+                {tiempoReal.errorUnirse}
+              </p>
 
-            <p className="text-suave">
-              Cuando alguien se una con el ID,
-              aparecerá en la sala.
+              <button
+                type="button"
+                className="btn-secundario"
+                onClick={tiempoReal.reintentar}
+              >
+                Reintentar
+              </button>
+            </div>
+          ) : !tiempoReal.unida ? (
+            <p
+              role="status"
+              className="tarjeta"
+            >
+              Entrando a la sala…
             </p>
-          </section>
+          ) : (
+            <section className="rounded-lg border-2 border-dashed border-borde px-5 py-12 text-center">
+              <h2 className="mb-2 font-bold">
+                Todavía no hay nadie más aquí
+              </h2>
+
+              <p className="text-suave">
+                Cuando alguien se una con el ID,
+                aparecerá en la sala.
+              </p>
+            </section>
+          )}
         </>
       ) : null}
     </div>
