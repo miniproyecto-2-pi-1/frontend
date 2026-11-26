@@ -245,24 +245,26 @@ export function Perfil() {
     setErrorEliminar("");
 
     try {
-      await apiFetch<null>(
-        "/api/v1/users/me",
-        {
-          method: "DELETE",
-        }
-      );
+      await apiFetch<null>("/api/v1/users/me", {
+        method: "DELETE",
+      });
 
       try {
         await cerrarSesion();
       } catch {
-        // El token de Firebase puede quedar invalidado.
+        // La API ya confirmó la eliminación.
       }
+
+      sessionStorage.setItem(
+        "salon-cuenta-eliminada",
+        "1"
+      );
 
       navegar("/ingreso", {
         replace: true,
         state: {
           aviso: "Tu cuenta fue eliminada.",
-        },
+      },
       });
     } catch {
       setErrorEliminar(mensajeBorrado);
@@ -322,7 +324,7 @@ export function Perfil() {
         ref={formularioRef}
         noValidate
         onSubmit={(e) => void guardar(e)}
-        className="tarjeta space-y-4 bg-superficie p-4 sm:p-6"
+        className="tarjeta space-y-4 p-4 sm:p-6"
       >
         <div className="flex items-center gap-4">
           <Avatar
@@ -418,7 +420,7 @@ export function Perfil() {
 
       <section
         aria-labelledby="zona-peligro"
-        className="mt-5 rounded-xl border border-error p-5"
+        className="mt-5 rounded-xl border border-error bg-error-fondo p-5"
       >
         <h2
           id="zona-peligro"

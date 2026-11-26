@@ -19,7 +19,9 @@ export function LayoutPublico() {
   return (
     <div className="flex min-h-screen flex-col">
       <SaltarAlContenido />
-      <header className="border-b-[1.5px] border-borde">
+      <header className="border-b-[1.5px] border-borde bg-fondo">
+        {/* Franja decorativa con los colores del prototipo. */}
+        <div aria-hidden="true" className="h-[5px] bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-8">
           <Logo />
           <div className="flex shrink-0 items-center gap-3">

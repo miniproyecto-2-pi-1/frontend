@@ -2,7 +2,7 @@ import { useState } from "react";
 
 // Botón de tema con ícono. Su nombre accesible dice lo que hará: «Activar modo oscuro» o «Activar modo claro».
 // Guarda la elección en el navegador (index.html la aplica antes de pintar la página).
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const [oscuro, setOscuro] = useState(() => document.documentElement.classList.contains("dark"));
 
   function alternar() {
@@ -24,7 +24,7 @@ export function ThemeToggle() {
       onClick={alternar}
       aria-label={etiqueta}
       title={etiqueta}
-      className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-borde text-texto hover:bg-superficie"
+      className={className ?? "inline-flex size-10 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-borde text-texto hover:bg-superficie"}
     >
       {oscuro ? (
         // Sol: al pulsarlo vuelve el modo claro.

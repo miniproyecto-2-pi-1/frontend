@@ -1,21 +1,35 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
-import {Link,useNavigate} from "react-router-dom";
+import {Link,useLocation,useNavigate} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
+import { colorAvatar } from "../components/Avatar";
 import { Campo } from "../components/Campo";
+import { IconoError } from "../components/IconoError";
+import { MenuAcciones } from "../components/MenuAcciones";
 import { ModalAccesible } from "../components/ModalAccesible";
+import { ModalEditarSala } from "../components/sala/ModalEditarSala";
+import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { useTitulo } from "../hooks/useTitulo";
+import { tieneEspaciosSobrantes, validarCodigoSala } from "../validacionSala";
 
 export type SalaPropia = {
   id: string;
   nombre: string;
   creadaEn?: string;
   esAdministrador?: boolean;
+  anfitrionUid?: string;
 };
 
 const MAX_NOMBRE = 50;
 
 const errorConexion =
   "No pudimos cargar tus salas. Revisa tu conexión e inténtalo de nuevo.";
+
+// Hash simple del ID: la misma sala conserva su color en cada visita.
+function colorSala(id: string) {
+  let n = 0;
+  for (const c of id) n = (n * 31 + c.charCodeAt(0)) >>> 0;
+  return colorAvatar(n);
+}
 
 function esAbort(error: unknown) {
   return (
@@ -28,6 +42,8 @@ export function MisSalas() {
   useTitulo("Mis salas");
 
   const navegar = useNavigate();
+
+  const ubicacion = useLocation();
 
   const [salas, setSalas] =
     useState<SalaPropia[]>([]);
@@ -56,8 +72,41 @@ export function MisSalas() {
   const [creando, setCreando] =
     useState(false);
 
-  const [mensajeCopia, setMensajeCopia] =
+  // Avisos de la pantalla: ID copiado, sala actualizada y, si vienes de eliminar una sala dentro de ella, «Sala eliminada».
+  const [aviso, setAviso] =
+    useState(
+      () =>
+        (ubicacion.state as { aviso?: string } | null)?.aviso ?? ""
+    );
+
+  const [codigo, setCodigo] =
     useState("");
+
+  const [errorCodigo, setErrorCodigo] =
+    useState("");
+
+  const [uniendo, setUniendo] =
+    useState(false);
+
+  const codigoRef =
+    useRef<HTMLInputElement>(null);
+
+  // Acción del menú ⋯ de una tarjeta (US-07): editar o eliminar, con la sala elegida.
+  const [accion, setAccion] =
+    useState<{ tipo: "editar" | "eliminar"; sala: SalaPropia } | null>(null);
+
+  // Botón de tres puntos que abrió la ventana: al cerrarla, el foco vuelve a él.
+  const iniciadorRef =
+    useRef<HTMLButtonElement | null>(null);
+
+  function abrirAccion(
+    tipo: "editar" | "eliminar",
+    sala: SalaPropia,
+    boton: HTMLButtonElement | null
+  ) {
+    iniciadorRef.current = boton;
+    setAccion({ tipo, sala });
+  }
 
   const abrirRef =
     useRef<HTMLButtonElement>(null);
@@ -73,6 +122,13 @@ export function MisSalas() {
       setErrorCrear("");
     }
   }, [creando]);
+
+  // El aviso que llegó con la navegación se muestra una vez; al recargar ya no vuelve a salir.
+  useEffect(() => {
+    if ((ubicacion.state as { aviso?: string } | null)?.aviso) {
+      window.history.replaceState({}, "");
+    }
+  }, [ubicacion.state]);
 
   useEffect(() => {
     const control = new AbortController();
@@ -203,15 +259,66 @@ export function MisSalas() {
     }
   }
 
+  // US-08: unirse a una sala con su código. El texto se limpia (espacios, mayúsculas) antes de pedirla a la API.
+  async function unirse(evento: FormEvent) {
+    evento.preventDefault();
+
+    if (uniendo) return;
+
+    const resultado = validarCodigoSala(codigo);
+
+    if (!resultado.ok) {
+      setErrorCodigo(resultado.error);
+      codigoRef.current?.focus();
+      return;
+    }
+
+    setUniendo(true);
+    setErrorCodigo("");
+
+    try {
+      const sala = await apiFetch<SalaPropia>(
+        `/api/v1/rooms/${encodeURIComponent(resultado.id)}`
+      );
+
+      navegar(
+        `/salas/${encodeURIComponent(sala.id)}`,
+        {
+          state: {
+            sala,
+          },
+        }
+      );
+    } catch (error) {
+      if (
+        error instanceof ApiError &&
+        (error.code === "ROOM_NOT_FOUND" ||
+          error.status === 404)
+      ) {
+        setErrorCodigo(
+          "Sala no encontrada. Revisa el código."
+        );
+      } else {
+        setErrorCodigo(
+          "No pudimos unirte a la sala. Revisa tu conexión e inténtalo de nuevo."
+        );
+      }
+
+      codigoRef.current?.focus();
+    } finally {
+      setUniendo(false);
+    }
+  }
+
   async function copiar(id: string) {
     try {
       await navigator.clipboard.writeText(id);
 
-      setMensajeCopia(
+      setAviso(
         `ID copiado: ${id}`
       );
     } catch {
-      setMensajeCopia(
+      setAviso(
         "No pudimos copiar el ID. Inténtalo de nuevo."
       );
     }
@@ -219,20 +326,13 @@ export function MisSalas() {
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">
-            Mis salas
-          </h1>
+      <h1 className="sr-only">Mis salas</h1>
 
-          <p className="text-suave">
-            Las salas de estudio que creaste.
-          </p>
-        </div>
-
+      {/* Una sola fila, como en el prototipo: crear una sala o unirse con un código. */}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start">
         <button
           ref={abrirRef}
-          className="btn-principal w-full sm:w-auto"
+          className="btn-principal min-h-14 w-full rounded-2xl text-lg shadow-[0_6px_18px_rgba(109,63,224,0.3)] sm:w-72 sm:shrink-0"
           type="button"
           onClick={() => {
             setModal(true);
@@ -245,15 +345,88 @@ export function MisSalas() {
           </span>{" "}
           Nueva sala
         </button>
+
+        <form
+          noValidate
+          aria-label="Unirme a una sala"
+          className="min-w-0 flex-1"
+          onSubmit={(e) =>
+            void unirse(e)
+          }
+        >
+          <label
+            htmlFor="codigo-sala"
+            className="sr-only"
+          >
+            Código de la sala
+          </label>
+
+          <div
+            className={`flex items-center gap-2 rounded-2xl border-[1.5px] bg-sala-tarjeta p-1.5 pl-4 shadow-[0_2px_10px_rgba(80,50,160,0.1)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace ${
+              errorCodigo
+                ? "border-error"
+                : "border-transparent dark:border-white/10"
+            }`}
+          >
+            <input
+              id="codigo-sala"
+              ref={codigoRef}
+              type="text"
+              className="campo-envuelto min-h-11 min-w-0 flex-1 bg-transparent text-texto placeholder:text-suave"
+              placeholder="Introduce un código"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              disabled={uniendo}
+              value={codigo}
+              aria-required="true"
+              aria-invalid={errorCodigo ? true : undefined}
+              aria-describedby="codigo-sala-ayuda"
+              onChange={(e) => {
+                setCodigo(e.target.value);
+                setErrorCodigo("");
+              }}
+            />
+
+            <button
+              type="submit"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-principal-suave px-5 font-bold text-enlace transition-colors hover:bg-principal hover:text-white disabled:opacity-60"
+              disabled={uniendo}
+            >
+              {uniendo
+                ? "Uniéndome…"
+                : "Unirme"}
+            </button>
+          </div>
+
+          {errorCodigo ? (
+            <p
+              id="codigo-sala-ayuda"
+              className="mt-1 flex items-start gap-1.5 text-sm font-medium text-error"
+            >
+              <IconoError />
+              <span>{errorCodigo}</span>
+            </p>
+          ) : (
+            <p
+              id="codigo-sala-ayuda"
+              className="mt-1 text-sm text-suave"
+            >
+              {tieneEspaciosSobrantes(codigo)
+                ? "Quitamos los espacios al inicio y al final del código."
+                : "Te lo comparte quien creó la sala."}
+            </p>
+          )}
+        </form>
       </div>
 
-      {mensajeCopia && (
+      {aviso && (
         <p
           role="status"
           aria-live="polite"
-          className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
+          className="mb-4 rounded-xl bg-exito-fondo p-3 text-exito"
         >
-          ✓ {mensajeCopia}
+          ✓ {aviso}
         </p>
       )}
 
@@ -270,7 +443,7 @@ export function MisSalas() {
             {[0, 1, 2].map((n) => (
               <div
                 key={n}
-                className="tarjeta animate-pulse space-y-3 bg-superficie"
+                className="rounded-2xl bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5 animate-pulse space-y-3 p-5"
               >
                 <div className="h-4 w-2/3 rounded bg-borde" />
                 <div className="h-4 w-1/3 rounded bg-borde" />
@@ -299,7 +472,7 @@ export function MisSalas() {
       ) : salas.length === 0 ? (
         <section
           aria-labelledby="sin-salas"
-          className="rounded-lg border-2 border-dashed border-borde px-5 py-12 text-center"
+          className="rounded-2xl border-2 border-dashed border-separador px-5 py-12 text-center"
         >
           <h2
             id="sin-salas"
@@ -314,57 +487,100 @@ export function MisSalas() {
           </p>
         </section>
       ) : (
+        <>
+        <h2 className="mb-4 mt-2 text-xl font-bold">
+          Tus salas
+        </h2>
+
         <ul
           aria-label="Salas que creaste"
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {salas.map((sala) => (
-            <li
-              key={sala.id}
-              className="tarjeta min-w-0 bg-superficie"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <h2 className="min-w-0 break-words text-lg font-bold">
-                  {sala.nombre}
-                </h2>
-
-                {sala.esAdministrador !== false && (
-                  <span className="shrink-0 rounded-full border border-enlace px-2 py-0.5 text-xs font-semibold text-enlace">
-                    Administrador
-                  </span>
-                )}
-              </div>
-
-              <p className="mt-4 text-sm text-suave">
-                ID de la sala
-              </p>
-
-              <p className="mt-1 break-all font-mono font-semibold">
-                {sala.id}
-              </p>
-
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Link
-                  className="btn-secundario"
-                  to={`/salas/${encodeURIComponent(sala.id)}`}
+          {salas.map((sala) => {
+            const color = colorSala(sala.id);
+            const anfitrion = sala.esAdministrador !== false;
+            return (
+              <li
+                key={sala.id}
+                className="rounded-2xl bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5 min-w-0 overflow-hidden"
+              >
+                {/* Encabezado de color con el nombre y el ID; el menú ⋯ va arriba a la derecha. */}
+                <div
+                  className="relative px-5 py-4 text-white"
+                  style={{ background: color }}
                 >
-                  Entrar
-                </Link>
+                  <h2 className="break-words pr-10 text-lg font-bold">
+                    {sala.nombre}
+                  </h2>
 
-                <button
-                  type="button"
-                  className="min-h-11 px-2 font-semibold text-enlace underline"
-                  aria-label={`Copiar ID de ${sala.nombre}`}
-                  onClick={() =>
-                    void copiar(sala.id)
-                  }
+                  <p className="font-mono text-sm tracking-wide">
+                    {sala.id}
+                  </p>
+
+                  {anfitrion && (
+                    <MenuAcciones
+                      sobreColor
+                      className="absolute right-1 top-1"
+                      etiqueta={`Más acciones de la sala ${sala.nombre}`}
+                      acciones={[
+                        {
+                          texto: "Editar sala",
+                          icono: "editar",
+                          alElegir: (boton) =>
+                            abrirAccion("editar", sala, boton),
+                        },
+                        {
+                          texto: "Eliminar sala",
+                          icono: "eliminar",
+                          peligro: true,
+                          alElegir: (boton) =>
+                            abrirAccion("eliminar", sala, boton),
+                        },
+                      ]}
+                    />
+                  )}
+                </div>
+
+                <p
+                  className={`px-5 pt-4 font-bold ${
+                    anfitrion ? "text-[#2563eb] dark:text-[#7aa7ff]" : "text-suave"
+                  }`}
                 >
-                  ▢ Copiar ID
-                </button>
-              </div>
-            </li>
-          ))}
+                  {anfitrion ? "Anfitrión" : "Invitado"}
+                </p>
+
+                <div className="flex items-center justify-between px-4 pb-5 pt-3">
+                  <Link
+                    className="inline-flex min-h-11 items-center gap-2 rounded-[14px] bg-principal-suave px-5 font-bold text-enlace no-underline transition-colors hover:bg-principal hover:text-white"
+                    to={`/salas/${encodeURIComponent(sala.id)}`}
+                    aria-label={`Entrar a la sala ${sala.nombre}`}
+                  >
+                    Entrar
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+
+                  <button
+                    type="button"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 font-bold text-enlace no-underline transition-colors hover:bg-principal-suave"
+                    aria-label={`Copiar ID de ${sala.nombre}`}
+                    onClick={() =>
+                      void copiar(sala.id)
+                    }
+                  >
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="11" height="11" rx="2" />
+                      <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+                    </svg>
+                    Copiar ID
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
+        </>
       )}
 
       {modal && (
@@ -429,6 +645,40 @@ export function MisSalas() {
             </div>
           </form>
         </ModalAccesible>
+      )}
+
+      {accion?.tipo === "eliminar" && (
+        <ModalEliminarSala
+          sala={accion.sala}
+          iniciadorRef={iniciadorRef}
+          alCerrar={() => setAccion(null)}
+          alEliminada={() => {
+            setSalas((actuales) =>
+              actuales.filter((s) => s.id !== accion.sala.id)
+            );
+            setAviso(`Sala «${accion.sala.nombre}» eliminada`);
+            setAccion(null);
+          }}
+        />
+      )}
+
+      {accion?.tipo === "editar" && (
+        <ModalEditarSala
+          sala={accion.sala}
+          iniciadorRef={iniciadorRef}
+          alCerrar={() => setAccion(null)}
+          alGuardada={(actualizada) => {
+            setSalas((actuales) =>
+              actuales.map((s) =>
+                s.id === actualizada.id
+                  ? { ...s, nombre: actualizada.nombre }
+                  : s
+              )
+            );
+            setAviso(`Sala actualizada: «${actualizada.nombre}»`);
+            setAccion(null);
+          }}
+        />
       )}
     </div>
   );
