@@ -46,8 +46,8 @@ export function Sala() {
   const iniciadorRef = useRef<HTMLButtonElement | null>(null);
   // La parte izquierda tiene dos pestañas: el chat y los participantes.
   const [pestana, setPestana] = useState<"chat" | "personas">("chat");
-  // El panel de la derecha se pliega con su barra de iconos.
-  const [panelVisible, setPanelVisible] = useState(true);
+  // El panel de la derecha siempre está a la vista.
+  const panelVisible = true;
   const botonChat = useRef<HTMLButtonElement>(null);
   const botonPersonas = useRef<HTMLButtonElement>(null);
 
@@ -121,14 +121,27 @@ export function Sala() {
     return () => control.abort();
   }, [id, intento]);
 
+  // El aviso de «ID copiado» dura solo 2 segundos; el temporizador se reinicia si se vuelve a copiar.
+  const temporizadorAviso = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (temporizadorAviso.current) clearTimeout(temporizadorAviso.current);
+    },
+    [],
+  );
+
   async function copiar() {
     const idSala = sala?.id ?? id;
+    let texto: string;
     try {
       await navigator.clipboard.writeText(idSala);
-      setMensaje(`ID copiado: ${idSala}`);
+      texto = `ID copiado: ${idSala}`;
     } catch {
-      setMensaje("No pudimos copiar el ID. Inténtalo de nuevo.");
+      texto = "No pudimos copiar el ID. Inténtalo de nuevo.";
     }
+    setMensaje(texto);
+    if (temporizadorAviso.current) clearTimeout(temporizadorAviso.current);
+    temporizadorAviso.current = setTimeout(() => setMensaje((actual) => (actual === texto ? "" : actual)), 2000);
   }
 
   const ICONO_ATRAS = (
@@ -141,30 +154,20 @@ export function Sala() {
   // Mensajes que ocupan el centro de la pantalla (cargando, errores, entrando).
   const centro = (contenido: ReactNode) => <div className="flex min-h-0 flex-1 items-start justify-center overflow-y-auto p-4">{contenido}</div>;
 
-  // Los botones de chat y participantes abren el panel en esa pestaña; si ya está abierta, lo pliegan.
-  function alternarPanel(clave: "chat" | "personas") {
-    if (panelVisible && pestana === clave) {
-      setPanelVisible(false);
-    } else {
-      setPestana(clave);
-      setPanelVisible(true);
-    }
-  }
-
   const icono = (rutas: ReactNode, tam = 21) => (
     <svg aria-hidden="true" width={tam} height={tam} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       {rutas}
     </svg>
   );
 
-  const claseBoton = "relative inline-flex size-12 shrink-0 items-center justify-center rounded-full transition-colors";
+  const claseBoton = "relative inline-flex size-12 shrink-0 items-center justify-center rounded-[14px] transition-colors";
 
   // Barra de controles flotante: micrófono, cámara y compartir (llegan en el Sprint 4), chat, participantes y salir.
   const barraControles = (
     <div
       role="toolbar"
       aria-label="Controles de la sala"
-      className="flex items-center gap-2.5 rounded-full bg-sala-tarjeta px-3.5 py-2.5 shadow-[0_10px_34px_rgba(80,50,160,0.2)] dark:shadow-[0_10px_34px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/10"
+      className="flex items-center gap-2.5 rounded-[20px] bg-sala-tarjeta px-3.5 py-2.5 shadow-[0_10px_34px_rgba(80,50,160,0.2)] dark:shadow-[0_10px_34px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/10"
     >
       {(
         [
@@ -177,42 +180,6 @@ export function Sala() {
           {icono(rutas)}
         </button>
       ))}
-
-      <span aria-hidden="true" className="h-7 w-px bg-borde" />
-
-      {(["chat", "personas"] as const).map((clave) => {
-        const activo = panelVisible && pestana === clave;
-        const nombre = clave === "chat" ? "Chat" : `Participantes (${personas.length})`;
-        return (
-          <button
-            key={clave}
-            type="button"
-            aria-label={nombre}
-            title={nombre}
-            aria-pressed={activo}
-            aria-controls="panel-sala"
-            onClick={() => alternarPanel(clave)}
-            className={`${claseBoton} ${activo ? "bg-principal text-white" : "bg-sala-campo text-texto hover:bg-principal-suave"}`}
-          >
-            {clave === "chat" ? (
-              icono(<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />)
-            ) : (
-              icono(
-                <>
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                </>,
-              )
-            )}
-            {clave === "personas" && (
-              <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 min-w-5 rounded-full border-2 border-sala-tarjeta bg-[#dc2626] px-1 text-center text-[11px] font-bold leading-4 text-white">
-                {personas.length}
-              </span>
-            )}
-          </button>
-        );
-      })}
 
       <span aria-hidden="true" className="h-7 w-px bg-borde" />
 
@@ -264,11 +231,11 @@ export function Sala() {
 
             <EstadoConexionSala estado={tiempoReal.estado} unida={tiempoReal.unida} />
 
-            <span className="inline-flex items-center gap-2 rounded-full bg-sala-tarjeta py-1 pl-3.5 pr-1 text-xs font-semibold shadow-sm">
+            <span className="inline-flex items-center gap-2 rounded-xl bg-sala-tarjeta py-1 pl-3.5 pr-1 text-xs font-semibold shadow-sm">
               <span className="font-mono tracking-wide">{sala.id}</span>
               <button
                 type="button"
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-principal-suave px-3 text-xs font-bold text-enlace transition-colors hover:bg-principal hover:text-white"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-[10px] bg-principal-suave px-3 text-xs font-bold text-enlace transition-colors hover:bg-principal hover:text-white"
                 aria-label={`Copiar ID de la sala ${sala.nombre}`}
                 onClick={() => void copiar()}
               >
@@ -353,7 +320,7 @@ export function Sala() {
               <div className="relative hidden min-h-0 min-w-0 flex-1 lg:flex">
                 <div
                   aria-hidden="true"
-                  className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[22px] bg-sala-tarjeta p-6 text-center text-sm text-suave shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5"
+                  className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-2xl bg-sala-tarjeta p-6 text-center text-sm text-suave shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_40%,var(--principal-suave),transparent)] opacity-60" />
                   <span className="relative">Aquí irá la cuadrícula de participantes</span>
@@ -362,7 +329,7 @@ export function Sala() {
                 <div className="absolute inset-x-0 bottom-5 flex justify-center">{barraControles}</div>
               </div>
 
-              {/* Panel flotante a la derecha: dos pestañas, Chat y Participantes. Se pliega con sus botones de la barra. */}
+              {/* Panel flotante a la derecha: dos pestañas, Chat y Participantes. */}
               <section
                 id="panel-sala"
                 aria-label="Chat y participantes"
@@ -372,11 +339,11 @@ export function Sala() {
               >
                 {/* El contenido conserva su ancho y se desliza: entra tirando hacia la izquierda y sale hacia la derecha. */}
                 <div
-                  className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-[22px] bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] transition-transform duration-300 ease-in-out dark:ring-1 dark:ring-white/5 lg:w-[26rem] lg:flex-none lg:h-full ${
+                  className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] transition-transform duration-300 ease-in-out dark:ring-1 dark:ring-white/5 lg:w-[26rem] lg:flex-none lg:h-full ${
                     panelVisible ? "translate-x-0" : "lg:translate-x-full"
                   }`}
                 >
-                  <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="m-3.5 mb-1.5 flex shrink-0 gap-0.5 rounded-full bg-sala-campo p-1">
+                  <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="m-3.5 mb-1.5 flex shrink-0 gap-0.5 rounded-[14px] bg-sala-campo p-1">
                     {(
                       [
                         ["chat", "Chat", botonChat],
@@ -393,7 +360,7 @@ export function Sala() {
                         aria-controls={`panel-${clave}`}
                         tabIndex={pestana === clave ? 0 : -1}
                         onClick={() => setPestana(clave)}
-                        className={`inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full px-3 text-sm font-bold transition-colors duration-300 ${
+                        className={`inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[10px] px-3 text-sm font-bold transition-colors duration-300 ${
                           pestana === clave ? "bg-principal text-white shadow-[0_2px_8px_rgba(109,63,224,0.35)]" : "text-suave hover:text-texto"
                         }`}
                       >
@@ -434,13 +401,7 @@ export function Sala() {
                         pestana === "personas" ? "visible translate-x-0 opacity-100" : "invisible translate-x-6 opacity-0"
                       }`}
                     >
-                      <ListaPersonas
-                        personas={personas}
-                        miUid={miUid}
-                        anfitrionUid={sala?.esAdministrador === true ? miUid : sala?.anfitrionUid}
-                        salaId={sala.id}
-                        alCopiar={() => void copiar()}
-                      />
+                      <ListaPersonas personas={personas} miUid={miUid} anfitrionUid={sala?.esAdministrador === true ? miUid : sala?.anfitrionUid} />
                     </div>
                   </div>
                 </div>

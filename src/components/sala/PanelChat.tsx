@@ -223,7 +223,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                 aria-label="Coincidencia anterior"
                 disabled={coincidencias.length === 0}
                 onClick={() => irACoincidencia((actual - 1 + coincidencias.length) % coincidencias.length)}
-                className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-principal-suave disabled:opacity-40"
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-enlace hover:bg-principal-suave disabled:opacity-40"
               >
                 <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m6 15 6-6 6 6" />
@@ -234,7 +234,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                 aria-label="Coincidencia siguiente"
                 disabled={coincidencias.length === 0}
                 onClick={() => irACoincidencia((actual + 1) % coincidencias.length)}
-                className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-principal-suave disabled:opacity-40"
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-enlace hover:bg-principal-suave disabled:opacity-40"
               >
                 <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m6 9 6 6 6-6" />
@@ -244,7 +244,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                 type="button"
                 aria-label="Borrar búsqueda"
                 onClick={limpiarBusqueda}
-                className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-suave hover:bg-principal-suave"
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-suave hover:bg-principal-suave"
               >
                 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <path d="M18 6 6 18M6 6l12 12" />
@@ -321,13 +321,13 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                 <Fragment key={m.id}>
                   {diaNuevo && (
                     <li className="mt-4 flex justify-center first:mt-0">
-                      <span className="rounded-full bg-sala-campo px-3 py-0.5 text-xs font-semibold text-suave">{dia}</span>
+                      <span className="rounded-lg bg-sala-campo px-3 py-0.5 text-xs font-semibold text-suave">{dia}</span>
                     </li>
                   )}
                   {propio ? (
                     <li data-mensaje={m.id} className={`flex min-w-0 flex-col items-end ${inicio ? "mt-4" : "mt-0.5"}`}>
                       <p
-                        className={`inline-block max-w-[88%] whitespace-pre-wrap rounded-[18px] bg-[#e0d4ff] px-3.5 py-2 text-left text-sm leading-snug text-[#241552] dark:bg-[#4b3b80] dark:text-white [overflow-wrap:anywhere] ${
+                        className={`inline-block max-w-[88%] whitespace-pre-wrap rounded-[14px] bg-[#e0d4ff] px-3.5 py-2 text-left text-sm leading-snug text-[#241552] dark:bg-[#4b3b80] dark:text-white [overflow-wrap:anywhere] ${
                           inicio ? "" : "rounded-tr-md"
                         } ${fin ? "" : "rounded-br-md"} ${marca}`}
                       >
@@ -370,7 +370,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
           <button
             type="button"
             onClick={irAlFinal}
-            className="absolute bottom-3 left-1/2 z-10 min-h-11 -translate-x-1/2 rounded-full bg-principal px-4 py-2 text-sm font-bold text-white shadow-lg"
+            className="absolute bottom-3 left-1/2 z-10 min-h-11 -translate-x-1/2 rounded-xl bg-principal px-4 py-2 text-sm font-bold text-white shadow-lg"
           >
             <span aria-hidden="true">↓ </span>
             {nuevos} {nuevos === 1 ? "mensaje nuevo" : "mensajes nuevos"}
@@ -379,7 +379,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
       </div>
 
       <form noValidate onSubmit={(e) => void enviar(e)} className="shrink-0 px-3.5 pb-3.5 pt-2">
-        <div className="flex items-end gap-1 rounded-[26px] bg-sala-campo py-1 pl-4 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
+        <div className="flex items-end gap-1 rounded-[14px] bg-sala-campo py-1 pl-4 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
           <textarea
             ref={escritura}
             rows={1}
@@ -399,7 +399,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
             type="submit"
             aria-label="Enviar mensaje"
             disabled={vacio || enviando || sinConexion}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-principal text-white transition-colors hover:bg-[#5a30c9] disabled:cursor-not-allowed disabled:bg-borde disabled:text-suave"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-principal text-white transition-colors hover:bg-[#5a30c9] disabled:cursor-not-allowed disabled:bg-borde disabled:text-suave"
           >
             <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 2 11 13" />

@@ -332,7 +332,7 @@ export function MisSalas() {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start">
         <button
           ref={abrirRef}
-          className="btn-principal min-h-14 w-full text-lg sm:w-72 sm:shrink-0"
+          className="btn-principal min-h-14 w-full rounded-[14px] text-lg shadow-[0_6px_18px_rgba(109,63,224,0.3)] sm:w-72 sm:shrink-0"
           type="button"
           onClick={() => {
             setModal(true);
@@ -362,10 +362,10 @@ export function MisSalas() {
           </label>
 
           <div
-            className={`flex items-center gap-2 rounded-lg border-[1.5px] bg-fondo p-1 pl-3 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace ${
+            className={`flex items-center gap-2 rounded-[14px] border-[1.5px] bg-sala-tarjeta p-1.5 pl-4 shadow-[0_2px_10px_rgba(80,50,160,0.1)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace ${
               errorCodigo
                 ? "border-error"
-                : "border-campo"
+                : "border-transparent dark:border-white/10"
             }`}
           >
             <input
@@ -390,7 +390,7 @@ export function MisSalas() {
 
             <button
               type="submit"
-              className="btn-principal disabled:opacity-60"
+              className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-principal-suave px-5 font-bold text-enlace transition-colors hover:bg-principal hover:text-white disabled:opacity-60"
               disabled={uniendo}
             >
               {uniendo
@@ -424,7 +424,7 @@ export function MisSalas() {
         <p
           role="status"
           aria-live="polite"
-          className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
+          className="mb-4 rounded-xl bg-exito-fondo p-3 text-exito"
         >
           ✓ {aviso}
         </p>
@@ -443,7 +443,7 @@ export function MisSalas() {
             {[0, 1, 2].map((n) => (
               <div
                 key={n}
-                className="tarjeta animate-pulse space-y-3"
+                className="rounded-2xl bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5 animate-pulse space-y-3 p-5"
               >
                 <div className="h-4 w-2/3 rounded bg-borde" />
                 <div className="h-4 w-1/3 rounded bg-borde" />
@@ -472,7 +472,7 @@ export function MisSalas() {
       ) : salas.length === 0 ? (
         <section
           aria-labelledby="sin-salas"
-          className="rounded-lg border-2 border-dashed border-borde px-5 py-12 text-center"
+          className="rounded-2xl border-2 border-dashed border-separador px-5 py-12 text-center"
         >
           <h2
             id="sin-salas"
@@ -488,7 +488,7 @@ export function MisSalas() {
         </section>
       ) : (
         <>
-        <h2 className="mb-3 font-semibold text-suave">
+        <h2 className="mb-4 mt-2 text-xl font-bold">
           Tus salas
         </h2>
 
@@ -502,11 +502,11 @@ export function MisSalas() {
             return (
               <li
                 key={sala.id}
-                className="tarjeta min-w-0 !p-0"
+                className="rounded-2xl bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5 min-w-0 overflow-hidden"
               >
                 {/* Encabezado de color con el nombre y el ID; el menú ⋯ va arriba a la derecha. */}
                 <div
-                  className="relative rounded-t-[9px] px-4 py-3 text-white"
+                  className="relative px-5 py-4 text-white"
                   style={{ background: color }}
                 >
                   <h2 className="break-words pr-10 text-lg font-bold">
@@ -542,25 +542,28 @@ export function MisSalas() {
                 </div>
 
                 <p
-                  className={`px-4 py-3 font-semibold ${
+                  className={`px-5 pt-4 font-bold ${
                     anfitrion ? "text-[#2563eb] dark:text-[#7aa7ff]" : "text-suave"
                   }`}
                 >
                   {anfitrion ? "Anfitrión" : "Invitado"}
                 </p>
 
-                <div className="flex items-center justify-between border-t border-borde px-2">
+                <div className="flex items-center justify-between px-4 pb-5 pt-3">
                   <Link
-                    className="inline-flex min-h-11 items-center px-2 font-bold text-enlace no-underline transition-colors hover:text-[#3b1f94] dark:hover:text-[#e4d9ff]"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-principal-suave px-5 font-bold text-enlace no-underline transition-colors hover:bg-principal hover:text-white"
                     to={`/salas/${encodeURIComponent(sala.id)}`}
                     aria-label={`Entrar a la sala ${sala.nombre}`}
                   >
                     Entrar
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
                   </Link>
 
                   <button
                     type="button"
-                    className="inline-flex min-h-11 items-center gap-1.5 px-2 font-semibold text-enlace no-underline transition-colors hover:text-[#3b1f94] dark:hover:text-[#e4d9ff]"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-3 font-bold text-enlace no-underline transition-colors hover:bg-principal-suave"
                     aria-label={`Copiar ID de ${sala.nombre}`}
                     onClick={() =>
                       void copiar(sala.id)

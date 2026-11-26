@@ -51,7 +51,7 @@ export function MenuAcciones({ etiqueta, acciones, sobreColor = false, contorno 
         {...menu.propsBoton}
         aria-label={etiqueta}
         aria-haspopup="true"
-        className={`inline-flex size-11 items-center justify-center rounded-full ${
+        className={`inline-flex size-11 items-center justify-center rounded-xl ${
           sobreColor ? "text-white hover:bg-white/20" : `text-enlace hover:bg-superficie ${contorno ? "border-[1.5px] border-enlace" : ""}`
         } ${menu.abierto ? (sobreColor ? "bg-white/25" : "bg-superficie") : ""}`}
       >
@@ -64,7 +64,7 @@ export function MenuAcciones({ etiqueta, acciones, sobreColor = false, contorno 
 
       <div
         {...menu.propsPanel}
-        className="absolute right-0 top-full z-30 mt-2 w-56 max-w-[calc(100vw-2rem)] rounded-[10px] border-[1.5px] border-borde bg-fondo p-2 text-left text-texto shadow-lg"
+        className="absolute right-0 top-full z-30 mt-2 w-56 max-w-[calc(100vw-2rem)] rounded-2xl bg-sala-tarjeta p-2 text-left text-texto shadow-[0_10px_34px_rgba(80,50,160,0.2)] dark:ring-1 dark:ring-white/10"
       >
         <ul className="flex flex-col gap-1">
           {acciones.map((accion, i) => (
@@ -72,7 +72,7 @@ export function MenuAcciones({ etiqueta, acciones, sobreColor = false, contorno 
               {accion.peligro && i > 0 && <hr className="my-1 border-borde" />}
               <button
                 type="button"
-                className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left font-semibold hover:bg-superficie ${
+                className={`flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-left font-semibold hover:bg-sala-campo ${
                   accion.peligro ? "text-error" : "text-texto"
                 }`}
                 onClick={() => {
