@@ -5,6 +5,7 @@ import { EstadoConexionSala } from "../components/EstadoConexionSala";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
 import { PanelChat } from "../components/sala/PanelChat";
+import { useHistorialSala } from "../hooks/useHistorialSala";
 import { useMensajesSala } from "../hooks/useMensajesSala";
 import { useSalaPersonas } from "../hooks/useSalaPersonas";
 import { useSalaTiempoReal } from "../hooks/useSalaTiempoReal";
@@ -32,7 +33,9 @@ export function Sala() {
   // Con la sala cargada se abre el tiempo real y se entra a ella con su ID oficial (US-08).
   const tiempoReal = useSalaTiempoReal(sala?.id ?? "", sala !== null);
   // Mensajes del chat (US-10).
-  const { mensajes } = useMensajesSala(tiempoReal.cliente);
+  const { mensajes, fusionar } = useMensajesSala(tiempoReal.cliente);
+  // Historial: los últimos mensajes guardados se piden al entrar a la sala (US-11).
+  const historial = useHistorialSala(sala?.id ?? "", tiempoReal.unida, fusionar);
   // Personas conectadas y avisos de quién entra o sale (US-10).
   const miUid = usuario?.uid ?? "";
   const { personas, avisos } = useSalaPersonas(tiempoReal.cliente, miUid);
@@ -163,6 +166,7 @@ export function Sala() {
                       roomId={sala.id}
                       estado={tiempoReal.estado}
                       mensajes={mensajes}
+                      historial={historial}
                       personas={personas}
                       miUid={miUid}
                     />
