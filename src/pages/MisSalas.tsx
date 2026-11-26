@@ -332,7 +332,7 @@ export function MisSalas() {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start">
         <button
           ref={abrirRef}
-          className="btn-principal min-h-14 w-full rounded-[14px] text-lg shadow-[0_6px_18px_rgba(109,63,224,0.3)] sm:w-72 sm:shrink-0"
+          className="btn-principal min-h-14 w-full rounded-2xl text-lg shadow-[0_6px_18px_rgba(109,63,224,0.3)] sm:w-72 sm:shrink-0"
           type="button"
           onClick={() => {
             setModal(true);
@@ -362,7 +362,7 @@ export function MisSalas() {
           </label>
 
           <div
-            className={`flex items-center gap-2 rounded-[14px] border-[1.5px] bg-sala-tarjeta p-1.5 pl-4 shadow-[0_2px_10px_rgba(80,50,160,0.1)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace ${
+            className={`flex items-center gap-2 rounded-2xl border-[1.5px] bg-sala-tarjeta p-1.5 pl-4 shadow-[0_2px_10px_rgba(80,50,160,0.1)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace ${
               errorCodigo
                 ? "border-error"
                 : "border-transparent dark:border-white/10"
@@ -390,7 +390,7 @@ export function MisSalas() {
 
             <button
               type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-principal-suave px-5 font-bold text-enlace transition-colors hover:bg-principal hover:text-white disabled:opacity-60"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-principal-suave px-5 font-bold text-enlace transition-colors hover:bg-principal hover:text-white disabled:opacity-60"
               disabled={uniendo}
             >
               {uniendo
@@ -551,7 +551,7 @@ export function MisSalas() {
 
                 <div className="flex items-center justify-between px-4 pb-5 pt-3">
                   <Link
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-principal-suave px-5 font-bold text-enlace no-underline transition-colors hover:bg-principal hover:text-white"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-[14px] bg-principal-suave px-5 font-bold text-enlace no-underline transition-colors hover:bg-principal hover:text-white"
                     to={`/salas/${encodeURIComponent(sala.id)}`}
                     aria-label={`Entrar a la sala ${sala.nombre}`}
                   >
@@ -563,7 +563,7 @@ export function MisSalas() {
 
                   <button
                     type="button"
-                    className="inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-3 font-bold text-enlace no-underline transition-colors hover:bg-principal-suave"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 font-bold text-enlace no-underline transition-colors hover:bg-principal-suave"
                     aria-label={`Copiar ID de ${sala.nombre}`}
                     onClick={() =>
                       void copiar(sala.id)

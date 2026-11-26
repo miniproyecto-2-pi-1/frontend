@@ -37,7 +37,7 @@ export function LayoutApp() {
               <button
                 {...navegacion.propsBoton}
                 aria-label="Menú de navegación"
-                className="inline-flex size-11 items-center justify-center rounded-xl bg-sala-tarjeta text-texto shadow-[0_2px_10px_rgba(80,50,160,0.12)] hover:bg-principal-suave dark:ring-1 dark:ring-white/10"
+                className="inline-flex size-11 items-center justify-center rounded-[14px] bg-sala-tarjeta text-texto shadow-[0_2px_10px_rgba(80,50,160,0.12)] hover:bg-principal-suave dark:ring-1 dark:ring-white/10"
               >
                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <line x1="4" y1="6" x2="20" y2="6" />
@@ -70,7 +70,7 @@ export function LayoutApp() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <ThemeToggle className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-sala-tarjeta text-texto shadow-[0_2px_10px_rgba(80,50,160,0.12)] hover:bg-principal-suave dark:ring-1 dark:ring-white/10" />
+            <ThemeToggle className="inline-flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-sala-tarjeta text-texto shadow-[0_2px_10px_rgba(80,50,160,0.12)] hover:bg-principal-suave dark:ring-1 dark:ring-white/10" />
             {/* Cuenta (avatar) */}
             <div ref={cuenta.contenedor} className="relative">
               <button

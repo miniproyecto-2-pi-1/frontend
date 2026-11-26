@@ -144,6 +144,9 @@ export function Sala() {
     temporizadorAviso.current = setTimeout(() => setMensaje((actual) => (actual === texto ? "" : actual)), 2000);
   }
 
+  // Un solo aviso a la vez: el de una acción reciente (copiar, editar…) tiene prioridad sobre «Sala creada» (5 s).
+  const aviso = mensaje || (creada && mostrarCreada ? "Sala creada. Eres su anfitrión." : "");
+
   const ICONO_ATRAS = (
     <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M19 12H5" />
@@ -160,14 +163,14 @@ export function Sala() {
     </svg>
   );
 
-  const claseBoton = "relative inline-flex size-12 shrink-0 items-center justify-center rounded-[14px] transition-colors";
+  const claseBoton = "relative inline-flex size-12 shrink-0 items-center justify-center rounded-2xl transition-colors";
 
   // Barra de controles flotante: micrófono, cámara y compartir (llegan en el Sprint 4), chat, participantes y salir.
   const barraControles = (
     <div
       role="toolbar"
       aria-label="Controles de la sala"
-      className="flex items-center gap-2.5 rounded-[20px] bg-sala-tarjeta px-3.5 py-2.5 shadow-[0_10px_34px_rgba(80,50,160,0.2)] dark:shadow-[0_10px_34px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/10"
+      className="flex items-center gap-2.5 rounded-[22px] bg-sala-tarjeta px-3.5 py-2.5 shadow-[0_10px_34px_rgba(80,50,160,0.2)] dark:shadow-[0_10px_34px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/10"
     >
       {(
         [
@@ -194,7 +197,7 @@ export function Sala() {
     // chat y participantes a la derecha, y la barra de controles flotando abajo. En pantallas angostas el panel ocupa todo.
     <main id="contenido" tabIndex={-1} className="flex h-dvh min-h-0 flex-col bg-sala-fondo focus:outline-none">
       <header className="relative flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-3 sm:px-4">
-        <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-xl bg-sala-tarjeta text-texto shadow-sm hover:bg-principal-suave">
+        <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-[14px] bg-sala-tarjeta text-texto shadow-sm hover:bg-principal-suave">
           {ICONO_ATRAS}
         </Link>
 
@@ -231,11 +234,11 @@ export function Sala() {
 
             <EstadoConexionSala estado={tiempoReal.estado} unida={tiempoReal.unida} />
 
-            <span className="inline-flex items-center gap-2 rounded-xl bg-sala-tarjeta py-1 pl-3.5 pr-1 text-xs font-semibold shadow-sm">
+            <span className="inline-flex items-center gap-2 rounded-2xl bg-sala-tarjeta py-1 pl-3.5 pr-1 text-xs font-semibold shadow-sm">
               <span className="font-mono tracking-wide">{sala.id}</span>
               <button
                 type="button"
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-[10px] bg-principal-suave px-3 text-xs font-bold text-enlace transition-colors hover:bg-principal hover:text-white"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-xl bg-principal-suave px-3 text-xs font-bold text-enlace transition-colors hover:bg-principal hover:text-white"
                 aria-label={`Copiar ID de la sala ${sala.nombre}`}
                 onClick={() => void copiar()}
               >
@@ -251,19 +254,19 @@ export function Sala() {
           <h1 className="text-2xl font-bold">Sala</h1>
         )}
 
-        {/* Avisos (ID copiado, sala actualizada…): flotan a la derecha, junto al botón de tema, y no mueven nada de la pantalla. */}
-        {mensaje && (
+        {/* Avisos (ID copiado, sala actualizada, sala creada…): flotan hacia el centro de la cabecera y no mueven nada de la pantalla. */}
+        {aviso && (
           <p
             role="status"
             aria-live="polite"
-            className="pointer-events-none absolute right-3 top-full z-30 mt-1 max-w-[calc(100vw-1.5rem)] rounded-xl bg-exito-fondo px-4 py-2 text-sm font-medium text-exito shadow-[0_6px_20px_rgba(31,122,63,0.2)] lg:right-[4.5rem] lg:top-1/2 lg:mt-0 lg:max-w-sm lg:-translate-y-1/2"
+            className="pointer-events-none absolute right-3 top-full z-30 mt-1 max-w-[calc(100vw-1.5rem)] rounded-2xl bg-exito-fondo px-4 py-2 text-sm font-medium text-exito shadow-[0_6px_20px_rgba(31,122,63,0.2)] lg:left-1/2 lg:right-auto lg:top-1/2 lg:mt-0 lg:max-w-sm lg:-translate-x-1/2 lg:-translate-y-1/2"
           >
-            ✓ {mensaje}
+            ✓ {aviso}
           </p>
         )}
 
         <div className="ml-auto flex items-center gap-3">
-          <ThemeToggle className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-sala-tarjeta text-texto shadow-sm hover:bg-principal-suave" />
+          <ThemeToggle className="inline-flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-sala-tarjeta text-texto shadow-sm hover:bg-principal-suave" />
         </div>
       </header>
 
@@ -305,19 +308,6 @@ export function Sala() {
             <AvisosSala avisos={avisos} />
 
             <div className="relative flex min-h-0 flex-1 flex-col px-3 pb-3 sm:px-4 sm:pb-4 lg:flex-row">
-              {/* «Sala creada»: se ve dentro del lado izquierdo, sobre la tarjeta, y se va a los 5 segundos. */}
-              <div role="status" className="pointer-events-none absolute left-6 top-4 z-10 max-w-[calc(100%-3rem)] lg:max-w-md">
-                {creada && (
-                  <p
-                    className={`rounded-xl bg-exito-fondo px-4 py-3 font-medium text-exito shadow transition-opacity duration-500 ${
-                      mostrarCreada ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    {mostrarCreada ? "✓ Sala creada. Eres su anfitrión." : ""}
-                  </p>
-                )}
-              </div>
-
               {/* Tarjeta de los cuadros de video, con la barra de controles flotando abajo. Por ahora solo se ve la tarjeta:
                   el video, el micrófono, la cámara y compartir pantalla llegan en el Sprint 4. */}
               <div className="relative hidden min-h-0 min-w-0 flex-1 lg:flex">
@@ -346,7 +336,7 @@ export function Sala() {
                     panelVisible ? "translate-x-0" : "lg:translate-x-full"
                   }`}
                 >
-                  <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="m-3.5 mb-1.5 flex shrink-0 gap-0.5 rounded-[14px] bg-sala-campo p-1">
+                  <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="m-3.5 mb-1.5 flex shrink-0 gap-0.5 rounded-2xl bg-sala-campo p-1">
                     {(
                       [
                         ["chat", "Chat", botonChat],
@@ -363,7 +353,7 @@ export function Sala() {
                         aria-controls={`panel-${clave}`}
                         tabIndex={pestana === clave ? 0 : -1}
                         onClick={() => setPestana(clave)}
-                        className={`inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[10px] px-3 text-sm font-bold transition-colors duration-300 ${
+                        className={`inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-sm font-bold transition-colors duration-300 ${
                           pestana === clave ? "bg-principal text-white shadow-[0_2px_8px_rgba(109,63,224,0.35)]" : "text-suave hover:text-texto"
                         }`}
                       >

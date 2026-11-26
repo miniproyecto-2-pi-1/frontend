@@ -198,7 +198,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Buscador del chat: siempre visible. Con texto aparecen el contador y las flechas para recorrer las coincidencias. */}
       <div id="busqueda-chat" className="flex shrink-0 items-center px-3.5 pb-2 pt-1">
-        <div className="flex min-w-0 flex-1 items-center gap-1 rounded-xl bg-sala-campo pl-3 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
+        <div className="flex min-w-0 flex-1 items-center gap-1 rounded-[14px] bg-sala-campo pl-3 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
           <span aria-hidden="true" className="shrink-0 text-suave">
             {iconoLupa}
           </span>
@@ -327,7 +327,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                   {propio ? (
                     <li data-mensaje={m.id} className={`flex min-w-0 flex-col items-end ${inicio ? "mt-4" : "mt-0.5"}`}>
                       <p
-                        className={`inline-block max-w-[88%] whitespace-pre-wrap rounded-[14px] bg-[#e1eeff] px-3.5 py-2 text-left text-sm leading-snug text-[#0f2a55] dark:bg-[#1f4170] dark:text-white [overflow-wrap:anywhere] ${
+                        className={`inline-block max-w-[88%] whitespace-pre-wrap rounded-2xl bg-[#e1eeff] px-3.5 py-2 text-left text-sm leading-snug text-[#0f2a55] dark:bg-[#1f4170] dark:text-white [overflow-wrap:anywhere] ${
                           inicio ? "" : "rounded-tr-md"
                         } ${fin ? "" : "rounded-br-md"} ${marca}`}
                       >
@@ -379,7 +379,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
       </div>
 
       <form noValidate onSubmit={(e) => void enviar(e)} className="shrink-0 px-3.5 pb-3.5 pt-2">
-        <div className="flex items-end gap-1 rounded-[14px] bg-sala-campo py-1 pl-4 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
+        <div className="flex items-end gap-1 rounded-2xl bg-sala-campo py-1 pl-4 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
           <textarea
             ref={escritura}
             rows={1}
@@ -399,7 +399,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
             type="submit"
             aria-label="Enviar mensaje"
             disabled={vacio || enviando || sinConexion}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-principal text-white transition-colors hover:bg-[#5a30c9] disabled:cursor-not-allowed disabled:bg-borde disabled:text-suave"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-principal text-white transition-colors hover:bg-[#5a30c9] disabled:cursor-not-allowed disabled:bg-borde disabled:text-suave"
           >
             <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 2 11 13" />
