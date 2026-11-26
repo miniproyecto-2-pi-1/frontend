@@ -1,6 +1,7 @@
 import type { RespuestaCruda } from "../api";
 import { auth } from "../firebase";
 import { PATRON_USERNAME, TOTAL_AVATARES, type DatosRegistro, type DatosUsername, type Usuario } from "../tipos";
+import { responderSalas } from "./salas";
 
 // MODO MOCK (VITE_USE_MOCKS=true): responde en el navegador las rutas de usuarios mientras la API no las tenga.
 // Firebase Auth sigue siendo real: el mock toma el uid, el correo y el nombre del usuario que ingresó.
@@ -152,6 +153,10 @@ function elegirUsername(uid: string, correo: string, cuerpo: CuerpoPerfil): Resp
 export async function responderMock(ruta: string, init: RequestInit): Promise<RespuestaCruda | null> {
   const metodo = (init.method ?? "GET").toUpperCase();
   const camino = ruta.split("?")[0].replace(/\/$/, "");
+  if (camino.startsWith("/api/v1/rooms")) {
+    await esperar(DEMORA_MS, init.signal);
+    return responderSalas(metodo, camino, new URLSearchParams(ruta.split("?")[1] ?? ""), leerCuerpo(init));
+  }
   const conocida =
     (metodo === "POST" && camino === "/api/v1/users") ||
     (metodo === "GET" && camino === "/api/v1/users/me") ||

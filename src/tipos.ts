@@ -30,3 +30,31 @@ export interface DatosUsername {
 
 export const PATRON_USERNAME = /^[A-Za-z0-9_]{3,20}$/;
 export const TOTAL_AVATARES = 6;
+
+// ---- Salas y chat (Sprint 3) ----
+
+// Sala tal como la devuelve la API (GET/POST/PATCH /api/v1/rooms). esAdministrador es el anfitrión.
+export interface SalaDatos {
+  id: string;
+  nombre: string;
+  creadaEn?: string;
+  esAdministrador?: boolean;
+}
+
+// Persona conectada a una sala (evento «presencia» del servidor de tiempo real).
+export interface Persona {
+  uid: string;
+  username: string;
+  avatar: number;
+}
+
+// Mensaje del chat (evento «mensaje» y respuesta de GET /api/v1/rooms/:id/messages).
+export interface Mensaje {
+  id: string;
+  uid: string;
+  username: string;
+  texto: string;
+  creadoEn: string; // fecha ISO
+}
+
+export const MAXIMO_MENSAJE = 1000;

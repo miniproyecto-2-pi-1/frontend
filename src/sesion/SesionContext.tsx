@@ -2,6 +2,7 @@ import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ApiError, apiFetch } from "../api";
 import { auth } from "../firebase";
+import { USUARIO_MOCK } from "../mocks/usuario";
 import type { Usuario } from "../tipos";
 
 export type { Usuario } from "../tipos";
@@ -27,24 +28,27 @@ interface ContextoSesion {
   cerrarSesion: () => Promise<void>;
 }
 
+// Solo para probar sin Firebase: con VITE_USE_MOCKS=true y VITE_MOCK_SESION=true la sesión empieza «lista» con una persona simulada.
+const SESION_MOCK = import.meta.env.VITE_USE_MOCKS === "true" && import.meta.env.VITE_MOCK_SESION === "true";
+
 const Contexto = createContext<ContextoSesion | null>(null);
 
 export function SesionProvider({ children }: { children: ReactNode }) {
   // undefined = Firebase todavía no ha dicho si hay sesión.
   const [cuenta, setCuenta] = useState<User | null | undefined>(auth ? undefined : null);
-  const [estado, setEstado] = useState<EstadoSesion>(auth ? "cargando" : "anonimo");
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [estado, setEstado] = useState<EstadoSesion>(SESION_MOCK ? "listo" : auth ? "cargando" : "anonimo");
+  const [usuario, setUsuario] = useState<Usuario | null>(SESION_MOCK ? USUARIO_MOCK : null);
   const [errorConexion, setErrorConexion] = useState<ApiError | null>(null);
   const [intento, setIntento] = useState(0);
   const peticion = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    if (!auth) return;
+    if (!auth || SESION_MOCK) return;
     return onAuthStateChanged(auth, (u) => setCuenta(u));
   }, []);
 
   useEffect(() => {
-    if (cuenta === undefined) return;
+    if (SESION_MOCK || cuenta === undefined) return;
     if (cuenta === null) {
       setUsuario(null);
       setErrorConexion(null);

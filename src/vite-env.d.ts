@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_PROJECT_ID?: string;
   readonly VITE_FIREBASE_APP_ID?: string;
   readonly VITE_USE_MOCKS?: string;
+  readonly VITE_MOCK_SESION?: string;
+  readonly VITE_REALTIME_URL?: string;
 }
 
 interface ImportMeta {
