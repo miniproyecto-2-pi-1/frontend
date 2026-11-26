@@ -38,6 +38,8 @@ export function Sala() {
   const iniciadorRef = useRef<HTMLButtonElement | null>(null);
   // La parte izquierda tiene dos pestañas: el chat y los participantes.
   const [pestana, setPestana] = useState<"chat" | "personas">("chat");
+  // El panel de la derecha se pliega con su barra de iconos.
+  const [panelVisible, setPanelVisible] = useState(true);
   const botonChat = useRef<HTMLButtonElement>(null);
   const botonPersonas = useRef<HTMLButtonElement>(null);
 
@@ -218,9 +220,99 @@ export function Sala() {
             <>
               <AvisosSala avisos={avisos} />
 
-              <div className="grid gap-5 lg:grid-cols-[28rem_minmax(0,1fr)]">
-                {/* Parte izquierda: dos pestañas, Chat y Participantes. Las dos quedan en la página para no perder el chat. */}
-                <section aria-label="Chat y participantes" className="tarjeta overflow-hidden p-0 lg:self-start">
+              <div className={`grid gap-5 lg:items-start ${panelVisible ? "lg:grid-cols-[minmax(0,1fr)_26rem_auto]" : "lg:grid-cols-[minmax(0,1fr)_auto]"}`}>
+                {/* Zona de los cuadros de video y sus botones. Por ahora solo se ve el recuadro y el botón de salir:
+                    el video, el micrófono, la cámara y compartir pantalla llegan en el Sprint 4. */}
+                <div className="hidden lg:order-1 lg:block">
+                  <div aria-hidden="true" className="min-h-[28rem] rounded-xl border border-borde bg-superficie" />
+
+                  <div className="mt-5 flex flex-wrap items-start justify-center gap-6">
+                    {(
+                      [
+                        ["Micrófono", <path key="m" d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3ZM5 11a7 7 0 0 0 14 0M12 18v3" />],
+                        ["Cámara", <path key="c" d="M3 7h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3ZM15 11l6-3v8l-6-3" />],
+                        ["Compartir pantalla", <path key="p" d="M3 5h18v11H3ZM8 20h8M12 16v4" />],
+                      ] as const
+                    ).map(([nombre, icono]) => (
+                      <button
+                        key={nombre}
+                        type="button"
+                        disabled
+                        className="flex flex-col items-center gap-1 text-sm text-suave opacity-60"
+                      >
+                        <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full border-[1.5px] border-campo">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            {icono}
+                          </svg>
+                        </span>
+                        {nombre}
+                      </button>
+                    ))}
+
+                    <Link to="/salas" className="flex flex-col items-center gap-1 text-sm font-semibold text-texto no-underline">
+                      <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full bg-[#b3261e] text-white">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                      </span>
+                      Salir de la sala
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Barra de iconos: ocultar o mostrar el panel y abrir directamente Participantes o Chat. */}
+                <div role="toolbar" aria-label="Panel de la sala" className="order-first flex gap-2 lg:order-3 lg:flex-col">
+                  <button
+                    type="button"
+                    aria-label={panelVisible ? "Ocultar panel" : "Mostrar panel"}
+                    aria-expanded={panelVisible}
+                    aria-controls="panel-sala"
+                    onClick={() => setPanelVisible((v) => !v)}
+                    className="inline-flex size-11 items-center justify-center rounded-lg border-[1.5px] border-enlace text-enlace hover:bg-superficie"
+                  >
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="16" rx="2" />
+                      <path d="M15 4v16" />
+                    </svg>
+                  </button>
+
+                  {(
+                    [
+                      ["personas", "Participantes"],
+                      ["chat", "Chat"],
+                    ] as const
+                  ).map(([clave, nombre]) => {
+                    const activo = panelVisible && pestana === clave;
+                    return (
+                      <button
+                        key={clave}
+                        type="button"
+                        aria-label={nombre}
+                        aria-pressed={activo}
+                        onClick={() => {
+                          setPestana(clave);
+                          setPanelVisible(true);
+                        }}
+                        className={`inline-flex size-11 items-center justify-center rounded-lg text-enlace hover:bg-superficie ${activo ? "bg-superficie" : ""}`}
+                      >
+                        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          {clave === "personas" ? (
+                            <>
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                              <circle cx="9" cy="7" r="4" />
+                              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </>
+                          ) : (
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
+                          )}
+                        </svg>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Panel de la derecha: dos pestañas, Chat y Participantes. Las dos quedan en la página para no perder el chat. */}
+                <section id="panel-sala" aria-label="Chat y participantes" hidden={!panelVisible} className="tarjeta overflow-hidden p-0 lg:order-2">
                   <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex border-b border-borde">
                     {(
                       [
@@ -265,22 +357,6 @@ export function Sala() {
                     <ListaPersonas personas={personas} miUid={miUid} />
                   </div>
                 </section>
-
-                {/* Zona de los cuadros de video: queda en blanco por ahora (el video llega en el Sprint 4). */}
-                <div className="hidden lg:block">
-                  <div aria-hidden="true" className="min-h-[28rem]" />
-
-                  <div className="mt-5 flex justify-center">
-                    <Link to="/salas" className="flex min-h-11 flex-col items-center gap-1 text-sm font-semibold text-texto no-underline">
-                      <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full bg-[#b3261e] text-white">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                      </span>
-                      Salir de la sala
-                    </Link>
-                  </div>
-                </div>
               </div>
             </>
           )}
