@@ -207,8 +207,8 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                         </time>
                       </p>
                       <p
-                        className={`mt-0.5 inline-block whitespace-pre-wrap break-words rounded-xl px-3 py-2 text-left ${
-                          propio ? "bg-principal text-white" : "bg-superficie"
+                        className={`mt-0.5 whitespace-pre-wrap break-words text-left ${
+                          propio ? "inline-block rounded-xl bg-principal px-3 py-2 text-white" : ""
                         }`}
                       >
                         {m.texto}
