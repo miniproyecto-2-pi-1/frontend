@@ -9,7 +9,7 @@ import { USUARIO_MOCK } from "./usuario";
 // Salas de ejemplo (la persona simulada es «camila», uid mock-camila):
 //   K7P2-91XQ «Cálculo II»           → la creó camila (anfitriona) y tiene 60 mensajes (para probar «cargar anteriores»).
 //   M4T8-27ZB «Proyecto Integrador»  → la creó camila y está vacía (para probar el historial vacío).
-//   R9D1-55LC «Física Mecánica»      → la creó otra persona (camila entra como invitada) y tiene 3 mensajes.
+//   R9D1-55LC «Física Mecánica»      → la creó Juan (camila entra como invitada) y tiene 3 mensajes.
 //
 // Para probar el error del historial: en la consola, localStorage.setItem("mockFallaHistorial", "1") (y removeItem para quitarlo).
 
@@ -48,7 +48,7 @@ function semillaMensajes(roomId: string, cantidad: number): Mensaje[] {
       id: `${roomId}-semilla-${String(i).padStart(3, "0")}`,
       uid: autor.uid,
       username: autor.username,
-      texto: `${textos[i % textos.length]} (${i + 1})`,
+      texto: textos[i % textos.length],
       creadoEn: new Date(ahora - (cantidad - i) * 12 * 60_000).toISOString(),
     };
   });
@@ -59,7 +59,7 @@ function semillaSalas(): SalaGuardada[] {
   return [
     { id: "K7P2-91XQ", nombre: "Cálculo II", creadaEn: new Date(ahora - 3 * 86_400_000).toISOString(), ownerUid: USUARIO_MOCK.uid },
     { id: "M4T8-27ZB", nombre: "Proyecto Integrador", creadaEn: new Date(ahora - 2 * 86_400_000).toISOString(), ownerUid: USUARIO_MOCK.uid },
-    { id: "R9D1-55LC", nombre: "Física Mecánica", creadaEn: new Date(ahora - 86_400_000).toISOString(), ownerUid: "mock-otra-persona" },
+    { id: "R9D1-55LC", nombre: "Física Mecánica", creadaEn: new Date(ahora - 86_400_000).toISOString(), ownerUid: "mock-juan" },
   ];
 }
 
@@ -121,7 +121,7 @@ function error(status: number, code: string, message: string, fields?: Record<st
 const noEncontrada = () => error(404, "ROOM_NOT_FOUND", "Sala no encontrada. Revisa el ID.");
 
 function paraElFrontend(sala: SalaGuardada): SalaDatos {
-  return { id: sala.id, nombre: sala.nombre, creadaEn: sala.creadaEn, esAdministrador: sala.ownerUid === uidActual() };
+  return { id: sala.id, nombre: sala.nombre, creadaEn: sala.creadaEn, esAdministrador: sala.ownerUid === uidActual(), anfitrionUid: sala.ownerUid };
 }
 
 function validarNombre(cuerpo: Record<string, unknown>): { nombre: string } | RespuestaCruda {

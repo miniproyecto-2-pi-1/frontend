@@ -1,5 +1,7 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Avatar } from "../Avatar";
+import { buscarCoincidencias } from "../../utils/busqueda";
+import { Resaltado } from "./Resaltado";
 import type { ClienteSala, EstadoConexion } from "../../tiempoReal";
 import type { HistorialSala } from "../../hooks/useHistorialSala";
 import { MAXIMO_MENSAJE, type Mensaje, type Persona } from "../../tipos";
@@ -38,6 +40,59 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
   // Altura de la lista justo antes de cargar mensajes anteriores: sirve para que lo que se leía no se mueva.
   const anclaAltura = useRef<number | null>(null);
   const [nuevos, setNuevos] = useState(0);
+
+  // Buscador del chat: el ícono de la lupa abre el campo debajo; se marcan los mensajes que coinciden y se recorren.
+  const [consulta, setConsulta] = useState("");
+  const [actual, setActual] = useState(0);
+  const campoBusqueda = useRef<HTMLInputElement>(null);
+  const coincidencias = useMemo(
+    () => (consulta.trim() ? mensajes.filter((m) => buscarCoincidencias(m.texto, consulta).length > 0).map((m) => m.id) : []),
+    [mensajes, consulta],
+  );
+  const idActual = coincidencias.length > 0 ? coincidencias[Math.min(actual, coincidencias.length - 1)] : null;
+
+  // Centra un mensaje moviendo solo la lista del chat (scrollIntoView movería también el panel que la contiene).
+  function centrar(elemento: Element | null | undefined) {
+    const cont = contenedor.current;
+    if (!cont || !elemento) return;
+    const c = cont.getBoundingClientRect();
+    const r = elemento.getBoundingClientRect();
+    cont.scrollTo({ top: cont.scrollTop + (r.top - c.top) - (c.height - r.height) / 2, behavior: "smooth" });
+  }
+
+  function irACoincidencia(indice: number) {
+    const id = coincidencias[indice];
+    setActual(indice);
+    centrar(contenedor.current?.querySelector(`[data-mensaje="${CSS.escape(id)}"]`));
+  }
+
+  function alBuscar(valor: string) {
+    setConsulta(valor);
+    const ids = valor.trim() ? mensajes.filter((m) => buscarCoincidencias(m.texto, valor).length > 0).map((m) => m.id) : [];
+    // Empieza por la coincidencia más reciente (la de más abajo).
+    const indice = Math.max(ids.length - 1, 0);
+    setActual(indice);
+    if (ids.length > 0) {
+      centrar(contenedor.current?.querySelector(`[data-mensaje="${CSS.escape(ids[indice])}"]`));
+    }
+  }
+
+  function limpiarBusqueda() {
+    setConsulta("");
+    setActual(0);
+    campoBusqueda.current?.focus();
+  }
+
+  function alPulsarBusqueda(evento: KeyboardEvent<HTMLInputElement>) {
+    if (evento.key === "Escape") {
+      evento.preventDefault();
+      limpiarBusqueda();
+    } else if (evento.key === "Enter" && coincidencias.length > 0) {
+      evento.preventDefault();
+      const n = coincidencias.length;
+      irACoincidencia(evento.shiftKey ? (actual - 1 + n) % n : (actual + 1) % n);
+    }
+  }
 
   const sinConexion = estado !== "conectado";
   // Un mensaje vacío o de solo espacios no se envía.
@@ -132,10 +187,76 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
     }
   }, [mensajes, miUid]);
 
+  const iconoLupa = (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Buscador del chat: siempre visible. Con texto aparecen el contador y las flechas para recorrer las coincidencias. */}
+      <div id="busqueda-chat" className="flex shrink-0 items-center px-3.5 pb-2 pt-1">
+        <div className="flex min-w-0 flex-1 items-center gap-1 rounded-[14px] bg-sala-campo pl-3 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
+          <span aria-hidden="true" className="shrink-0 text-suave">
+            {iconoLupa}
+          </span>
+          <input
+            ref={campoBusqueda}
+            type="search"
+            autoComplete="off"
+            aria-label="Buscar en el chat"
+            placeholder="Buscar en el chat"
+            value={consulta}
+            onChange={(e) => alBuscar(e.target.value)}
+            onKeyDown={alPulsarBusqueda}
+            className="campo-envuelto min-h-10 min-w-0 flex-1 bg-transparent px-1 text-sm text-texto placeholder:text-suave"
+          />
+          {consulta.trim() && (
+            <>
+              <span role="status" className="shrink-0 text-xs text-texto/75">
+                {coincidencias.length === 0 ? "Sin coincidencias" : `${Math.min(actual, coincidencias.length - 1) + 1} de ${coincidencias.length}`}
+              </span>
+              <button
+                type="button"
+                aria-label="Coincidencia anterior"
+                disabled={coincidencias.length === 0}
+                onClick={() => irACoincidencia((actual - 1 + coincidencias.length) % coincidencias.length)}
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-enlace hover:bg-principal-suave disabled:opacity-40"
+              >
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 15 6-6 6 6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                aria-label="Coincidencia siguiente"
+                disabled={coincidencias.length === 0}
+                onClick={() => irACoincidencia((actual + 1) % coincidencias.length)}
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-enlace hover:bg-principal-suave disabled:opacity-40"
+              >
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                aria-label="Borrar búsqueda"
+                onClick={limpiarBusqueda}
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-suave hover:bg-principal-suave"
+              >
+                <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="relative min-h-0 flex-1">
-        <div ref={contenedor} onScroll={alDesplazar} className="h-full overflow-y-auto p-4">
+        <div ref={contenedor} onScroll={alDesplazar} className="barra-fina h-full overflow-y-auto overflow-x-hidden p-4">
           {historial.estado === "cargando" && mensajes.length === 0 && (
             <div role="status" className="space-y-4" aria-label="Cargando mensajes">
               <p className="text-center text-sm font-semibold text-suave">Cargando mensajes…</p>
@@ -185,47 +306,73 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
             </div>
           )}
 
-          <ul role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions" className="space-y-4">
+          <div role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions">
+          <ul>
             {mensajes.map((m, i) => {
               const propio = m.uid === miUid;
               const dia = etiquetaDia(m.creadoEn);
-              const diaNuevo = i === 0 || dia !== etiquetaDia(mensajes[i - 1].creadoEn);
+              const previo = i > 0 ? mensajes[i - 1] : null;
+              const siguiente = i < mensajes.length - 1 ? mensajes[i + 1] : null;
+              const diaNuevo = !previo || dia !== etiquetaDia(previo.creadoEn);
+              // Los mensajes seguidos de la misma persona se agrupan: nombre y avatar solo en el primero, hora solo en el último.
+              const inicio = diaNuevo || previo.uid !== m.uid;
+              const fin = !siguiente || siguiente.uid !== m.uid || etiquetaDia(siguiente.creadoEn) !== dia;
+              const marca = m.id === idActual ? "outline outline-2 outline-offset-2 outline-[#d97706]" : "";
               return (
                 <Fragment key={m.id}>
                   {diaNuevo && (
-                    <li className="flex justify-center">
-                      <span className="rounded-full border border-borde bg-fondo px-3 py-0.5 text-xs text-suave">{dia}</span>
+                    <li className="mt-4 flex justify-center first:mt-0">
+                      <span className="rounded-lg bg-sala-campo px-3 py-0.5 text-xs font-semibold text-suave">{dia}</span>
                     </li>
                   )}
-                  <li className={`flex gap-2 ${propio ? "flex-row-reverse" : ""}`}>
-                    <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={32} />
-                    <div className={`min-w-0 max-w-[85%] ${propio ? "text-right" : ""}`}>
-                      <p className="text-sm">
-                        <strong>{propio ? "Tú" : m.username}</strong>{" "}
-                        <time dateTime={m.creadoEn} className="text-suave">
-                          {horaCorta(m.creadoEn)}
-                        </time>
-                      </p>
+                  {propio ? (
+                    <li data-mensaje={m.id} className={`flex min-w-0 flex-col items-end ${inicio ? "mt-4" : "mt-0.5"}`}>
                       <p
-                        className={`mt-0.5 inline-block whitespace-pre-wrap break-words rounded-xl px-3 py-2 text-left ${
-                          propio ? "bg-principal text-white" : "bg-superficie"
-                        }`}
+                        className={`inline-block max-w-[88%] whitespace-pre-wrap rounded-2xl bg-[#e1eeff] px-3.5 py-2 text-left text-sm leading-snug text-[#0f2a55] dark:bg-[#1f4170] dark:text-white [overflow-wrap:anywhere] ${
+                          inicio ? "" : "rounded-tr-md"
+                        } ${fin ? "" : "rounded-br-md"} ${marca}`}
                       >
-                        {m.texto}
+                        <span className="sr-only">Tú: </span>
+                        <Resaltado texto={m.texto} consulta={consulta} />
                       </p>
-                    </div>
-                  </li>
+                      <time dateTime={m.creadoEn} className={fin ? "mt-1 text-[11px] text-suave" : "sr-only"}>
+                        {horaCorta(m.creadoEn)}
+                      </time>
+                    </li>
+                  ) : (
+                    <li data-mensaje={m.id} className={`flex min-w-0 gap-2.5 ${inicio ? "mt-4" : "mt-0.5"}`}>
+                      {inicio ? <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={30} /> : <span aria-hidden="true" className="w-[30px] shrink-0" />}
+                      <div className="min-w-0 max-w-[88%]">
+                        {inicio ? (
+                          <p className="text-xs">
+                            <strong>{m.username}</strong>{" "}
+                            <time dateTime={m.creadoEn} className="ml-1 text-suave">
+                              {horaCorta(m.creadoEn)}
+                            </time>
+                          </p>
+                        ) : (
+                          <time dateTime={m.creadoEn} className="sr-only">
+                            {horaCorta(m.creadoEn)}
+                          </time>
+                        )}
+                        <p className={`whitespace-pre-wrap text-left text-sm leading-snug [overflow-wrap:anywhere] ${marca}`}>
+                          <Resaltado texto={m.texto} consulta={consulta} />
+                        </p>
+                      </div>
+                    </li>
+                  )}
                 </Fragment>
               );
             })}
           </ul>
+          </div>
         </div>
 
         {nuevos > 0 && (
           <button
             type="button"
             onClick={irAlFinal}
-            className="absolute bottom-3 left-1/2 z-10 min-h-11 -translate-x-1/2 rounded-full bg-principal px-4 py-2 text-sm font-bold text-white shadow-lg"
+            className="absolute bottom-3 left-1/2 z-10 min-h-11 -translate-x-1/2 rounded-xl bg-principal px-4 py-2 text-sm font-bold text-white shadow-lg"
           >
             <span aria-hidden="true">↓ </span>
             {nuevos} {nuevos === 1 ? "mensaje nuevo" : "mensajes nuevos"}
@@ -233,15 +380,15 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
         )}
       </div>
 
-      <form noValidate onSubmit={(e) => void enviar(e)} className="border-t border-borde p-3">
-        <div className="flex items-end gap-2">
+      <form noValidate onSubmit={(e) => void enviar(e)} className="shrink-0 px-3.5 pb-3.5 pt-2">
+        <div className="flex items-end gap-1 rounded-2xl bg-sala-campo py-1 pl-4 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
           <textarea
             ref={escritura}
             rows={1}
             maxLength={MAXIMO_MENSAJE}
             aria-label="Escribe un mensaje"
             placeholder="Escribe un mensaje"
-            className="campo max-h-32 min-h-11 flex-1 resize-none [field-sizing:content]"
+            className="campo-envuelto max-h-32 min-h-10 flex-1 resize-none bg-transparent py-2 text-sm text-texto placeholder:text-suave [field-sizing:content]"
             value={texto}
             onChange={(e) => {
               setTexto(e.target.value);
@@ -254,7 +401,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
             type="submit"
             aria-label="Enviar mensaje"
             disabled={vacio || enviando || sinConexion}
-            className="btn-principal size-11 shrink-0 rounded-full !p-0 disabled:cursor-not-allowed disabled:border-borde disabled:bg-superficie disabled:text-suave"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-principal text-white transition-colors hover:bg-[#5a30c9] disabled:cursor-not-allowed disabled:bg-borde disabled:text-suave"
           >
             <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 2 11 13" />
@@ -263,7 +410,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
           </button>
         </div>
 
-        <p className="mt-1 text-xs text-suave">
+        <p className={`mt-1.5 text-center text-xs text-texto/75 ${sinConexion || texto.length >= MAXIMO_MENSAJE * 0.9 ? "" : "max-sm:hidden"}`}>
           {sinConexion ? "Sin conexión con la sala: no se pueden enviar mensajes." : "Enter envía · Mayús + Enter hace un salto de línea"}
           {texto.length >= MAXIMO_MENSAJE * 0.9 && ` · ${texto.length}/${MAXIMO_MENSAJE}`}
         </p>

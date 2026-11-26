@@ -12,11 +12,15 @@
   --principal: #6d3fe0; /* texto blanco encima: 6,1 : 1 */
   --enlace: #5b35c4;
   --borde: #d9d4e6;
+  --separador: #b7aed3; /* línea más marcada entre las secciones de la sala */
   --campo: #6f6885; /* bordes de campos y botones secundarios */
   --error: #b3261e;
   --exito: #1f7a3f;
   --exito-fondo: #ddf3e4;
   --lienzo: #eee8fa; /* fondo de la página, detrás de encabezado y tarjetas */
+  --sala-fondo: #f1eefb; /* fondo de la sala */
+  --sala-tarjeta: #ffffff; /* tarjetas flotantes de la sala */
+  --sala-campo: #f1eefb; /* campos y botones sobre una tarjeta */
   --principal-suave: #ece6fd;
   --error-fondo: #fbe9e7;
 }
@@ -29,11 +33,15 @@
   --principal: #6d3fe0;
   --enlace: #c4b1ff;
   --borde: #3d3949;
+  --separador: #5f5877;
   --campo: #9a94ab;
   --error: #ff8aa0;
   --exito: #57d58a;
   --exito-fondo: #173a24;
   --lienzo: #211e29;
+  --sala-fondo: #0f0d17;
+  --sala-tarjeta: #17132a;
+  --sala-campo: #241f3d;
   --principal-suave: #3a2f5e;
   --error-fondo: #3a1d24;
 }
@@ -46,11 +54,15 @@
   --color-principal: var(--principal);
   --color-enlace: var(--enlace);
   --color-borde: var(--borde);
+  --color-separador: var(--separador);
   --color-campo: var(--campo);
   --color-error: var(--error);
   --color-exito: var(--exito);
   --color-exito-fondo: var(--exito-fondo);
   --color-lienzo: var(--lienzo);
+  --color-sala-fondo: var(--sala-fondo);
+  --color-sala-tarjeta: var(--sala-tarjeta);
+  --color-sala-campo: var(--sala-campo);
   --color-principal-suave: var(--principal-suave);
   --color-error-fondo: var(--error-fondo);
   --font-sans: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -64,7 +76,7 @@ html.dark {
 }
 
 body {
-  background: var(--lienzo);
+  background: var(--fondo);
   color: var(--texto);
   font-family: var(--font-sans);
   line-height: 1.6;
@@ -76,6 +88,15 @@ body {
   outline: 2px solid var(--enlace);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Campos de búsqueda que van dentro de un contenedor con su propio contorno de foco (focus-within):
+   no se repite el contorno del navegador ni se muestra su «x» de borrar. */
+.campo-envuelto:focus-visible {
+  outline: none;
+}
+.campo-envuelto::-webkit-search-cancel-button {
+  display: none;
 }
 
 /* El contenido principal recibe el foco al cambiar de página, sin dibujar recuadro. */
@@ -142,4 +163,10 @@ main:focus {
     box-shadow: 0 2px 8px rgba(69, 51, 115, 0.08);
     padding: 1.25rem;
   }
+}
+
+/* Barra de desplazamiento fina y del tono del panel. */
+.barra-fina {
+  scrollbar-width: thin;
+  scrollbar-color: var(--separador) transparent;
 }

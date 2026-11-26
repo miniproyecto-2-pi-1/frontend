@@ -8,9 +8,9 @@ import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const PANEL =
-  "absolute top-full z-30 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-[10px] border-[1.5px] border-borde bg-fondo p-2 shadow-lg";
+  "absolute top-full z-30 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-2xl bg-sala-tarjeta p-2 shadow-[0_10px_34px_rgba(80,50,160,0.2)] dark:ring-1 dark:ring-white/10";
 const OPCION =
-  "flex min-h-11 w-full items-center rounded-lg px-3 text-left text-texto no-underline hover:bg-superficie";
+  "flex min-h-11 w-full items-center rounded-xl px-3 text-left text-texto no-underline hover:bg-sala-campo";
 
 // Estructura de las pantallas privadas (Mis salas, Sala y Perfil), con el encabezado del prototipo:
 // botón ☰ a la izquierda (navegación) y avatar redondo a la derecha (menú de la cuenta).
@@ -25,9 +25,9 @@ export function LayoutApp() {
   const nombreCompleto = usuario ? `${usuario.nombres} ${usuario.apellidos}`.trim() : "";
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-sala-fondo">
       <SaltarAlContenido />
-      <header className="border-b-[1.5px] border-borde bg-fondo">
+      <header>
         {/* Franja decorativa con los colores del prototipo. */}
         <div aria-hidden="true" className="h-[5px] bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-8">
@@ -37,7 +37,7 @@ export function LayoutApp() {
               <button
                 {...navegacion.propsBoton}
                 aria-label="Menú de navegación"
-                className="inline-flex size-10 items-center justify-center rounded-lg text-texto hover:bg-superficie"
+                className="inline-flex size-11 items-center justify-center rounded-[14px] bg-sala-tarjeta text-texto shadow-[0_2px_10px_rgba(80,50,160,0.12)] hover:bg-principal-suave dark:ring-1 dark:ring-white/10"
               >
                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <line x1="4" y1="6" x2="20" y2="6" />
@@ -57,7 +57,7 @@ export function LayoutApp() {
                         to={e.a}
                         end
                         onClick={() => navegacion.cerrar(false)}
-                        className={({ isActive }) => `${OPCION} ${isActive ? "bg-superficie font-bold" : ""}`}
+                        className={({ isActive }) => `${OPCION} ${isActive ? "bg-sala-campo font-bold" : ""}`}
                       >
                         {e.texto}
                       </NavLink>
@@ -70,7 +70,7 @@ export function LayoutApp() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <ThemeToggle />
+            <ThemeToggle className="inline-flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-sala-tarjeta text-texto shadow-[0_2px_10px_rgba(80,50,160,0.12)] hover:bg-principal-suave dark:ring-1 dark:ring-white/10" />
             {/* Cuenta (avatar) */}
             <div ref={cuenta.contenedor} className="relative">
               <button

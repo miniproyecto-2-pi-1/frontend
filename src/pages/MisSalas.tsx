@@ -1,8 +1,9 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
 import {Link,useLocation,useNavigate} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
-import { colorAvatar, iniciales } from "../components/Avatar";
+import { colorAvatar } from "../components/Avatar";
 import { Campo } from "../components/Campo";
+import { IconoError } from "../components/IconoError";
 import { MenuAcciones } from "../components/MenuAcciones";
 import { ModalAccesible } from "../components/ModalAccesible";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
@@ -15,6 +16,7 @@ export type SalaPropia = {
   nombre: string;
   creadaEn?: string;
   esAdministrador?: boolean;
+  anfitrionUid?: string;
 };
 
 const MAX_NOMBRE = 50;
@@ -324,20 +326,13 @@ export function MisSalas() {
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">
-            Mis salas
-          </h1>
+      <h1 className="sr-only">Mis salas</h1>
 
-          <p className="text-suave">
-            Las salas de estudio que creaste.
-          </p>
-        </div>
-
+      {/* Una sola fila, como en el prototipo: crear una sala o unirse con un código. */}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start">
         <button
           ref={abrirRef}
-          className="btn-principal w-full sm:w-auto"
+          className="btn-principal min-h-14 w-full rounded-2xl text-lg shadow-[0_6px_18px_rgba(109,63,224,0.3)] sm:w-72 sm:shrink-0"
           type="button"
           onClick={() => {
             setModal(true);
@@ -350,66 +345,86 @@ export function MisSalas() {
           </span>{" "}
           Nueva sala
         </button>
-      </div>
 
-      <form
-        noValidate
-        aria-labelledby="titulo-unirse"
-        className="tarjeta mb-6"
-        onSubmit={(e) =>
-          void unirse(e)
-        }
-      >
-        <h2
-          id="titulo-unirse"
-          className="mb-3 text-lg font-bold"
+        <form
+          noValidate
+          aria-label="Unirme a una sala"
+          className="min-w-0 flex-1"
+          onSubmit={(e) =>
+            void unirse(e)
+          }
         >
-          Unirme a una sala
-        </h2>
+          <label
+            htmlFor="codigo-sala"
+            className="sr-only"
+          >
+            Código de la sala
+          </label>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-          <div className="min-w-0 flex-1">
-            <Campo
+          <div
+            className={`flex items-center gap-2 rounded-2xl border-[1.5px] bg-sala-tarjeta p-1.5 pl-4 shadow-[0_2px_10px_rgba(80,50,160,0.1)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace ${
+              errorCodigo
+                ? "border-error"
+                : "border-transparent dark:border-white/10"
+            }`}
+          >
+            <input
               id="codigo-sala"
-              inputRef={codigoRef}
-              etiqueta="Código de la sala"
-              requerido
-              value={codigo}
-              placeholder="Ej. K7P2-91XQ"
+              ref={codigoRef}
+              type="text"
+              className="campo-envuelto min-h-11 min-w-0 flex-1 bg-transparent text-texto placeholder:text-suave"
+              placeholder="Introduce un código"
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
               disabled={uniendo}
+              value={codigo}
+              aria-required="true"
+              aria-invalid={errorCodigo ? true : undefined}
+              aria-describedby="codigo-sala-ayuda"
               onChange={(e) => {
                 setCodigo(e.target.value);
                 setErrorCodigo("");
               }}
-              ayuda={
-                tieneEspaciosSobrantes(codigo)
-                  ? "Quitamos los espacios al inicio y al final del código."
-                  : "Te lo comparte quien creó la sala."
-              }
-              error={errorCodigo}
             />
+
+            <button
+              type="submit"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-principal-suave px-5 font-bold text-enlace transition-colors hover:bg-principal hover:text-white disabled:opacity-60"
+              disabled={uniendo}
+            >
+              {uniendo
+                ? "Uniéndome…"
+                : "Unirme"}
+            </button>
           </div>
 
-          <button
-            type="submit"
-            className="btn-principal w-full disabled:opacity-60 sm:mt-8 sm:w-auto"
-            disabled={uniendo}
-          >
-            {uniendo
-              ? "Uniéndome…"
-              : "Unirme"}
-          </button>
-        </div>
-      </form>
+          {errorCodigo ? (
+            <p
+              id="codigo-sala-ayuda"
+              className="mt-1 flex items-start gap-1.5 text-sm font-medium text-error"
+            >
+              <IconoError />
+              <span>{errorCodigo}</span>
+            </p>
+          ) : (
+            <p
+              id="codigo-sala-ayuda"
+              className="mt-1 text-sm text-suave"
+            >
+              {tieneEspaciosSobrantes(codigo)
+                ? "Quitamos los espacios al inicio y al final del código."
+                : "Te lo comparte quien creó la sala."}
+            </p>
+          )}
+        </form>
+      </div>
 
       {aviso && (
         <p
           role="status"
           aria-live="polite"
-          className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
+          className="mb-4 rounded-xl bg-exito-fondo p-3 text-exito"
         >
           ✓ {aviso}
         </p>
@@ -428,7 +443,7 @@ export function MisSalas() {
             {[0, 1, 2].map((n) => (
               <div
                 key={n}
-                className="tarjeta animate-pulse space-y-3"
+                className="rounded-2xl bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5 animate-pulse space-y-3 p-5"
               >
                 <div className="h-4 w-2/3 rounded bg-borde" />
                 <div className="h-4 w-1/3 rounded bg-borde" />
@@ -457,7 +472,7 @@ export function MisSalas() {
       ) : salas.length === 0 ? (
         <section
           aria-labelledby="sin-salas"
-          className="rounded-lg border-2 border-dashed border-borde px-5 py-12 text-center"
+          className="rounded-2xl border-2 border-dashed border-separador px-5 py-12 text-center"
         >
           <h2
             id="sin-salas"
@@ -472,49 +487,40 @@ export function MisSalas() {
           </p>
         </section>
       ) : (
+        <>
+        <h2 className="mb-4 mt-2 text-xl font-bold">
+          Tus salas
+        </h2>
+
         <ul
           aria-label="Salas que creaste"
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           {salas.map((sala) => {
             const color = colorSala(sala.id);
+            const anfitrion = sala.esAdministrador !== false;
             return (
               <li
                 key={sala.id}
-                className="tarjeta min-w-0"
+                className="rounded-2xl bg-sala-tarjeta shadow-[0_8px_30px_rgba(80,50,160,0.1)] dark:ring-1 dark:ring-white/5 min-w-0 overflow-hidden"
               >
+                {/* Encabezado de color con el nombre y el ID; el menú ⋯ va arriba a la derecha. */}
                 <div
-                  aria-hidden="true"
-                  className="-mx-5 -mt-5 mb-4 h-2 rounded-t-[9px]"
+                  className="relative px-5 py-4 text-white"
                   style={{ background: color }}
-                />
-  
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span
-                      aria-hidden="true"
-                      className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] font-bold text-white"
-                      style={{ background: color }}
-                    >
-                      {iniciales(sala.nombre)}
-                    </span>
+                >
+                  <h2 className="break-words pr-10 text-lg font-bold">
+                    {sala.nombre}
+                  </h2>
 
-                    <div className="min-w-0">
-                      <h2 className="break-words text-lg font-bold">
-                        {sala.nombre}
-                      </h2>
+                  <p className="font-mono text-sm tracking-wide">
+                    {sala.id}
+                  </p>
 
-                      {sala.esAdministrador !== false && (
-                        <p className="text-sm font-semibold text-enlace">
-                          Anfitrión
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {sala.esAdministrador !== false && (
+                  {anfitrion && (
                     <MenuAcciones
-                      className="-mr-2 -mt-1 shrink-0"
+                      sobreColor
+                      className="absolute right-1 top-1"
                       etiqueta={`Más acciones de la sala ${sala.nombre}`}
                       acciones={[
                         {
@@ -535,37 +541,46 @@ export function MisSalas() {
                   )}
                 </div>
 
-                <p className="mt-4 text-sm text-suave">
-                  ID de la sala
+                <p
+                  className={`px-5 pt-4 font-bold ${
+                    anfitrion ? "text-[#2563eb] dark:text-[#7aa7ff]" : "text-suave"
+                  }`}
+                >
+                  {anfitrion ? "Anfitrión" : "Invitado"}
                 </p>
-  
-                <p className="mt-1 break-all font-mono font-semibold">
-                  {sala.id}
-                </p>
-  
-                <div className="mt-4 flex flex-wrap items-center gap-2">
+
+                <div className="flex items-center justify-between px-4 pb-5 pt-3">
                   <Link
-                    className="btn-secundario"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-[14px] bg-principal-suave px-5 font-bold text-enlace no-underline transition-colors hover:bg-principal hover:text-white"
                     to={`/salas/${encodeURIComponent(sala.id)}`}
+                    aria-label={`Entrar a la sala ${sala.nombre}`}
                   >
                     Entrar
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
                   </Link>
-  
+
                   <button
                     type="button"
-                    className="min-h-11 px-2 font-semibold text-enlace underline"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 font-bold text-enlace no-underline transition-colors hover:bg-principal-suave"
                     aria-label={`Copiar ID de ${sala.nombre}`}
                     onClick={() =>
                       void copiar(sala.id)
                     }
                   >
-                    ▢ Copiar ID
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="11" height="11" rx="2" />
+                      <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+                    </svg>
+                    Copiar ID
                   </button>
                 </div>
               </li>
             );
           })}
         </ul>
+        </>
       )}
 
       {modal && (

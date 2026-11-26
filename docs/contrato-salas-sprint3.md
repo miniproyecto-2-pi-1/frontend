@@ -15,6 +15,8 @@ Todas piden sesión (`Authorization: Bearer <idToken>`) y perfil completo. Los e
 | `DELETE /rooms/:id` | Eliminar la sala y su chat (US-07) | `204` | `403 FORBIDDEN`, `404 ROOM_NOT_FOUND` | **Falta** |
 | `GET /rooms/:id/messages?limite=50&antes=<ISO>` | Historial (US-11), ordenado del más viejo al más nuevo. Sin `antes` devuelve los últimos; con `antes` los anteriores a esa fecha | `{ mensajes: Mensaje[], hayMas: boolean }` | `404 ROOM_NOT_FOUND` | **Falta** |
 
+La sala (`GET`, `POST` y `PATCH /rooms`) debe incluir `anfitrionUid`, el `uid` de quien la creó, para que el frontend marque al anfitrión en la lista de participantes. Hoy solo llega `esAdministrador`, que dice si quien pregunta es el anfitrión; sin `anfitrionUid`, un invitado no puede saber quién lo es. Estado: **Falta**.
+
 `Mensaje` = `{ id, uid, username, texto, creadoEn }` (`creadoEn` en formato ISO).
 
 ## Tiempo real (`backend-realtime`, Socket.IO)
