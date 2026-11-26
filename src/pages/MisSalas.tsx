@@ -1,9 +1,12 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from "react";
-import {Link,useNavigate} from "react-router-dom";
+import {Link,useLocation,useNavigate} from "react-router-dom";
 import {ApiError,apiFetch} from "../api";
 import { colorAvatar, iniciales } from "../components/Avatar";
 import { Campo } from "../components/Campo";
+import { MenuAcciones } from "../components/MenuAcciones";
 import { ModalAccesible } from "../components/ModalAccesible";
+import { ModalEditarSala } from "../components/sala/ModalEditarSala";
+import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { useTitulo } from "../hooks/useTitulo";
 import { tieneEspaciosSobrantes, validarCodigoSala } from "../validacionSala";
 
@@ -38,6 +41,8 @@ export function MisSalas() {
 
   const navegar = useNavigate();
 
+  const ubicacion = useLocation();
+
   const [salas, setSalas] =
     useState<SalaPropia[]>([]);
 
@@ -65,8 +70,12 @@ export function MisSalas() {
   const [creando, setCreando] =
     useState(false);
 
-  const [mensajeCopia, setMensajeCopia] =
-    useState("");
+  // Avisos de la pantalla: ID copiado, sala actualizada y, si vienes de eliminar una sala dentro de ella, «Sala eliminada».
+  const [aviso, setAviso] =
+    useState(
+      () =>
+        (ubicacion.state as { aviso?: string } | null)?.aviso ?? ""
+    );
 
   const [codigo, setCodigo] =
     useState("");
@@ -79,6 +88,23 @@ export function MisSalas() {
 
   const codigoRef =
     useRef<HTMLInputElement>(null);
+
+  // Acción del menú ⋯ de una tarjeta (US-07): editar o eliminar, con la sala elegida.
+  const [accion, setAccion] =
+    useState<{ tipo: "editar" | "eliminar"; sala: SalaPropia } | null>(null);
+
+  // Botón de tres puntos que abrió la ventana: al cerrarla, el foco vuelve a él.
+  const iniciadorRef =
+    useRef<HTMLButtonElement | null>(null);
+
+  function abrirAccion(
+    tipo: "editar" | "eliminar",
+    sala: SalaPropia,
+    boton: HTMLButtonElement | null
+  ) {
+    iniciadorRef.current = boton;
+    setAccion({ tipo, sala });
+  }
 
   const abrirRef =
     useRef<HTMLButtonElement>(null);
@@ -94,6 +120,13 @@ export function MisSalas() {
       setErrorCrear("");
     }
   }, [creando]);
+
+  // El aviso que llegó con la navegación se muestra una vez; al recargar ya no vuelve a salir.
+  useEffect(() => {
+    if ((ubicacion.state as { aviso?: string } | null)?.aviso) {
+      window.history.replaceState({}, "");
+    }
+  }, [ubicacion.state]);
 
   useEffect(() => {
     const control = new AbortController();
@@ -279,11 +312,11 @@ export function MisSalas() {
     try {
       await navigator.clipboard.writeText(id);
 
-      setMensajeCopia(
+      setAviso(
         `ID copiado: ${id}`
       );
     } catch {
-      setMensajeCopia(
+      setAviso(
         "No pudimos copiar el ID. Inténtalo de nuevo."
       );
     }
@@ -372,13 +405,13 @@ export function MisSalas() {
         </div>
       </form>
 
-      {mensajeCopia && (
+      {aviso && (
         <p
           role="status"
           aria-live="polite"
           className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito"
         >
-          ✓ {mensajeCopia}
+          ✓ {aviso}
         </p>
       )}
 
@@ -448,11 +481,11 @@ export function MisSalas() {
             return (
               <li
                 key={sala.id}
-                className="tarjeta min-w-0 overflow-hidden"
+                className="tarjeta min-w-0"
               >
                 <div
                   aria-hidden="true"
-                  className="-mx-5 -mt-5 mb-4 h-2"
+                  className="-mx-5 -mt-5 mb-4 h-2 rounded-t-[9px]"
                   style={{ background: color }}
                 />
   
@@ -465,19 +498,43 @@ export function MisSalas() {
                     >
                       {iniciales(sala.nombre)}
                     </span>
-  
-                    <h2 className="min-w-0 break-words text-lg font-bold">
-                      {sala.nombre}
-                    </h2>
+
+                    <div className="min-w-0">
+                      <h2 className="break-words text-lg font-bold">
+                        {sala.nombre}
+                      </h2>
+
+                      {sala.esAdministrador !== false && (
+                        <p className="text-sm font-semibold text-enlace">
+                          Anfitrión
+                        </p>
+                      )}
+                    </div>
                   </div>
-  
+
                   {sala.esAdministrador !== false && (
-                    <span className="shrink-0 text-sm font-semibold text-enlace">
-                      Anfitrión
-                    </span>
+                    <MenuAcciones
+                      className="-mr-2 -mt-1 shrink-0"
+                      etiqueta={`Más acciones de la sala ${sala.nombre}`}
+                      acciones={[
+                        {
+                          texto: "Editar sala",
+                          icono: "editar",
+                          alElegir: (boton) =>
+                            abrirAccion("editar", sala, boton),
+                        },
+                        {
+                          texto: "Eliminar sala",
+                          icono: "eliminar",
+                          peligro: true,
+                          alElegir: (boton) =>
+                            abrirAccion("eliminar", sala, boton),
+                        },
+                      ]}
+                    />
                   )}
                 </div>
-  
+
                 <p className="mt-4 text-sm text-suave">
                   ID de la sala
                 </p>
@@ -573,6 +630,40 @@ export function MisSalas() {
             </div>
           </form>
         </ModalAccesible>
+      )}
+
+      {accion?.tipo === "eliminar" && (
+        <ModalEliminarSala
+          sala={accion.sala}
+          iniciadorRef={iniciadorRef}
+          alCerrar={() => setAccion(null)}
+          alEliminada={() => {
+            setSalas((actuales) =>
+              actuales.filter((s) => s.id !== accion.sala.id)
+            );
+            setAviso(`Sala «${accion.sala.nombre}» eliminada`);
+            setAccion(null);
+          }}
+        />
+      )}
+
+      {accion?.tipo === "editar" && (
+        <ModalEditarSala
+          sala={accion.sala}
+          iniciadorRef={iniciadorRef}
+          alCerrar={() => setAccion(null)}
+          alGuardada={(actualizada) => {
+            setSalas((actuales) =>
+              actuales.map((s) =>
+                s.id === actualizada.id
+                  ? { ...s, nombre: actualizada.nombre }
+                  : s
+              )
+            );
+            setAviso(`Sala actualizada: «${actualizada.nombre}»`);
+            setAccion(null);
+          }}
+        />
       )}
     </div>
   );

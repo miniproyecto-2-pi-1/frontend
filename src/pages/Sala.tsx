@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { EstadoConexionSala } from "../components/EstadoConexionSala";
+import { MenuAcciones } from "../components/MenuAcciones";
+import { AvisoSalaEliminada } from "../components/sala/AvisoSalaEliminada";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
+import { ModalEditarSala } from "../components/sala/ModalEditarSala";
+import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { PanelChat } from "../components/sala/PanelChat";
 import { useHistorialSala } from "../hooks/useHistorialSala";
 import { useMensajesSala } from "../hooks/useMensajesSala";
@@ -16,6 +20,7 @@ import type { SalaPropia } from "./MisSalas";
 export function Sala() {
   const { id = "" } = useParams();
   const ubicacion = useLocation();
+  const navegar = useNavigate();
   const { usuario } = useSesion();
 
   const creada = (ubicacion.state as { salaCreada?: boolean } | null)?.salaCreada === true;
@@ -25,6 +30,12 @@ export function Sala() {
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [intento, setIntento] = useState(0);
+  // Acciones del anfitrión (US-07): editar el nombre de la sala.
+  const [editando, setEditando] = useState(false);
+  const [eliminando, setEliminando] = useState(false);
+  // El anfitrión eliminó la sala mientras estabas dentro (evento «sala-eliminada»).
+  const [eliminadaPorAnfitrion, setEliminadaPorAnfitrion] = useState(false);
+  const iniciadorRef = useRef<HTMLButtonElement | null>(null);
   // En pantallas angostas se ve una sola cosa a la vez: el chat o las personas.
   const [vista, setVista] = useState<"chat" | "personas">("chat");
 
@@ -39,6 +50,25 @@ export function Sala() {
   // Personas conectadas y avisos de quién entra o sale (US-10).
   const miUid = usuario?.uid ?? "";
   const { personas, avisos } = useSalaPersonas(tiempoReal.cliente, miUid);
+
+  // Cambios que hace el anfitrión con la sala abierta: nuevo nombre o eliminación (US-07).
+  useEffect(() => {
+    const cliente = tiempoReal.cliente;
+    if (!cliente) return;
+    const quitarEliminada = cliente.alSalaEliminada(() => {
+      setEditando(false);
+      setEliminando(false);
+      setEliminadaPorAnfitrion(true);
+    });
+    const quitarActualizada = cliente.alSalaActualizada((nombre) => {
+      setSala((actual) => (actual ? { ...actual, nombre } : actual));
+      setMensaje(`El anfitrión cambió el nombre de la sala a «${nombre}»`);
+    });
+    return () => {
+      quitarEliminada();
+      quitarActualizada();
+    };
+  }, [tiempoReal.cliente]);
 
   useEffect(() => {
     const control = new AbortController();
@@ -116,6 +146,33 @@ export function Sala() {
                 ▢ Copiar ID
               </button>
             </span>
+
+            {sala.esAdministrador !== false && (
+              <MenuAcciones
+                className="ml-auto"
+                contorno
+                etiqueta={`Más acciones de la sala ${sala.nombre}`}
+                acciones={[
+                  {
+                    texto: "Editar sala",
+                    icono: "editar",
+                    alElegir: (boton) => {
+                      iniciadorRef.current = boton;
+                      setEditando(true);
+                    },
+                  },
+                  {
+                    texto: "Eliminar sala",
+                    icono: "eliminar",
+                    peligro: true,
+                    alElegir: (boton) => {
+                      iniciadorRef.current = boton;
+                      setEliminando(true);
+                    },
+                  },
+                ]}
+              />
+            )}
           </div>
 
           {creada && (
@@ -178,6 +235,32 @@ export function Sala() {
                 </aside>
               </div>
             </>
+          )}
+
+          {eliminadaPorAnfitrion && (
+            <AvisoSalaEliminada nombre={sala.nombre} alIrAMisSalas={() => navegar("/salas", { replace: true })} />
+          )}
+
+          {eliminando && (
+            <ModalEliminarSala
+              sala={sala}
+              iniciadorRef={iniciadorRef}
+              alCerrar={() => setEliminando(false)}
+              alEliminada={() => navegar("/salas", { replace: true, state: { aviso: `Sala «${sala.nombre}» eliminada` } })}
+            />
+          )}
+
+          {editando && (
+            <ModalEditarSala
+              sala={sala}
+              iniciadorRef={iniciadorRef}
+              alCerrar={() => setEditando(false)}
+              alGuardada={(actualizada) => {
+                setSala((actual) => (actual ? { ...actual, nombre: actualizada.nombre } : actual));
+                setMensaje(`Sala actualizada: «${actualizada.nombre}»`);
+                setEditando(false);
+              }}
+            />
           )}
         </>
       ) : null}
