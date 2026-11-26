@@ -16,6 +16,7 @@ export type SalaPropia = {
   nombre: string;
   creadaEn?: string;
   esAdministrador?: boolean;
+  anfitrionUid?: string;
 };
 
 const MAX_NOMBRE = 50;

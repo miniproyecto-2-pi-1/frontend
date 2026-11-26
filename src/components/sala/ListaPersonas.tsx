@@ -4,7 +4,7 @@ import type { Persona } from "../../tipos";
 
 // Personas que están en la sala ahora, con un buscador por nombre. Tú apareces primero.
 // El título «Personas · N en línea» lo pone la sección plegable que la contiene.
-export function ListaPersonas({ personas, miUid }: { personas: Persona[]; miUid: string }) {
+export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Persona[]; miUid: string; anfitrionUid?: string }) {
   const [busqueda, setBusqueda] = useState("");
   const idBusqueda = useId();
 
@@ -38,9 +38,12 @@ export function ListaPersonas({ personas, miUid }: { personas: Persona[]; miUid:
         {visibles.map((p) => (
           <li key={p.uid} className="flex items-center gap-3">
             <Avatar nombre={p.username} color={p.avatar} tam={32} />
-            <span className="min-w-0 flex-1 truncate">
-              {p.username}
-              {p.uid === miUid && <span className="text-suave"> (tú)</span>}
+            <span className="min-w-0 flex-1">
+              <span className="block truncate">
+                {p.username}
+                {p.uid === miUid && <span className="text-suave"> (tú)</span>}
+              </span>
+              {p.uid === anfitrionUid && <span className="block text-xs font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>}
             </span>
             <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-exito">
               <span aria-hidden="true" className="size-2 rounded-full bg-exito" />

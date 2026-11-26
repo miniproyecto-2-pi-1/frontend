@@ -39,6 +39,8 @@ export interface SalaDatos {
   nombre: string;
   creadaEn?: string;
   esAdministrador?: boolean;
+  // uid del anfitrión, para marcarlo en la lista de participantes (pendiente en la API: hoy solo llega esAdministrador).
+  anfitrionUid?: string;
 }
 
 // Persona conectada a una sala (evento «presencia» del servidor de tiempo real).
