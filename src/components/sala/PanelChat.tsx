@@ -306,7 +306,8 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
             </div>
           )}
 
-          <ul role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions">
+          <div role="log" aria-label="Mensajes de la sala" aria-live="polite" aria-relevant="additions">
+          <ul>
             {mensajes.map((m, i) => {
               const propio = m.uid === miUid;
               const dia = etiquetaDia(m.creadoEn);
@@ -364,6 +365,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
               );
             })}
           </ul>
+          </div>
         </div>
 
         {nuevos > 0 && (
@@ -408,7 +410,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
           </button>
         </div>
 
-        <p className="mt-1.5 text-center text-xs text-texto/75">
+        <p className={`mt-1.5 text-center text-xs text-texto/75 ${sinConexion || texto.length >= MAXIMO_MENSAJE * 0.9 ? "" : "max-sm:hidden"}`}>
           {sinConexion ? "Sin conexión con la sala: no se pueden enviar mensajes." : "Enter envía · Mayús + Enter hace un salto de línea"}
           {texto.length >= MAXIMO_MENSAJE * 0.9 && ` · ${texto.length}/${MAXIMO_MENSAJE}`}
         </p>

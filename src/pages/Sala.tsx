@@ -254,12 +254,12 @@ export function Sala() {
           <h1 className="text-2xl font-bold">Sala</h1>
         )}
 
-        {/* Avisos (ID copiado, sala actualizada, sala creada…): flotan hacia el centro de la cabecera y no mueven nada de la pantalla. */}
+        {/* Avisos (ID copiado, sala actualizada, sala creada…): flotan hacia el centro de la cabecera (en celular, sobre la barra de controles) y no mueven nada de la pantalla. */}
         {aviso && (
           <p
             role="status"
             aria-live="polite"
-            className="pointer-events-none absolute right-3 top-full z-30 mt-1 max-w-[calc(100vw-1.5rem)] rounded-2xl bg-exito-fondo px-4 py-2 text-sm font-medium text-exito shadow-[0_6px_20px_rgba(31,122,63,0.2)] lg:left-1/2 lg:right-auto lg:top-1/2 lg:mt-0 lg:max-w-sm lg:-translate-x-1/2 lg:-translate-y-1/2"
+            className="pointer-events-none fixed inset-x-3 bottom-24 z-30 mx-auto w-fit max-w-[calc(100vw-1.5rem)] rounded-2xl bg-exito-fondo px-4 py-2 text-sm font-medium text-exito shadow-[0_6px_20px_rgba(31,122,63,0.2)] lg:absolute lg:inset-x-auto lg:bottom-auto lg:left-1/2 lg:top-1/2 lg:mx-0 lg:max-w-sm lg:-translate-x-1/2 lg:-translate-y-1/2"
           >
             ✓ {aviso}
           </p>

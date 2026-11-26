@@ -33,7 +33,7 @@ export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Per
         />
       </div>
 
-      <h3 className="mb-1 mt-4 shrink-0 px-2 text-xs font-bold uppercase tracking-wider text-suave">En línea · {visibles.length}</h3>
+      <h2 className="mb-1 mt-4 shrink-0 px-2 text-xs font-bold uppercase tracking-wider text-suave">En línea · {visibles.length}</h2>
 
       <ul aria-label="Personas en línea" className="barra-fina min-h-0 flex-1 space-y-0.5 overflow-y-auto">
         {visibles.map((p) => (
