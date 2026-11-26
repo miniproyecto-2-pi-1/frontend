@@ -193,7 +193,7 @@ export function Sala() {
     // La sala ocupa toda la pantalla: fondo lila suave con dos tarjetas flotantes, el video a la izquierda y el panel de
     // chat y participantes a la derecha, y la barra de controles flotando abajo. En pantallas angostas el panel ocupa todo.
     <main id="contenido" tabIndex={-1} className="flex h-dvh min-h-0 flex-col bg-sala-fondo focus:outline-none">
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-3 sm:px-4">
+      <header className="relative flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-3 sm:px-4">
         <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-xl bg-sala-tarjeta text-texto shadow-sm hover:bg-principal-suave">
           {ICONO_ATRAS}
         </Link>
@@ -251,18 +251,21 @@ export function Sala() {
           <h1 className="text-2xl font-bold">Sala</h1>
         )}
 
+        {/* Avisos (ID copiado, sala actualizada…): flotan a la derecha, junto al botón de tema, y no mueven nada de la pantalla. */}
+        {mensaje && (
+          <p
+            role="status"
+            aria-live="polite"
+            className="pointer-events-none absolute right-3 top-full z-30 mt-1 max-w-[calc(100vw-1.5rem)] rounded-xl bg-exito-fondo px-4 py-2 text-sm font-medium text-exito shadow-[0_6px_20px_rgba(31,122,63,0.2)] lg:right-[4.5rem] lg:top-1/2 lg:mt-0 lg:max-w-sm lg:-translate-y-1/2"
+          >
+            ✓ {mensaje}
+          </p>
+        )}
+
         <div className="ml-auto flex items-center gap-3">
           <ThemeToggle className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-sala-tarjeta text-texto shadow-sm hover:bg-principal-suave" />
         </div>
       </header>
-
-      {mensaje && (
-        <div className="space-y-2 px-3 pb-2 sm:px-4">
-          <p role="status" aria-live="polite" className="rounded-xl bg-exito-fondo p-3 text-exito">
-            ✓ {mensaje}
-          </p>
-        </div>
-      )}
 
       {cargando ? (
         centro(
