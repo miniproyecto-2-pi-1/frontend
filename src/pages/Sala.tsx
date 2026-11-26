@@ -311,9 +311,16 @@ export function Sala() {
               <section
                 id="panel-sala"
                 aria-label="Chat y participantes"
-                hidden={!panelVisible}
-                className="flex min-h-0 flex-1 flex-col border-t border-borde bg-principal-suave lg:w-[26rem] lg:flex-none lg:border-l lg:border-t-0"
+                className={`flex min-h-0 flex-col overflow-hidden bg-principal-suave transition-[width,visibility] duration-300 ease-in-out lg:flex-none ${
+                  panelVisible ? "visible flex-1 border-t border-borde lg:w-[26rem] lg:border-l lg:border-t-0" : "invisible max-lg:hidden lg:w-0"
+                }`}
               >
+                {/* El contenido conserva su ancho y se desliza: entra tirando hacia la izquierda y sale hacia la derecha. */}
+                <div
+                  className={`flex min-h-0 flex-1 flex-col transition-transform duration-300 ease-in-out lg:w-[26rem] ${
+                    panelVisible ? "translate-x-0" : "lg:translate-x-full"
+                  }`}
+                >
                 <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex shrink-0 border-b border-borde">
                   {(
                     [
@@ -372,6 +379,7 @@ export function Sala() {
                   }`}
                 >
                   <ListaPersonas personas={personas} miUid={miUid} anfitrionUid={sala?.esAdministrador === true ? miUid : sala?.anfitrionUid} />
+                </div>
                 </div>
                 </div>
               </section>
