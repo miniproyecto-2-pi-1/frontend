@@ -76,7 +76,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
     setBuscando(false);
     setConsulta("");
     setActual(0);
-    botonBusqueda.current?.focus();
+    setTimeout(() => botonBusqueda.current?.focus(), 0);
   }
 
   function alPulsarBusqueda(evento: KeyboardEvent<HTMLInputElement>) {
@@ -192,84 +192,84 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      {/* Debajo del título del panel, a la derecha: la lupa que abre el buscador del chat. */}
-      <div className="flex shrink-0 justify-end px-3 pt-1">
-        <button
-          ref={botonBusqueda}
-          type="button"
-          aria-label="Buscar en el chat"
-          aria-expanded={buscando}
-          aria-controls="busqueda-chat"
-          onClick={() => {
-            if (buscando) cerrarBusqueda();
-            else {
+      {/* Una sola fila de búsqueda: cerrada es solo la lupa a la derecha; abierta, el campo ocupa su lugar. */}
+      <div id="busqueda-chat" className="flex shrink-0 items-center justify-end gap-1 px-3 py-2">
+        {!buscando ? (
+          <button
+            ref={botonBusqueda}
+            type="button"
+            aria-label="Buscar en el chat"
+            aria-expanded={false}
+            aria-controls="busqueda-chat"
+            onClick={() => {
               setBuscando(true);
               setTimeout(() => campoBusqueda.current?.focus(), 0);
-            }
-          }}
-          className={`inline-flex size-9 items-center justify-center rounded-full text-enlace hover:bg-fondo ${buscando ? "bg-fondo" : ""}`}
-        >
-          {iconoLupa}
-        </button>
+            }}
+            className="inline-flex size-9 items-center justify-center rounded-full text-enlace hover:bg-fondo"
+          >
+            {iconoLupa}
+          </button>
+        ) : (
+          <>
+            <div className="flex min-w-0 flex-1 items-center gap-1 rounded-full border-[1.5px] border-campo bg-fondo pl-3 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
+              <span aria-hidden="true" className="shrink-0 text-enlace">
+                {iconoLupa}
+              </span>
+              <input
+                ref={campoBusqueda}
+                type="search"
+                autoComplete="off"
+                aria-label="Buscar en el chat"
+                placeholder="Buscar en el chat"
+                value={consulta}
+                onChange={(e) => alBuscar(e.target.value)}
+                onKeyDown={alPulsarBusqueda}
+                className="campo-envuelto min-h-9 min-w-0 flex-1 bg-transparent text-sm text-texto placeholder:text-suave"
+              />
+              {consulta.trim() && (
+                <span role="status" className="shrink-0 text-xs text-texto/75">
+                  {coincidencias.length === 0 ? "Sin coincidencias" : `${Math.min(actual, coincidencias.length - 1) + 1} de ${coincidencias.length}`}
+                </span>
+              )}
+              <button
+                type="button"
+                aria-label="Coincidencia anterior"
+                disabled={coincidencias.length === 0}
+                onClick={() => irACoincidencia((actual - 1 + coincidencias.length) % coincidencias.length)}
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-superficie disabled:opacity-40"
+              >
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 15 6-6 6 6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                aria-label="Coincidencia siguiente"
+                disabled={coincidencias.length === 0}
+                onClick={() => irACoincidencia((actual + 1) % coincidencias.length)}
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-superficie disabled:opacity-40"
+              >
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+            <button
+              type="button"
+              aria-label="Cerrar búsqueda"
+              onClick={cerrarBusqueda}
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-fondo"
+            >
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </>
+        )}
       </div>
 
-      {buscando && (
-        <div id="busqueda-chat" className="flex shrink-0 items-center gap-1 px-3 pb-2">
-          <div className="flex min-w-0 flex-1 items-center gap-1 rounded-full border-[1.5px] border-campo bg-fondo pl-3 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
-            <input
-              ref={campoBusqueda}
-              type="search"
-              autoComplete="off"
-              aria-label="Buscar en el chat"
-              placeholder="Buscar en el chat"
-              value={consulta}
-              onChange={(e) => alBuscar(e.target.value)}
-              onKeyDown={alPulsarBusqueda}
-              className="campo-envuelto min-h-9 min-w-0 flex-1 bg-transparent text-sm text-texto placeholder:text-suave"
-            />
-            {consulta.trim() && (
-              <span role="status" className="shrink-0 text-xs text-suave">
-                {coincidencias.length === 0 ? "Sin coincidencias" : `${Math.min(actual, coincidencias.length - 1) + 1} de ${coincidencias.length}`}
-              </span>
-            )}
-            <button
-              type="button"
-              aria-label="Coincidencia anterior"
-              disabled={coincidencias.length === 0}
-              onClick={() => irACoincidencia((actual - 1 + coincidencias.length) % coincidencias.length)}
-              className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-superficie disabled:opacity-40"
-            >
-              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m6 15 6-6 6 6" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              aria-label="Coincidencia siguiente"
-              disabled={coincidencias.length === 0}
-              onClick={() => irACoincidencia((actual + 1) % coincidencias.length)}
-              className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-superficie disabled:opacity-40"
-            >
-              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-          </div>
-          <button
-            type="button"
-            aria-label="Cerrar búsqueda"
-            onClick={cerrarBusqueda}
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-fondo"
-          >
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      )}
-
       <div className="relative min-h-0 flex-1">
-        <div ref={contenedor} onScroll={alDesplazar} className="h-full overflow-y-auto overflow-x-hidden p-4">
+        <div ref={contenedor} onScroll={alDesplazar} className="barra-fina h-full overflow-y-auto overflow-x-hidden p-4">
           {historial.estado === "cargando" && mensajes.length === 0 && (
             <div role="status" className="space-y-4" aria-label="Cargando mensajes">
               <p className="text-center text-sm font-semibold text-suave">Cargando mensajes…</p>
@@ -328,21 +328,21 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                 <Fragment key={m.id}>
                   {diaNuevo && (
                     <li className="flex justify-center">
-                      <span className="rounded-full border border-borde bg-fondo px-3 py-0.5 text-xs text-suave">{dia}</span>
+                      <span className="text-xs font-medium text-texto/70">{dia}</span>
                     </li>
                   )}
                   <li data-mensaje={m.id} className={`flex min-w-0 gap-2 ${propio ? "flex-row-reverse" : ""}`}>
                     <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={32} />
                     <div className={`min-w-0 max-w-[85%] ${propio ? "text-right" : ""}`}>
                       <p className="text-xs">
-                        <strong>{propio ? "Tú" : m.username}</strong>{" "}
-                        <time dateTime={m.creadoEn} className="text-suave">
+                        {propio ? <span className="sr-only">Tú </span> : <strong>{m.username} </strong>}
+                        <time dateTime={m.creadoEn} className="text-texto/70">
                           {horaCorta(m.creadoEn)}
                         </time>
                       </p>
                       <p
                         className={`mt-0.5 whitespace-pre-wrap text-left text-sm [overflow-wrap:anywhere] ${
-                          propio ? "inline-block max-w-full rounded-xl bg-principal-suave px-3 py-2 text-texto" : ""
+                          propio ? "inline-block max-w-full rounded-xl border border-[#c4b2f7] bg-[#e1d6ff] px-3 py-2 text-[#1f1a2e] dark:border-[#6a55a8] dark:bg-[#4b3b80] dark:text-white" : ""
                         } ${m.id === idActual ? "outline outline-2 outline-offset-2 outline-[#d97706]" : ""}`}
                       >
                         <Resaltado texto={m.texto} consulta={consulta} />
@@ -367,7 +367,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
         )}
       </div>
 
-      <form noValidate onSubmit={(e) => void enviar(e)} className="border-t border-borde p-3">
+      <form noValidate onSubmit={(e) => void enviar(e)} className="border-t border-separador p-3">
         <div className="flex items-end gap-2">
           <textarea
             ref={escritura}
@@ -397,7 +397,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
           </button>
         </div>
 
-        <p className="mt-1 text-xs text-suave">
+        <p className="mt-1 text-xs text-texto/75">
           {sinConexion ? "Sin conexión con la sala: no se pueden enviar mensajes." : "Enter envía · Mayús + Enter hace un salto de línea"}
           {texto.length >= MAXIMO_MENSAJE * 0.9 && ` · ${texto.length}/${MAXIMO_MENSAJE}`}
         </p>

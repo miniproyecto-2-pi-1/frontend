@@ -147,13 +147,14 @@ export function Sala() {
     <main id="contenido" tabIndex={-1} className="flex h-dvh min-h-0 flex-col bg-fondo focus:outline-none">
       {/* Franja decorativa con los colores del prototipo, igual que en Mis salas. */}
 
-      <header className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-2 sm:px-4">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-separador px-3 py-2 sm:px-4">
         <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-lg text-texto hover:bg-superficie">
           {ICONO_ATRAS}
         </Link>
 
         {sala ? (
           <>
+            <div className="flex items-center gap-1">
             <h1 className="text-2xl font-bold text-enlace">{sala.nombre}</h1>
 
             {sala.esAdministrador !== false && (
@@ -180,11 +181,12 @@ export function Sala() {
                 ]}
               />
             )}
+            </div>
 
             <EstadoConexionSala estado={tiempoReal.estado} unida={tiempoReal.unida} />
 
             <span className="flex items-center gap-1">
-              <span className="rounded-md border border-borde px-2 py-0.5 font-mono text-xs tracking-wide">{sala.id}</span>
+              <span className="rounded-md border border-separador px-2 py-0.5 font-mono text-xs tracking-wide">{sala.id}</span>
               <button
                 type="button"
                 className="inline-flex min-h-11 items-center gap-1 px-1 text-sm font-semibold text-enlace no-underline transition-colors hover:text-[#2563eb] dark:hover:text-[#7aa7ff]"
@@ -274,7 +276,9 @@ export function Sala() {
               {/* Zona de los cuadros de video y sus botones. Por ahora solo se ve el recuadro y el botón de salir:
                   el video, el micrófono, la cámara y compartir pantalla llegan en el Sprint 4. */}
               <div className="hidden min-h-0 min-w-0 flex-1 flex-col p-4 lg:flex">
-                <div aria-hidden="true" className="min-h-0 flex-1 rounded-xl border border-borde bg-superficie" />
+                <div aria-hidden="true" className="flex min-h-0 flex-1 items-center justify-center rounded-xl border border-separador bg-superficie p-6 text-center text-sm text-suave">
+                  Aquí irá la cuadrícula de participantes
+                </div>
 
                 <div className="mt-4 flex shrink-0 flex-wrap items-start justify-center gap-6">
                   {(
@@ -284,7 +288,7 @@ export function Sala() {
                       ["Compartir pantalla", <path key="p" d="M3 5h18v11H3ZM8 20h8M12 16v4" />],
                     ] as const
                   ).map(([nombre, icono]) => (
-                    <button key={nombre} type="button" disabled className="flex flex-col items-center gap-1 text-sm text-suave opacity-60">
+                    <button key={nombre} type="button" disabled className="flex w-32 flex-col items-center gap-1 text-center text-sm font-medium text-suave opacity-80">
                       <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full border-[1.5px] border-campo">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           {icono}
@@ -294,10 +298,10 @@ export function Sala() {
                     </button>
                   ))}
 
-                  <Link to="/salas" className="flex flex-col items-center gap-1 text-sm font-semibold text-texto no-underline">
+                  <Link to="/salas" className="flex w-32 flex-col items-center gap-1 text-center text-sm font-medium text-texto no-underline">
                     <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full bg-[#b3261e] text-white">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                        <path d="M18 6 6 18M6 6l12 12" />
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path transform="rotate(135 12 12)" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                       </svg>
                     </span>
                     Salir de la sala
@@ -310,7 +314,7 @@ export function Sala() {
                 id="panel-sala"
                 aria-label="Chat y participantes"
                 className={`flex min-h-0 flex-col overflow-hidden bg-superficie transition-[width,visibility] duration-300 ease-in-out lg:flex-none ${
-                  panelVisible ? "visible flex-1 border-t border-borde lg:w-[26rem] lg:border-l lg:border-t-0" : "invisible max-lg:hidden lg:w-0"
+                  panelVisible ? "visible flex-1 border-t border-separador lg:w-[26rem] lg:border-l lg:border-t-0" : "invisible max-lg:hidden lg:w-0"
                 }`}
               >
                 {/* El contenido conserva su ancho y se desliza: entra tirando hacia la izquierda y sale hacia la derecha. */}
@@ -319,7 +323,7 @@ export function Sala() {
                     panelVisible ? "translate-x-0" : "lg:translate-x-full"
                   }`}
                 >
-                <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex shrink-0 border-b border-borde">
+                <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex shrink-0 border-b border-separador">
                   {(
                     [
                       ["chat", "Chat", botonChat],
@@ -336,7 +340,7 @@ export function Sala() {
                       aria-controls={`panel-${clave}`}
                       tabIndex={pestana === clave ? 0 : -1}
                       onClick={() => setPestana(clave)}
-                      className={`min-h-12 flex-1 border-b-[3px] px-4 font-bold transition-colors duration-300 ${
+                      className={`box-border inline-flex h-12 flex-1 items-center justify-center border-b-[3px] px-4 font-bold leading-none transition-colors duration-300 ${
                         pestana === clave ? "border-principal text-texto" : "border-transparent text-suave hover:text-texto"
                       }`}
                     >
@@ -372,7 +376,7 @@ export function Sala() {
                   role="tabpanel"
                   id="panel-personas"
                   aria-labelledby="pestana-personas"
-                  className={`absolute inset-0 overflow-y-auto p-4 transition-[opacity,transform,visibility] duration-300 ease-in-out ${
+                  className={`barra-fina absolute inset-0 overflow-y-auto p-4 transition-[opacity,transform,visibility] duration-300 ease-in-out ${
                     pestana === "personas" ? "visible translate-x-0 opacity-100" : "invisible translate-x-6 opacity-0"
                   }`}
                 >
@@ -386,15 +390,16 @@ export function Sala() {
               <div
                 role="toolbar"
                 aria-label="Panel de la sala"
-                className="order-first flex shrink-0 gap-2 border-b border-borde bg-principal-suave p-2 lg:order-none lg:w-16 lg:flex-col lg:items-center lg:border-b-0 lg:border-l"
+                className="order-first flex shrink-0 gap-2 border-b border-separador bg-principal-suave p-2 lg:order-none lg:w-16 lg:flex-col lg:items-center lg:border-b-0 lg:border-l"
               >
                 <button
                   type="button"
                   aria-label={panelVisible ? "Ocultar panel" : "Mostrar panel"}
                   aria-expanded={panelVisible}
                   aria-controls="panel-sala"
+                  title={panelVisible ? "Ocultar panel" : "Mostrar panel"}
                   onClick={() => setPanelVisible((v) => !v)}
-                  className="inline-flex size-11 items-center justify-center rounded-lg border-[1.5px] border-enlace text-enlace hover:bg-superficie"
+                  className="inline-flex size-11 items-center justify-center rounded-lg text-enlace hover:bg-superficie"
                 >
                   <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="16" rx="2" />
@@ -415,11 +420,12 @@ export function Sala() {
                       type="button"
                       aria-label={nombre}
                       aria-pressed={activo}
+                      title={nombre}
                       onClick={() => {
                         setPestana(clave);
                         setPanelVisible(true);
                       }}
-                      className={`inline-flex size-11 items-center justify-center rounded-lg text-enlace hover:bg-superficie ${activo ? "bg-superficie" : ""}`}
+                      className={`inline-flex size-11 items-center justify-center rounded-lg text-enlace hover:bg-superficie ${activo ? "bg-superficie shadow-sm ring-1 ring-separador" : ""}`}
                     >
                       <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         {clave === "personas" ? (
