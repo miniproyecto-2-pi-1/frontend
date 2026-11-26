@@ -133,7 +133,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
   }, [mensajes, miUid]);
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="relative min-h-0 flex-1">
         <div ref={contenedor} onScroll={alDesplazar} className="h-full overflow-y-auto p-4">
           {historial.estado === "cargando" && mensajes.length === 0 && (

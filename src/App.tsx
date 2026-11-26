@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 import { LayoutApp } from "./components/LayoutApp";
 import { LayoutPublico } from "./components/LayoutPublico";
 import { Ayuda } from "./pages/Ayuda";
@@ -42,8 +42,17 @@ export function App() {
         }
       >
         <Route path="salas" element={<MisSalas />} />
-        <Route path="salas/:id" element={<Sala />} />
         <Route path="perfil" element={<Perfil />} />
+      </Route>
+      {/* La sala ocupa toda la pantalla: sin el encabezado ni el pie de las demás pantallas privadas. */}
+      <Route
+        element={
+          <RutaPrivada>
+            <Outlet />
+          </RutaPrivada>
+        }
+      >
+        <Route path="salas/:id" element={<Sala />} />
       </Route>
     </Routes>
   );

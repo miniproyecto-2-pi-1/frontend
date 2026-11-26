@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { EstadoConexionSala } from "../components/EstadoConexionSala";
 import { MenuAcciones } from "../components/MenuAcciones";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { AvisoSalaEliminada } from "../components/sala/AvisoSalaEliminada";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
@@ -118,28 +119,28 @@ export function Sala() {
     }
   }
 
+  const ICONO_ATRAS = (
+    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5" />
+      <path d="m12 19-7-7 7-7" />
+    </svg>
+  );
+
+  // Mensajes que ocupan el centro de la pantalla (cargando, errores, entrando).
+  const centro = (contenido: ReactNode) => <div className="flex min-h-0 flex-1 items-start justify-center overflow-y-auto p-4">{contenido}</div>;
+
   return (
-    <div className="mx-auto w-full max-w-5xl">
-      <Link to="/salas" className="mb-4 inline-block font-semibold text-enlace underline">
-        ← Mis salas
-      </Link>
+    // La sala ocupa toda la pantalla (ancho y alto) y se adapta: en pantallas anchas va el recuadro del video
+    // a la izquierda y el panel pegado al borde derecho; en pantallas angostas el panel ocupa todo.
+    <main id="contenido" tabIndex={-1} className="flex h-dvh min-h-0 flex-col bg-fondo focus:outline-none">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-borde px-3 py-2 sm:px-4">
+        <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-lg text-texto hover:bg-superficie">
+          {ICONO_ATRAS}
+        </Link>
 
-      {cargando ? (
-        <p role="status" className="tarjeta">
-          Conectando… Cargando tu sala…
-        </p>
-      ) : error ? (
-        <div role="alert">
-          <p className="mb-4 rounded-lg bg-error-fondo p-4 font-medium text-error">{error}</p>
-
-          <button type="button" className="btn-secundario" onClick={() => setIntento((i) => i + 1)}>
-            Reintentar
-          </button>
-        </div>
-      ) : sala ? (
-        <>
-          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1">
-            <h1 className="text-3xl font-bold">{sala.nombre}</h1>
+        {sala ? (
+          <>
+            <h1 className="text-2xl font-bold">{sala.nombre}</h1>
 
             <EstadoConexionSala estado={tiempoReal.estado} unida={tiempoReal.unida} />
 
@@ -154,213 +155,251 @@ export function Sala() {
                 ▢ Copiar ID
               </button>
             </span>
+          </>
+        ) : (
+          <h1 className="text-2xl font-bold">Sala</h1>
+        )}
 
-            {/* Arriba a la derecha, aparte del resto: el rol en esta sala y, si eres anfitrión, el menú ⋯. */}
-            <div className="ml-auto flex items-center gap-3">
-              {sala.esAdministrador !== false ? (
-                <span className="font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>
-              ) : (
-                <span className="font-semibold text-suave">Invitado</span>
-              )}
+        {/* Arriba a la derecha, aparte del resto: el rol en esta sala y, si eres anfitrión, el menú ⋯. */}
+        <div className="ml-auto flex items-center gap-3">
+          {sala &&
+            (sala.esAdministrador !== false ? (
+              <span className="font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>
+            ) : (
+              <span className="font-semibold text-suave">Invitado</span>
+            ))}
 
-              {sala.esAdministrador !== false && (
-              <MenuAcciones
-                contorno
-                etiqueta={`Más acciones de la sala ${sala.nombre}`}
-                acciones={[
-                  {
-                    texto: "Editar sala",
-                    icono: "editar",
-                    alElegir: (boton) => {
-                      iniciadorRef.current = boton;
-                      setEditando(true);
-                    },
+          {sala && sala.esAdministrador !== false && (
+            <MenuAcciones
+              contorno
+              etiqueta={`Más acciones de la sala ${sala.nombre}`}
+              acciones={[
+                {
+                  texto: "Editar sala",
+                  icono: "editar",
+                  alElegir: (boton) => {
+                    iniciadorRef.current = boton;
+                    setEditando(true);
                   },
-                  {
-                    texto: "Eliminar sala",
-                    icono: "eliminar",
-                    peligro: true,
-                    alElegir: (boton) => {
-                      iniciadorRef.current = boton;
-                      setEliminando(true);
-                    },
+                },
+                {
+                  texto: "Eliminar sala",
+                  icono: "eliminar",
+                  peligro: true,
+                  alElegir: (boton) => {
+                    iniciadorRef.current = boton;
+                    setEliminando(true);
                   },
-                ]}
-              />
-              )}
+                },
+              ]}
+            />
+          )}
 
-            </div>
-          </div>
+          <ThemeToggle />
+        </div>
+      </header>
 
+      {(creada || mensaje) && (
+        <div className="space-y-2 px-3 pt-2 sm:px-4">
           {creada && (
-            <p role="status" className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito">
+            <p role="status" className="rounded-lg bg-exito-fondo p-3 text-exito">
               ✓ Sala creada. Eres su anfitrión.
             </p>
           )}
 
           {mensaje && (
-            <p role="status" aria-live="polite" className="mb-4 rounded-lg bg-exito-fondo p-3 text-exito">
+            <p role="status" aria-live="polite" className="rounded-lg bg-exito-fondo p-3 text-exito">
               ✓ {mensaje}
             </p>
           )}
+        </div>
+      )}
 
-          {tiempoReal.errorUnirse ? (
-            <div role="alert">
+      {cargando ? (
+        centro(
+          <p role="status" className="tarjeta w-full max-w-md">
+            Conectando… Cargando tu sala…
+          </p>,
+        )
+      ) : error ? (
+        centro(
+          <div role="alert" className="w-full max-w-md">
+            <p className="mb-4 rounded-lg bg-error-fondo p-4 font-medium text-error">{error}</p>
+
+            <button type="button" className="btn-secundario" onClick={() => setIntento((i) => i + 1)}>
+              Reintentar
+            </button>
+          </div>,
+        )
+      ) : sala ? (
+        tiempoReal.errorUnirse ? (
+          centro(
+            <div role="alert" className="w-full max-w-md">
               <p className="mb-4 rounded-lg bg-error-fondo p-4 font-medium text-error">{tiempoReal.errorUnirse}</p>
 
               <button type="button" className="btn-secundario" onClick={tiempoReal.reintentar}>
                 Reintentar
               </button>
-            </div>
-          ) : !tiempoReal.unida ? (
-            <p role="status" className="tarjeta">
+            </div>,
+          )
+        ) : !tiempoReal.unida ? (
+          centro(
+            <p role="status" className="tarjeta w-full max-w-md">
               Entrando a la sala…
-            </p>
-          ) : (
-            <>
-              <AvisosSala avisos={avisos} />
+            </p>,
+          )
+        ) : (
+          <>
+            <AvisosSala avisos={avisos} />
 
-              <div className={`grid gap-5 lg:items-start ${panelVisible ? "lg:grid-cols-[minmax(0,1fr)_26rem_auto]" : "lg:grid-cols-[minmax(0,1fr)_auto]"}`}>
-                {/* Zona de los cuadros de video y sus botones. Por ahora solo se ve el recuadro y el botón de salir:
-                    el video, el micrófono, la cámara y compartir pantalla llegan en el Sprint 4. */}
-                <div className="hidden lg:order-1 lg:block">
-                  <div aria-hidden="true" className="min-h-[28rem] rounded-xl border border-borde bg-superficie" />
+            <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+              {/* Zona de los cuadros de video y sus botones. Por ahora solo se ve el recuadro y el botón de salir:
+                  el video, el micrófono, la cámara y compartir pantalla llegan en el Sprint 4. */}
+              <div className="hidden min-h-0 min-w-0 flex-1 flex-col p-4 lg:flex">
+                <div aria-hidden="true" className="min-h-0 flex-1 rounded-xl border border-borde bg-superficie" />
 
-                  <div className="mt-5 flex flex-wrap items-start justify-center gap-6">
-                    {(
-                      [
-                        ["Micrófono", <path key="m" d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3ZM5 11a7 7 0 0 0 14 0M12 18v3" />],
-                        ["Cámara", <path key="c" d="M3 7h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3ZM15 11l6-3v8l-6-3" />],
-                        ["Compartir pantalla", <path key="p" d="M3 5h18v11H3ZM8 20h8M12 16v4" />],
-                      ] as const
-                    ).map(([nombre, icono]) => (
-                      <button
-                        key={nombre}
-                        type="button"
-                        disabled
-                        className="flex flex-col items-center gap-1 text-sm text-suave opacity-60"
-                      >
-                        <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full border-[1.5px] border-campo">
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            {icono}
-                          </svg>
-                        </span>
-                        {nombre}
-                      </button>
-                    ))}
-
-                    <Link to="/salas" className="flex flex-col items-center gap-1 text-sm font-semibold text-texto no-underline">
-                      <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full bg-[#b3261e] text-white">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                      </span>
-                      Salir de la sala
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Barra de iconos: ocultar o mostrar el panel y abrir directamente Participantes o Chat. */}
-                <div role="toolbar" aria-label="Panel de la sala" className="order-first flex gap-2 lg:order-3 lg:flex-col">
-                  <button
-                    type="button"
-                    aria-label={panelVisible ? "Ocultar panel" : "Mostrar panel"}
-                    aria-expanded={panelVisible}
-                    aria-controls="panel-sala"
-                    onClick={() => setPanelVisible((v) => !v)}
-                    className="inline-flex size-11 items-center justify-center rounded-lg border-[1.5px] border-enlace text-enlace hover:bg-superficie"
-                  >
-                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="4" width="18" height="16" rx="2" />
-                      <path d="M15 4v16" />
-                    </svg>
-                  </button>
-
+                <div className="mt-4 flex shrink-0 flex-wrap items-start justify-center gap-6">
                   {(
                     [
-                      ["personas", "Participantes"],
-                      ["chat", "Chat"],
+                      ["Micrófono", <path key="m" d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3ZM5 11a7 7 0 0 0 14 0M12 18v3" />],
+                      ["Cámara", <path key="c" d="M3 7h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3ZM15 11l6-3v8l-6-3" />],
+                      ["Compartir pantalla", <path key="p" d="M3 5h18v11H3ZM8 20h8M12 16v4" />],
                     ] as const
-                  ).map(([clave, nombre]) => {
-                    const activo = panelVisible && pestana === clave;
-                    return (
-                      <button
-                        key={clave}
-                        type="button"
-                        aria-label={nombre}
-                        aria-pressed={activo}
-                        onClick={() => {
-                          setPestana(clave);
-                          setPanelVisible(true);
-                        }}
-                        className={`inline-flex size-11 items-center justify-center rounded-lg text-enlace hover:bg-superficie ${activo ? "bg-superficie" : ""}`}
-                      >
-                        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          {clave === "personas" ? (
-                            <>
-                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                              <circle cx="9" cy="7" r="4" />
-                              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                            </>
-                          ) : (
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
-                          )}
+                  ).map(([nombre, icono]) => (
+                    <button key={nombre} type="button" disabled className="flex flex-col items-center gap-1 text-sm text-suave opacity-60">
+                      <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full border-[1.5px] border-campo">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          {icono}
                         </svg>
-                      </button>
-                    );
-                  })}
+                      </span>
+                      {nombre}
+                    </button>
+                  ))}
+
+                  <Link to="/salas" className="flex flex-col items-center gap-1 text-sm font-semibold text-texto no-underline">
+                    <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full bg-[#b3261e] text-white">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg>
+                    </span>
+                    Salir de la sala
+                  </Link>
+                </div>
+              </div>
+
+              {/* Panel pegado al borde derecho: dos pestañas, Chat y Participantes. Las dos quedan en la página para no perder el chat. */}
+              <section
+                id="panel-sala"
+                aria-label="Chat y participantes"
+                hidden={!panelVisible}
+                className="flex min-h-0 flex-1 flex-col border-t border-borde lg:w-[26rem] lg:flex-none lg:border-l lg:border-t-0"
+              >
+                <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex shrink-0 border-b border-borde">
+                  {(
+                    [
+                      ["chat", "Chat", botonChat],
+                      ["personas", `Participantes (${personas.length})`, botonPersonas],
+                    ] as const
+                  ).map(([clave, texto, ref]) => (
+                    <button
+                      key={clave}
+                      ref={ref}
+                      type="button"
+                      role="tab"
+                      id={`pestana-${clave}`}
+                      aria-selected={pestana === clave}
+                      aria-controls={`panel-${clave}`}
+                      tabIndex={pestana === clave ? 0 : -1}
+                      onClick={() => setPestana(clave)}
+                      className={`min-h-12 flex-1 border-b-[3px] px-4 font-bold ${
+                        pestana === clave ? "border-principal text-texto" : "border-transparent text-suave hover:text-texto"
+                      }`}
+                    >
+                      {texto}
+                    </button>
+                  ))}
                 </div>
 
-                {/* Panel de la derecha: dos pestañas, Chat y Participantes. Las dos quedan en la página para no perder el chat. */}
-                <section id="panel-sala" aria-label="Chat y participantes" hidden={!panelVisible} className="tarjeta overflow-hidden p-0 lg:order-2">
-                  <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex border-b border-borde">
-                    {(
-                      [
-                        ["chat", "Chat", botonChat],
-                        ["personas", `Participantes (${personas.length})`, botonPersonas],
-                      ] as const
-                    ).map(([clave, texto, ref]) => (
-                      <button
-                        key={clave}
-                        ref={ref}
-                        type="button"
-                        role="tab"
-                        id={`pestana-${clave}`}
-                        aria-selected={pestana === clave}
-                        aria-controls={`panel-${clave}`}
-                        tabIndex={pestana === clave ? 0 : -1}
-                        onClick={() => setPestana(clave)}
-                        className={`min-h-12 flex-1 border-b-[3px] px-4 font-bold ${
-                          pestana === clave ? "border-principal text-texto" : "border-transparent text-suave hover:text-texto"
-                        }`}
-                      >
-                        {texto}
-                      </button>
-                    ))}
-                  </div>
+                <div role="tabpanel" id="panel-chat" aria-labelledby="pestana-chat" hidden={pestana !== "chat"} className="flex min-h-0 flex-1 flex-col">
+                  {tiempoReal.cliente && (
+                    <PanelChat
+                      cliente={tiempoReal.cliente}
+                      roomId={sala.id}
+                      estado={tiempoReal.estado}
+                      mensajes={mensajes}
+                      historial={historial}
+                      personas={personas}
+                      miUid={miUid}
+                    />
+                  )}
+                </div>
 
-                  <div role="tabpanel" id="panel-chat" aria-labelledby="pestana-chat" hidden={pestana !== "chat"} className="h-[30rem]">
-                    {tiempoReal.cliente && (
-                      <PanelChat
-                        cliente={tiempoReal.cliente}
-                        roomId={sala.id}
-                        estado={tiempoReal.estado}
-                        mensajes={mensajes}
-                        historial={historial}
-                        personas={personas}
-                        miUid={miUid}
-                      />
-                    )}
-                  </div>
+                <div role="tabpanel" id="panel-personas" aria-labelledby="pestana-personas" hidden={pestana !== "personas"} className="min-h-0 flex-1 overflow-y-auto p-4">
+                  <ListaPersonas personas={personas} miUid={miUid} />
+                </div>
+              </section>
 
-                  <div role="tabpanel" id="panel-personas" aria-labelledby="pestana-personas" hidden={pestana !== "personas"} className="p-4">
-                    <ListaPersonas personas={personas} miUid={miUid} />
-                  </div>
-                </section>
+              {/* Barra de iconos pegada al borde: ocultar o mostrar el panel y abrir directamente Participantes o Chat. */}
+              <div
+                role="toolbar"
+                aria-label="Panel de la sala"
+                className="order-first flex shrink-0 gap-2 border-b border-borde p-2 lg:order-none lg:w-16 lg:flex-col lg:items-center lg:border-b-0 lg:border-l"
+              >
+                <button
+                  type="button"
+                  aria-label={panelVisible ? "Ocultar panel" : "Mostrar panel"}
+                  aria-expanded={panelVisible}
+                  aria-controls="panel-sala"
+                  onClick={() => setPanelVisible((v) => !v)}
+                  className="inline-flex size-11 items-center justify-center rounded-lg border-[1.5px] border-enlace text-enlace hover:bg-superficie"
+                >
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="16" rx="2" />
+                    <path d="M15 4v16" />
+                  </svg>
+                </button>
+
+                {(
+                  [
+                    ["personas", "Participantes"],
+                    ["chat", "Chat"],
+                  ] as const
+                ).map(([clave, nombre]) => {
+                  const activo = panelVisible && pestana === clave;
+                  return (
+                    <button
+                      key={clave}
+                      type="button"
+                      aria-label={nombre}
+                      aria-pressed={activo}
+                      onClick={() => {
+                        setPestana(clave);
+                        setPanelVisible(true);
+                      }}
+                      className={`inline-flex size-11 items-center justify-center rounded-lg text-enlace hover:bg-superficie ${activo ? "bg-superficie" : ""}`}
+                    >
+                      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {clave === "personas" ? (
+                          <>
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                          </>
+                        ) : (
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
+                        )}
+                      </svg>
+                    </button>
+                  );
+                })}
               </div>
-            </>
-          )}
+            </div>
+          </>
+        )
+      ) : null}
 
+      {sala && (
+        <>
           {eliminadaPorAnfitrion && (
             <AvisoSalaEliminada nombre={sala.nombre} alIrAMisSalas={() => navegar("/salas", { replace: true })} />
           )}
@@ -387,7 +426,7 @@ export function Sala() {
             />
           )}
         </>
-      ) : null}
-    </div>
+      )}
+    </main>
   );
 }
