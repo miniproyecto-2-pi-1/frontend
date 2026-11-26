@@ -372,7 +372,7 @@ export function MisSalas() {
               id="codigo-sala"
               ref={codigoRef}
               type="text"
-              className="min-h-11 min-w-0 flex-1 bg-transparent text-texto outline-none placeholder:text-suave"
+              className="campo-envuelto min-h-11 min-w-0 flex-1 bg-transparent text-texto placeholder:text-suave"
               placeholder="Introduce un código"
               autoComplete="off"
               autoCapitalize="characters"

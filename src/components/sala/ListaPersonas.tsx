@@ -30,7 +30,7 @@ export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Per
           placeholder="Buscar participante"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          className="min-h-10 min-w-0 flex-1 bg-transparent text-texto outline-none placeholder:text-suave"
+          className="campo-envuelto min-h-10 min-w-0 flex-1 bg-transparent text-texto placeholder:text-suave"
         />
       </div>
 

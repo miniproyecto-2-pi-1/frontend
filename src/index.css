@@ -78,6 +78,15 @@ body {
   border-radius: 4px;
 }
 
+/* Campos de búsqueda que van dentro de un contenedor con su propio contorno de foco (focus-within):
+   no se repite el contorno del navegador ni se muestra su «x» de borrar. */
+.campo-envuelto:focus-visible {
+  outline: none;
+}
+.campo-envuelto::-webkit-search-cancel-button {
+  display: none;
+}
+
 /* El contenido principal recibe el foco al cambiar de página, sin dibujar recuadro. */
 main:focus {
   outline: none;

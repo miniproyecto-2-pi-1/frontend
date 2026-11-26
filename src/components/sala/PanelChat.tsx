@@ -1,5 +1,7 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Avatar } from "../Avatar";
+import { buscarCoincidencias } from "../../utils/busqueda";
+import { Resaltado } from "./Resaltado";
 import type { ClienteSala, EstadoConexion } from "../../tiempoReal";
 import type { HistorialSala } from "../../hooks/useHistorialSala";
 import { MAXIMO_MENSAJE, type Mensaje, type Persona } from "../../tipos";
@@ -38,6 +40,55 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
   // Altura de la lista justo antes de cargar mensajes anteriores: sirve para que lo que se leía no se mueva.
   const anclaAltura = useRef<number | null>(null);
   const [nuevos, setNuevos] = useState(0);
+
+  // Buscador del chat: el ícono de la lupa abre el campo debajo; se marcan los mensajes que coinciden y se recorren.
+  const [buscando, setBuscando] = useState(false);
+  const [consulta, setConsulta] = useState("");
+  const [actual, setActual] = useState(0);
+  const campoBusqueda = useRef<HTMLInputElement>(null);
+  const botonBusqueda = useRef<HTMLButtonElement>(null);
+  const coincidencias = useMemo(
+    () => (consulta.trim() ? mensajes.filter((m) => buscarCoincidencias(m.texto, consulta).length > 0).map((m) => m.id) : []),
+    [mensajes, consulta],
+  );
+  const idActual = coincidencias.length > 0 ? coincidencias[Math.min(actual, coincidencias.length - 1)] : null;
+
+  function irACoincidencia(indice: number) {
+    const id = coincidencias[indice];
+    setActual(indice);
+    const elemento = contenedor.current?.querySelector(`[data-mensaje="${CSS.escape(id)}"]`);
+    elemento?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
+
+  function alBuscar(valor: string) {
+    setConsulta(valor);
+    const ids = valor.trim() ? mensajes.filter((m) => buscarCoincidencias(m.texto, valor).length > 0).map((m) => m.id) : [];
+    // Empieza por la coincidencia más reciente (la de más abajo).
+    const indice = Math.max(ids.length - 1, 0);
+    setActual(indice);
+    if (ids.length > 0) {
+      const elemento = contenedor.current?.querySelector(`[data-mensaje="${CSS.escape(ids[indice])}"]`);
+      elemento?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }
+
+  function cerrarBusqueda() {
+    setBuscando(false);
+    setConsulta("");
+    setActual(0);
+    botonBusqueda.current?.focus();
+  }
+
+  function alPulsarBusqueda(evento: KeyboardEvent<HTMLInputElement>) {
+    if (evento.key === "Escape") {
+      evento.preventDefault();
+      cerrarBusqueda();
+    } else if (evento.key === "Enter" && coincidencias.length > 0) {
+      evento.preventDefault();
+      const n = coincidencias.length;
+      irACoincidencia(evento.shiftKey ? (actual - 1 + n) % n : (actual + 1) % n);
+    }
+  }
 
   const sinConexion = estado !== "conectado";
   // Un mensaje vacío o de solo espacios no se envía.
@@ -132,10 +183,93 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
     }
   }, [mensajes, miUid]);
 
+  const iconoLupa = (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      {/* Debajo del título del panel, a la derecha: la lupa que abre el buscador del chat. */}
+      <div className="flex shrink-0 justify-end px-3 pt-1">
+        <button
+          ref={botonBusqueda}
+          type="button"
+          aria-label="Buscar en el chat"
+          aria-expanded={buscando}
+          aria-controls="busqueda-chat"
+          onClick={() => {
+            if (buscando) cerrarBusqueda();
+            else {
+              setBuscando(true);
+              setTimeout(() => campoBusqueda.current?.focus(), 0);
+            }
+          }}
+          className={`inline-flex size-9 items-center justify-center rounded-full text-enlace hover:bg-fondo ${buscando ? "bg-fondo" : ""}`}
+        >
+          {iconoLupa}
+        </button>
+      </div>
+
+      {buscando && (
+        <div id="busqueda-chat" className="flex shrink-0 items-center gap-1 px-3 pb-2">
+          <div className="flex min-w-0 flex-1 items-center gap-1 rounded-full border-[1.5px] border-campo bg-fondo pl-3 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
+            <input
+              ref={campoBusqueda}
+              type="search"
+              autoComplete="off"
+              aria-label="Buscar en el chat"
+              placeholder="Buscar en el chat"
+              value={consulta}
+              onChange={(e) => alBuscar(e.target.value)}
+              onKeyDown={alPulsarBusqueda}
+              className="campo-envuelto min-h-9 min-w-0 flex-1 bg-transparent text-sm text-texto placeholder:text-suave"
+            />
+            {consulta.trim() && (
+              <span role="status" className="shrink-0 text-xs text-suave">
+                {coincidencias.length === 0 ? "Sin coincidencias" : `${Math.min(actual, coincidencias.length - 1) + 1} de ${coincidencias.length}`}
+              </span>
+            )}
+            <button
+              type="button"
+              aria-label="Coincidencia anterior"
+              disabled={coincidencias.length === 0}
+              onClick={() => irACoincidencia((actual - 1 + coincidencias.length) % coincidencias.length)}
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-superficie disabled:opacity-40"
+            >
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m6 15 6-6 6 6" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Coincidencia siguiente"
+              disabled={coincidencias.length === 0}
+              onClick={() => irACoincidencia((actual + 1) % coincidencias.length)}
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-superficie disabled:opacity-40"
+            >
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+          <button
+            type="button"
+            aria-label="Cerrar búsqueda"
+            onClick={cerrarBusqueda}
+            className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-enlace hover:bg-fondo"
+          >
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className="relative min-h-0 flex-1">
-        <div ref={contenedor} onScroll={alDesplazar} className="h-full overflow-y-auto p-4">
+        <div ref={contenedor} onScroll={alDesplazar} className="h-full overflow-y-auto overflow-x-hidden p-4">
           {historial.estado === "cargando" && mensajes.length === 0 && (
             <div role="status" className="space-y-4" aria-label="Cargando mensajes">
               <p className="text-center text-sm font-semibold text-suave">Cargando mensajes…</p>
@@ -197,21 +331,21 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                       <span className="rounded-full border border-borde bg-fondo px-3 py-0.5 text-xs text-suave">{dia}</span>
                     </li>
                   )}
-                  <li className={`flex gap-2 ${propio ? "flex-row-reverse" : ""}`}>
+                  <li data-mensaje={m.id} className={`flex min-w-0 gap-2 ${propio ? "flex-row-reverse" : ""}`}>
                     <Avatar nombre={m.username} color={colorDe(m.uid, personas)} tam={32} />
                     <div className={`min-w-0 max-w-[85%] ${propio ? "text-right" : ""}`}>
-                      <p className="text-sm">
+                      <p className="text-xs">
                         <strong>{propio ? "Tú" : m.username}</strong>{" "}
                         <time dateTime={m.creadoEn} className="text-suave">
                           {horaCorta(m.creadoEn)}
                         </time>
                       </p>
                       <p
-                        className={`mt-0.5 whitespace-pre-wrap break-words text-left ${
-                          propio ? "inline-block rounded-xl bg-principal px-3 py-2 text-white" : ""
-                        }`}
+                        className={`mt-0.5 whitespace-pre-wrap text-left text-sm [overflow-wrap:anywhere] ${
+                          propio ? "inline-block max-w-full rounded-xl bg-principal px-3 py-2 text-white" : ""
+                        } ${m.id === idActual ? "outline outline-2 outline-offset-2 outline-[#d97706]" : ""}`}
                       >
-                        {m.texto}
+                        <Resaltado texto={m.texto} consulta={consulta} />
                       </p>
                     </div>
                   </li>
@@ -241,7 +375,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
             maxLength={MAXIMO_MENSAJE}
             aria-label="Escribe un mensaje"
             placeholder="Escribe un mensaje"
-            className="campo max-h-32 min-h-11 flex-1 resize-none [field-sizing:content]"
+            className="campo max-h-32 min-h-11 flex-1 resize-none text-sm [field-sizing:content]"
             value={texto}
             onChange={(e) => {
               setTexto(e.target.value);
