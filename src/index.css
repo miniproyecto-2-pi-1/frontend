@@ -64,7 +64,7 @@ html.dark {
 }
 
 body {
-  background: var(--lienzo);
+  background: var(--fondo);
   color: var(--texto);
   font-family: var(--font-sans);
   line-height: 1.6;
