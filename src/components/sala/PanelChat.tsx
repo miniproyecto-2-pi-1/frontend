@@ -342,7 +342,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                       </p>
                       <p
                         className={`mt-0.5 whitespace-pre-wrap text-left text-sm [overflow-wrap:anywhere] ${
-                          propio ? "inline-block max-w-full rounded-xl bg-principal px-3 py-2 text-white" : ""
+                          propio ? "inline-block max-w-full rounded-xl bg-principal-suave px-3 py-2 text-texto" : ""
                         } ${m.id === idActual ? "outline outline-2 outline-offset-2 outline-[#d97706]" : ""}`}
                       >
                         <Resaltado texto={m.texto} consulta={consulta} />

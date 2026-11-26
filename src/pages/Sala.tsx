@@ -146,7 +146,6 @@ export function Sala() {
     // a la izquierda y el panel pegado al borde derecho; en pantallas angostas el panel ocupa todo.
     <main id="contenido" tabIndex={-1} className="flex h-dvh min-h-0 flex-col bg-fondo focus:outline-none">
       {/* Franja decorativa con los colores del prototipo, igual que en Mis salas. */}
-      <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-2 sm:px-4">
         <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-lg text-texto hover:bg-superficie">
@@ -210,7 +209,6 @@ export function Sala() {
       </header>
 
       {/* La misma franja de color separa el encabezado del resto de la pantalla. */}
-      <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
 
       {mensaje && (
         <div className="space-y-2 px-3 pt-2 sm:px-4">
@@ -311,7 +309,7 @@ export function Sala() {
               <section
                 id="panel-sala"
                 aria-label="Chat y participantes"
-                className={`flex min-h-0 flex-col overflow-hidden bg-principal-suave transition-[width,visibility] duration-300 ease-in-out lg:flex-none ${
+                className={`flex min-h-0 flex-col overflow-hidden bg-superficie transition-[width,visibility] duration-300 ease-in-out lg:flex-none ${
                   panelVisible ? "visible flex-1 border-t border-borde lg:w-[26rem] lg:border-l lg:border-t-0" : "invisible max-lg:hidden lg:w-0"
                 }`}
               >
@@ -444,7 +442,6 @@ export function Sala() {
       ) : null}
 
       {/* Y la misma franja cierra la pantalla por abajo. */}
-      <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
 
       {sala && (
         <>
