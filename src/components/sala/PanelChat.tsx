@@ -327,7 +327,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
                   {propio ? (
                     <li data-mensaje={m.id} className={`flex min-w-0 flex-col items-end ${inicio ? "mt-4" : "mt-0.5"}`}>
                       <p
-                        className={`inline-block max-w-[88%] whitespace-pre-wrap rounded-[14px] bg-[#e0d4ff] px-3.5 py-2 text-left text-sm leading-snug text-[#241552] dark:bg-[#4b3b80] dark:text-white [overflow-wrap:anywhere] ${
+                        className={`inline-block max-w-[88%] whitespace-pre-wrap rounded-[14px] bg-[#d6e6ff] px-3.5 py-2 text-left text-sm leading-snug text-[#0f2a55] dark:bg-[#1f4170] dark:text-white [overflow-wrap:anywhere] ${
                           inicio ? "" : "rounded-tr-md"
                         } ${fin ? "" : "rounded-br-md"} ${marca}`}
                       >
