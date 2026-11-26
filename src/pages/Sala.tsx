@@ -141,7 +141,7 @@ export function Sala() {
       {/* Franja decorativa con los colores del prototipo, igual que en Mis salas. */}
       <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
 
-      <header className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-borde px-3 py-2 sm:px-4">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-2 sm:px-4">
         <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-lg text-texto hover:bg-superficie">
           {ICONO_ATRAS}
         </Link>
@@ -202,6 +202,9 @@ export function Sala() {
           <ThemeToggle />
         </div>
       </header>
+
+      {/* La misma franja de color separa el encabezado del resto de la pantalla. */}
+      <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
 
       {(creada || mensaje) && (
         <div className="space-y-2 px-3 pt-2 sm:px-4">
@@ -401,6 +404,9 @@ export function Sala() {
           </>
         )
       ) : null}
+
+      {/* Y la misma franja cierra la pantalla por abajo. */}
+      <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
 
       {sala && (
         <>
