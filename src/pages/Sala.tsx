@@ -64,7 +64,12 @@ export function Sala() {
   const historial = useHistorialSala(sala?.id ?? "", tiempoReal.unida, fusionar);
   // Personas conectadas y avisos de quién entra o sale (US-10).
   const miUid = usuario?.uid ?? "";
-  const { personas, avisos } = useSalaPersonas(tiempoReal.cliente, miUid);
+  const { personas: conectadas, avisos } = useSalaPersonas(tiempoReal.cliente, miUid);
+  // Tú siempre apareces en la lista de participantes, aunque el servidor todavía no haya enviado la lista.
+  const personas =
+    !usuario || conectadas.some((p) => p.uid === miUid)
+      ? conectadas
+      : [{ uid: usuario.uid, username: usuario.username, avatar: usuario.avatar }, ...conectadas];
 
   // Cambios que hace el anfitrión con la sala abierta: nuevo nombre o eliminación (US-07).
   useEffect(() => {
@@ -133,6 +138,9 @@ export function Sala() {
     // La sala ocupa toda la pantalla (ancho y alto) y se adapta: en pantallas anchas va el recuadro del video
     // a la izquierda y el panel pegado al borde derecho; en pantallas angostas el panel ocupa todo.
     <main id="contenido" tabIndex={-1} className="flex h-dvh min-h-0 flex-col bg-fondo focus:outline-none">
+      {/* Franja decorativa con los colores del prototipo, igual que en Mis salas. */}
+      <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
+
       <header className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-borde px-3 py-2 sm:px-4">
         <Link to="/salas" aria-label="Volver a Mis salas" className="inline-flex size-11 items-center justify-center rounded-lg text-texto hover:bg-superficie">
           {ICONO_ATRAS}
@@ -140,19 +148,49 @@ export function Sala() {
 
         {sala ? (
           <>
-            <h1 className="text-2xl font-bold">{sala.nombre}</h1>
+            <h1 className="text-2xl font-bold text-enlace">{sala.nombre}</h1>
+
+            {sala.esAdministrador !== false && (
+              <MenuAcciones
+                contorno
+                etiqueta={`Más acciones de la sala ${sala.nombre}`}
+                acciones={[
+                  {
+                    texto: "Editar sala",
+                    icono: "editar",
+                    alElegir: (boton) => {
+                      iniciadorRef.current = boton;
+                      setEditando(true);
+                    },
+                  },
+                  {
+                    texto: "Eliminar sala",
+                    icono: "eliminar",
+                    peligro: true,
+                    alElegir: (boton) => {
+                      iniciadorRef.current = boton;
+                      setEliminando(true);
+                    },
+                  },
+                ]}
+              />
+            )}
 
             <EstadoConexionSala estado={tiempoReal.estado} unida={tiempoReal.unida} />
 
             <span className="flex items-center gap-1">
-              <span className="rounded-md border border-borde px-2 py-0.5 font-mono text-sm tracking-wide">{sala.id}</span>
+              <span className="rounded-md border border-borde px-2 py-0.5 font-mono text-xs tracking-wide">{sala.id}</span>
               <button
                 type="button"
-                className="min-h-11 px-2 font-semibold text-enlace underline"
+                className="inline-flex min-h-11 items-center gap-1 px-1 text-sm font-semibold text-enlace no-underline transition-colors hover:text-[#2563eb] dark:hover:text-[#7aa7ff]"
                 aria-label={`Copiar ID de la sala ${sala.nombre}`}
                 onClick={() => void copiar()}
               >
-                ▢ Copiar ID
+                <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="11" height="11" rx="2" />
+                  <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+                </svg>
+                Copiar ID
               </button>
             </span>
           </>
@@ -160,41 +198,7 @@ export function Sala() {
           <h1 className="text-2xl font-bold">Sala</h1>
         )}
 
-        {/* Arriba a la derecha, aparte del resto: el rol en esta sala y, si eres anfitrión, el menú ⋯. */}
         <div className="ml-auto flex items-center gap-3">
-          {sala &&
-            (sala.esAdministrador !== false ? (
-              <span className="font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>
-            ) : (
-              <span className="font-semibold text-suave">Invitado</span>
-            ))}
-
-          {sala && sala.esAdministrador !== false && (
-            <MenuAcciones
-              contorno
-              etiqueta={`Más acciones de la sala ${sala.nombre}`}
-              acciones={[
-                {
-                  texto: "Editar sala",
-                  icono: "editar",
-                  alElegir: (boton) => {
-                    iniciadorRef.current = boton;
-                    setEditando(true);
-                  },
-                },
-                {
-                  texto: "Eliminar sala",
-                  icono: "eliminar",
-                  peligro: true,
-                  alElegir: (boton) => {
-                    iniciadorRef.current = boton;
-                    setEliminando(true);
-                  },
-                },
-              ]}
-            />
-          )}
-
           <ThemeToggle />
         </div>
       </header>
@@ -292,7 +296,7 @@ export function Sala() {
                 id="panel-sala"
                 aria-label="Chat y participantes"
                 hidden={!panelVisible}
-                className="flex min-h-0 flex-1 flex-col border-t border-borde lg:w-[26rem] lg:flex-none lg:border-l lg:border-t-0"
+                className="flex min-h-0 flex-1 flex-col border-t border-borde bg-principal-suave lg:w-[26rem] lg:flex-none lg:border-l lg:border-t-0"
               >
                 <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex shrink-0 border-b border-borde">
                   {(
@@ -335,7 +339,7 @@ export function Sala() {
                 </div>
 
                 <div role="tabpanel" id="panel-personas" aria-labelledby="pestana-personas" hidden={pestana !== "personas"} className="min-h-0 flex-1 overflow-y-auto p-4">
-                  <ListaPersonas personas={personas} miUid={miUid} />
+                  <ListaPersonas personas={personas} miUid={miUid} anfitrionUid={sala?.esAdministrador === true ? miUid : sala?.anfitrionUid} />
                 </div>
               </section>
 
@@ -343,7 +347,7 @@ export function Sala() {
               <div
                 role="toolbar"
                 aria-label="Panel de la sala"
-                className="order-first flex shrink-0 gap-2 border-b border-borde p-2 lg:order-none lg:w-16 lg:flex-col lg:items-center lg:border-b-0 lg:border-l"
+                className="order-first flex shrink-0 gap-2 border-b border-borde bg-principal-suave p-2 lg:order-none lg:w-16 lg:flex-col lg:items-center lg:border-b-0 lg:border-l"
               >
                 <button
                   type="button"
