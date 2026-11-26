@@ -25,6 +25,13 @@ export function Sala() {
   const { usuario } = useSesion();
 
   const creada = (ubicacion.state as { salaCreada?: boolean } | null)?.salaCreada === true;
+  // El aviso «Sala creada» se ve 5 segundos y se va solo.
+  const [mostrarCreada, setMostrarCreada] = useState(creada);
+  useEffect(() => {
+    if (!creada) return;
+    const temporizador = setTimeout(() => setMostrarCreada(false), 5000);
+    return () => clearTimeout(temporizador);
+  }, [creada]);
 
   const [sala, setSala] = useState<SalaPropia | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -152,7 +159,6 @@ export function Sala() {
 
             {sala.esAdministrador !== false && (
               <MenuAcciones
-                contorno
                 etiqueta={`Más acciones de la sala ${sala.nombre}`}
                 acciones={[
                   {
@@ -206,14 +212,8 @@ export function Sala() {
       {/* La misma franja de color separa el encabezado del resto de la pantalla. */}
       <div aria-hidden="true" className="h-[5px] shrink-0 bg-[linear-gradient(90deg,#6d3fe0,#a03e9b,#0e7490)]" />
 
-      {(creada || mensaje) && (
+      {mensaje && (
         <div className="space-y-2 px-3 pt-2 sm:px-4">
-          {creada && (
-            <p role="status" className="rounded-lg bg-exito-fondo p-3 text-exito">
-              ✓ Sala creada. Eres su anfitrión.
-            </p>
-          )}
-
           {mensaje && (
             <p role="status" aria-live="polite" className="rounded-lg bg-exito-fondo p-3 text-exito">
               ✓ {mensaje}
@@ -259,7 +259,20 @@ export function Sala() {
           <>
             <AvisosSala avisos={avisos} />
 
-            <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+            <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
+              {/* «Sala creada»: se ve dentro del lado izquierdo, sobre el recuadro, y se va a los 5 segundos. */}
+              <div role="status" className="pointer-events-none absolute left-4 top-4 z-10 max-w-[calc(100%-2rem)] lg:max-w-md">
+                {creada && (
+                  <p
+                    className={`rounded-lg bg-exito-fondo px-4 py-3 font-medium text-exito shadow transition-opacity duration-500 ${
+                      mostrarCreada ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {mostrarCreada ? "✓ Sala creada. Eres su anfitrión." : ""}
+                  </p>
+                )}
+              </div>
+
               {/* Zona de los cuadros de video y sus botones. Por ahora solo se ve el recuadro y el botón de salir:
                   el video, el micrófono, la cámara y compartir pantalla llegan en el Sprint 4. */}
               <div className="hidden min-h-0 min-w-0 flex-1 flex-col p-4 lg:flex">
@@ -318,7 +331,7 @@ export function Sala() {
                       aria-controls={`panel-${clave}`}
                       tabIndex={pestana === clave ? 0 : -1}
                       onClick={() => setPestana(clave)}
-                      className={`min-h-12 flex-1 border-b-[3px] px-4 font-bold ${
+                      className={`min-h-12 flex-1 border-b-[3px] px-4 font-bold transition-colors duration-300 ${
                         pestana === clave ? "border-principal text-texto" : "border-transparent text-suave hover:text-texto"
                       }`}
                     >
@@ -327,7 +340,16 @@ export function Sala() {
                   ))}
                 </div>
 
-                <div role="tabpanel" id="panel-chat" aria-labelledby="pestana-chat" hidden={pestana !== "chat"} className="flex min-h-0 flex-1 flex-col">
+                {/* Las dos secciones quedan una sobre otra: al cambiar, la que sale se desvanece y se desliza y la que entra aparece. */}
+                <div className="relative min-h-0 flex-1 overflow-hidden">
+                <div
+                  role="tabpanel"
+                  id="panel-chat"
+                  aria-labelledby="pestana-chat"
+                  className={`absolute inset-0 flex flex-col transition-[opacity,transform,visibility] duration-300 ease-in-out ${
+                    pestana === "chat" ? "visible translate-x-0 opacity-100" : "invisible -translate-x-6 opacity-0"
+                  }`}
+                >
                   {tiempoReal.cliente && (
                     <PanelChat
                       cliente={tiempoReal.cliente}
@@ -341,8 +363,16 @@ export function Sala() {
                   )}
                 </div>
 
-                <div role="tabpanel" id="panel-personas" aria-labelledby="pestana-personas" hidden={pestana !== "personas"} className="min-h-0 flex-1 overflow-y-auto p-4">
+                <div
+                  role="tabpanel"
+                  id="panel-personas"
+                  aria-labelledby="pestana-personas"
+                  className={`absolute inset-0 overflow-y-auto p-4 transition-[opacity,transform,visibility] duration-300 ease-in-out ${
+                    pestana === "personas" ? "visible translate-x-0 opacity-100" : "invisible translate-x-6 opacity-0"
+                  }`}
+                >
                   <ListaPersonas personas={personas} miUid={miUid} anfitrionUid={sala?.esAdministrador === true ? miUid : sala?.anfitrionUid} />
+                </div>
                 </div>
               </section>
 
@@ -368,8 +398,8 @@ export function Sala() {
 
                 {(
                   [
-                    ["personas", "Participantes"],
                     ["chat", "Chat"],
+                    ["personas", "Participantes"],
                   ] as const
                 ).map(([clave, nombre]) => {
                   const activo = panelVisible && pestana === clave;
