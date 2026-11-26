@@ -131,7 +131,7 @@ export function Sala() {
             <EstadoConexionSala estado={tiempoReal.estado} unida={tiempoReal.unida} />
 
             {sala.esAdministrador !== false ? (
-              <span className="text-sm font-semibold text-enlace">Anfitrión</span>
+              <span className="text-sm font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>
             ) : (
               <span className="text-sm font-semibold text-suave">Invitado</span>
             )}

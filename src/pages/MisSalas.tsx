@@ -542,7 +542,7 @@ export function MisSalas() {
 
                 <p
                   className={`px-4 py-3 font-semibold ${
-                    anfitrion ? "text-enlace" : "text-suave"
+                    anfitrion ? "text-[#2563eb] dark:text-[#7aa7ff]" : "text-suave"
                   }`}
                 >
                   {anfitrion ? "Anfitrión" : "Invitado"}
@@ -550,7 +550,7 @@ export function MisSalas() {
 
                 <div className="flex items-center justify-between border-t border-borde px-2">
                   <Link
-                    className="inline-flex min-h-11 items-center px-2 font-bold text-[#2563eb] dark:text-[#7aa7ff] no-underline transition-colors hover:text-[#1e3a8a] dark:hover:text-[#cfe0ff]"
+                    className="inline-flex min-h-11 items-center px-2 font-bold text-enlace no-underline transition-colors hover:text-[#3b1f94] dark:hover:text-[#e4d9ff]"
                     to={`/salas/${encodeURIComponent(sala.id)}`}
                     aria-label={`Entrar a la sala ${sala.nombre}`}
                   >
@@ -559,7 +559,7 @@ export function MisSalas() {
 
                   <button
                     type="button"
-                    className="inline-flex min-h-11 items-center gap-1.5 px-2 font-semibold text-[#2563eb] dark:text-[#7aa7ff] no-underline transition-colors hover:text-[#1e3a8a] dark:hover:text-[#cfe0ff]"
+                    className="inline-flex min-h-11 items-center gap-1.5 px-2 font-semibold text-enlace no-underline transition-colors hover:text-[#3b1f94] dark:hover:text-[#e4d9ff]"
                     aria-label={`Copiar ID de ${sala.nombre}`}
                     onClick={() =>
                       void copiar(sala.id)
