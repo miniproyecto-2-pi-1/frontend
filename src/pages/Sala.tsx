@@ -6,10 +6,10 @@ import { MenuAcciones } from "../components/MenuAcciones";
 import { AvisoSalaEliminada } from "../components/sala/AvisoSalaEliminada";
 import { AvisosSala } from "../components/sala/AvisosSala";
 import { ListaPersonas } from "../components/sala/ListaPersonas";
-import { MosaicoPersonas } from "../components/sala/MosaicoPersonas";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
 import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { PanelChat } from "../components/sala/PanelChat";
+import { SeccionColapsable } from "../components/sala/SeccionColapsable";
 import { useHistorialSala } from "../hooks/useHistorialSala";
 import { useMensajesSala } from "../hooks/useMensajesSala";
 import { useSalaPersonas } from "../hooks/useSalaPersonas";
@@ -37,8 +37,8 @@ export function Sala() {
   // El anfitrión eliminó la sala mientras estabas dentro (evento «sala-eliminada»).
   const [eliminadaPorAnfitrion, setEliminadaPorAnfitrion] = useState(false);
   const iniciadorRef = useRef<HTMLButtonElement | null>(null);
-  // En pantallas angostas se ve una sola cosa a la vez: el chat o las personas.
-  const [vista, setVista] = useState<"chat" | "personas">("chat");
+  // El panel de la derecha (personas y chat) se puede ocultar.
+  const [panelVisible, setPanelVisible] = useState(true);
 
   useTitulo(sala?.nombre ?? "Sala");
 
@@ -175,6 +175,18 @@ export function Sala() {
                 ]}
               />
               )}
+
+              {tiempoReal.unida && !tiempoReal.errorUnirse && (
+                <button
+                  type="button"
+                  className="btn-secundario min-h-11 px-3 text-sm"
+                  aria-expanded={panelVisible}
+                  aria-controls="panel-sala"
+                  onClick={() => setPanelVisible((v) => !v)}
+                >
+                  {panelVisible ? "Ocultar panel" : "Mostrar panel"}
+                </button>
+              )}
             </div>
           </div>
 
@@ -206,19 +218,10 @@ export function Sala() {
             <>
               <AvisosSala avisos={avisos} />
 
-              <div className="mb-3 flex gap-2 lg:hidden">
-                <button type="button" className="btn-secundario flex-1" aria-pressed={vista === "chat"} onClick={() => setVista("chat")}>
-                  Chat
-                </button>
-                <button type="button" className="btn-secundario flex-1" aria-pressed={vista === "personas"} onClick={() => setVista("personas")}>
-                  Personas ({personas.length})
-                </button>
-              </div>
-
-              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-                {/* Mosaico de personas y botón para salir (en pantallas angostas va en la pestaña «Personas»). */}
-                <section aria-label="Participantes" className={vista === "personas" ? "" : "hidden lg:block"}>
-                  <MosaicoPersonas personas={personas} miUid={miUid} />
+              <div className={`grid gap-5 ${panelVisible ? "lg:grid-cols-[minmax(0,1fr)_22rem]" : ""}`}>
+                {/* Zona de los cuadros de video: queda en blanco por ahora (el video llega en el Sprint 4). */}
+                <div className="hidden lg:block">
+                  <div aria-hidden="true" className="min-h-[28rem]" />
 
                   <div className="mt-5 flex justify-center">
                     <Link to="/salas" className="flex min-h-11 flex-col items-center gap-1 text-sm font-semibold text-texto no-underline">
@@ -230,27 +233,36 @@ export function Sala() {
                       Salir de la sala
                     </Link>
                   </div>
-                </section>
+                </div>
 
-                <section
-                  aria-label="Chat de la sala"
-                  className={`tarjeta h-[32rem] overflow-hidden p-0 ${vista === "chat" ? "" : "hidden lg:block"}`}
+                {/* Panel de la derecha: Personas y Chat, cada uno se pliega con su título. */}
+                <aside
+                  id="panel-sala"
+                  aria-label="Personas y chat de la sala"
+                  hidden={!panelVisible}
+                  className="tarjeta overflow-hidden p-0 lg:self-start"
                 >
-                  {tiempoReal.cliente && (
-                    <PanelChat
-                      cliente={tiempoReal.cliente}
-                      roomId={sala.id}
-                      estado={tiempoReal.estado}
-                      mensajes={mensajes}
-                      historial={historial}
-                      personas={personas}
-                      miUid={miUid}
-                    />
-                  )}
-                </section>
+                  <SeccionColapsable titulo="Personas" detalle={`· ${personas.length} en línea`}>
+                    <div className="px-4 pb-4">
+                      <ListaPersonas personas={personas} miUid={miUid} />
+                    </div>
+                  </SeccionColapsable>
 
-                <aside className={`tarjeta lg:self-start ${vista === "personas" ? "" : "hidden lg:block"}`}>
-                  <ListaPersonas personas={personas} miUid={miUid} />
+                  <SeccionColapsable titulo="Chat" className="border-t border-borde">
+                    <div className="h-[26rem] border-t border-borde">
+                      {tiempoReal.cliente && (
+                        <PanelChat
+                          cliente={tiempoReal.cliente}
+                          roomId={sala.id}
+                          estado={tiempoReal.estado}
+                          mensajes={mensajes}
+                          historial={historial}
+                          personas={personas}
+                          miUid={miUid}
+                        />
+                      )}
+                    </div>
+                  </SeccionColapsable>
                 </aside>
               </div>
             </>
