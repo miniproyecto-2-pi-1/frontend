@@ -3,8 +3,20 @@ import { Avatar } from "../Avatar";
 import type { Persona } from "../../tipos";
 
 // Personas que están en la sala ahora, con un buscador por nombre. Tú apareces primero.
-// El título «Personas · N en línea» lo pone la sección plegable que la contiene.
-export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Persona[]; miUid: string; anfitrionUid?: string }) {
+// Abajo va la tarjeta para invitar: el ID de la sala y su botón de copiar.
+export function ListaPersonas({
+  personas,
+  miUid,
+  anfitrionUid,
+  salaId,
+  alCopiar,
+}: {
+  personas: Persona[];
+  miUid: string;
+  anfitrionUid?: string;
+  salaId: string;
+  alCopiar: () => void;
+}) {
   const [busqueda, setBusqueda] = useState("");
   const idBusqueda = useId();
 
@@ -14,11 +26,11 @@ export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Per
     .filter((p) => p.username.toLowerCase().includes(texto));
 
   return (
-    <div>
+    <div className="flex min-h-0 flex-1 flex-col">
       <label htmlFor={idBusqueda} className="sr-only">
         Buscar participante
       </label>
-      <div className="mb-3 flex items-center gap-2 rounded-full border-[1.5px] border-campo bg-fondo px-3 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
+      <div className="flex shrink-0 items-center gap-2 rounded-xl bg-sala-campo px-3 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-enlace">
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-suave">
           <circle cx="11" cy="11" r="7" />
           <path d="m21 21-4.3-4.3" />
@@ -30,34 +42,55 @@ export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Per
           placeholder="Buscar participante"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          className="campo-envuelto min-h-10 min-w-0 flex-1 bg-transparent text-texto placeholder:text-suave"
+          className="campo-envuelto min-h-10 min-w-0 flex-1 bg-transparent text-sm text-texto placeholder:text-suave"
         />
       </div>
 
-      <ul aria-label="Personas en línea" className="space-y-3">
+      <h3 className="mb-1 mt-4 shrink-0 px-2 text-xs font-bold uppercase tracking-wider text-suave">En línea · {visibles.length}</h3>
+
+      <ul aria-label="Personas en línea" className="barra-fina min-h-0 flex-1 space-y-0.5 overflow-y-auto">
         {visibles.map((p) => (
-          <li key={p.uid} className="flex items-center gap-3">
-            <Avatar nombre={p.username} color={p.avatar} tam={32} />
-            <span className="min-w-0 flex-1">
-              <span className="block truncate">
-                {p.username}
-                {p.uid === miUid && <span className="text-suave"> (tú)</span>}
-              </span>
-              {p.uid === anfitrionUid && <span className="block text-xs font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>}
+          <li key={p.uid} className={`flex items-center gap-3 rounded-2xl px-2 py-2 ${p.uid === miUid ? "bg-sala-campo" : ""}`}>
+            <span className="relative shrink-0">
+              <Avatar nombre={p.username} color={p.avatar} tam={40} />
+              <span aria-hidden="true" className="absolute -bottom-px -right-px size-3 rounded-full border-[2.5px] border-sala-tarjeta bg-exito" />
             </span>
-            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-exito">
-              <span aria-hidden="true" className="size-2 rounded-full bg-exito" />
-              En línea
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-2">
+                <span className="truncate font-bold">{p.username}</span>
+                {p.uid === anfitrionUid && (
+                  <span className="shrink-0 rounded-full bg-principal-suave px-2 py-0.5 text-[11px] font-bold text-enlace">Anfitrión</span>
+                )}
+              </span>
+              <span className="block text-sm text-suave">{p.uid === miUid ? "Tú · En línea" : "En línea"}</span>
             </span>
           </li>
         ))}
       </ul>
 
       {texto && visibles.length === 0 && (
-        <p role="status" className="text-sm text-suave">
+        <p role="status" className="px-2 text-sm text-suave">
           Nadie coincide con «{busqueda.trim()}».
         </p>
       )}
+
+      <div className="mt-3 flex shrink-0 items-center gap-3 rounded-2xl bg-sala-campo px-4 py-3 text-sm text-suave">
+        <span>
+          Invita con el ID <b className="font-mono tracking-wide text-texto">{salaId}</b>
+        </span>
+        <button
+          type="button"
+          onClick={alCopiar}
+          aria-label={`Copiar ID de la sala ${salaId}`}
+          className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-2 font-bold text-enlace hover:bg-principal-suave"
+        >
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="9" y="9" width="11" height="11" rx="2" />
+            <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+          </svg>
+          Copiar
+        </button>
+      </div>
     </div>
   );
 }

@@ -18,6 +18,9 @@
   --exito: #1f7a3f;
   --exito-fondo: #ddf3e4;
   --lienzo: #eee8fa; /* fondo de la página, detrás de encabezado y tarjetas */
+  --sala-fondo: #f1eefb; /* fondo de la sala */
+  --sala-tarjeta: #ffffff; /* tarjetas flotantes de la sala */
+  --sala-campo: #f1eefb; /* campos y botones sobre una tarjeta */
   --principal-suave: #ece6fd;
   --error-fondo: #fbe9e7;
 }
@@ -36,6 +39,9 @@
   --exito: #57d58a;
   --exito-fondo: #173a24;
   --lienzo: #211e29;
+  --sala-fondo: #0f0d17;
+  --sala-tarjeta: #17132a;
+  --sala-campo: #241f3d;
   --principal-suave: #3a2f5e;
   --error-fondo: #3a1d24;
 }
@@ -54,6 +60,9 @@
   --color-exito: var(--exito);
   --color-exito-fondo: var(--exito-fondo);
   --color-lienzo: var(--lienzo);
+  --color-sala-fondo: var(--sala-fondo);
+  --color-sala-tarjeta: var(--sala-tarjeta);
+  --color-sala-campo: var(--sala-campo);
   --color-principal-suave: var(--principal-suave);
   --color-error-fondo: var(--error-fondo);
   --font-sans: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
