@@ -551,7 +551,7 @@ export function MisSalas() {
 
                 <div className="flex items-center justify-between px-4 pb-5 pt-3">
                   <Link
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border-[1.5px] border-[#c4b2f7] bg-principal-suave px-5 font-bold text-enlace no-underline transition-colors hover:border-principal hover:bg-principal hover:text-white dark:border-[#6a55a8]"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-principal-suave px-5 font-bold text-enlace no-underline transition-colors hover:bg-principal hover:text-white"
                     to={`/salas/${encodeURIComponent(sala.id)}`}
                     aria-label={`Entrar a la sala ${sala.nombre}`}
                   >
