@@ -48,7 +48,7 @@ function semillaMensajes(roomId: string, cantidad: number): Mensaje[] {
       id: `${roomId}-semilla-${String(i).padStart(3, "0")}`,
       uid: autor.uid,
       username: autor.username,
-      texto: `${textos[i % textos.length]} (${i + 1})`,
+      texto: textos[i % textos.length],
       creadoEn: new Date(ahora - (cantidad - i) * 12 * 60_000).toISOString(),
     };
   });

@@ -130,12 +130,6 @@ export function Sala() {
 
             <EstadoConexionSala estado={tiempoReal.estado} unida={tiempoReal.unida} />
 
-            {sala.esAdministrador !== false ? (
-              <span className="text-sm font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>
-            ) : (
-              <span className="text-sm font-semibold text-suave">Invitado</span>
-            )}
-
             <span className="flex items-center gap-1">
               <span className="rounded-md border border-borde px-2 py-0.5 font-mono text-sm tracking-wide">{sala.id}</span>
               <button
@@ -148,9 +142,16 @@ export function Sala() {
               </button>
             </span>
 
-            {sala.esAdministrador !== false && (
+            {/* Arriba a la derecha, aparte del resto: el rol en esta sala y, si eres anfitrión, el menú ⋯. */}
+            <div className="ml-auto flex items-center gap-3">
+              {sala.esAdministrador !== false ? (
+                <span className="font-semibold text-[#2563eb] dark:text-[#7aa7ff]">Anfitrión</span>
+              ) : (
+                <span className="font-semibold text-suave">Invitado</span>
+              )}
+
+              {sala.esAdministrador !== false && (
               <MenuAcciones
-                className="ml-auto"
                 contorno
                 etiqueta={`Más acciones de la sala ${sala.nombre}`}
                 acciones={[
@@ -173,7 +174,8 @@ export function Sala() {
                   },
                 ]}
               />
-            )}
+              )}
+            </div>
           </div>
 
           {creada && (
