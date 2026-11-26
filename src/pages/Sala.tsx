@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError, apiFetch } from "../api";
 import { EstadoConexionSala } from "../components/EstadoConexionSala";
@@ -9,7 +9,6 @@ import { ListaPersonas } from "../components/sala/ListaPersonas";
 import { ModalEditarSala } from "../components/sala/ModalEditarSala";
 import { ModalEliminarSala } from "../components/sala/ModalEliminarSala";
 import { PanelChat } from "../components/sala/PanelChat";
-import { SeccionColapsable } from "../components/sala/SeccionColapsable";
 import { useHistorialSala } from "../hooks/useHistorialSala";
 import { useMensajesSala } from "../hooks/useMensajesSala";
 import { useSalaPersonas } from "../hooks/useSalaPersonas";
@@ -37,8 +36,20 @@ export function Sala() {
   // El anfitrión eliminó la sala mientras estabas dentro (evento «sala-eliminada»).
   const [eliminadaPorAnfitrion, setEliminadaPorAnfitrion] = useState(false);
   const iniciadorRef = useRef<HTMLButtonElement | null>(null);
-  // El panel de la derecha (personas y chat) se puede ocultar.
-  const [panelVisible, setPanelVisible] = useState(true);
+  // La parte izquierda tiene dos pestañas: el chat y los participantes.
+  const [pestana, setPestana] = useState<"chat" | "personas">("chat");
+  const botonChat = useRef<HTMLButtonElement>(null);
+  const botonPersonas = useRef<HTMLButtonElement>(null);
+
+  // Pestañas con el teclado: flechas izquierda y derecha, Inicio y Fin cambian de pestaña y mueven el foco.
+  function alPulsarPestana(evento: KeyboardEvent) {
+    const claves = ["ArrowLeft", "ArrowRight", "Home", "End"];
+    if (!claves.includes(evento.key)) return;
+    evento.preventDefault();
+    const siguiente = evento.key === "Home" ? "chat" : evento.key === "End" ? "personas" : pestana === "chat" ? "personas" : "chat";
+    setPestana(siguiente);
+    (siguiente === "chat" ? botonChat : botonPersonas).current?.focus();
+  }
 
   useTitulo(sala?.nombre ?? "Sala");
 
@@ -176,17 +187,6 @@ export function Sala() {
               />
               )}
 
-              {tiempoReal.unida && !tiempoReal.errorUnirse && (
-                <button
-                  type="button"
-                  className="btn-secundario min-h-11 px-3 text-sm"
-                  aria-expanded={panelVisible}
-                  aria-controls="panel-sala"
-                  onClick={() => setPanelVisible((v) => !v)}
-                >
-                  {panelVisible ? "Ocultar panel" : "Mostrar panel"}
-                </button>
-              )}
             </div>
           </div>
 
@@ -218,7 +218,54 @@ export function Sala() {
             <>
               <AvisosSala avisos={avisos} />
 
-              <div className={`grid gap-5 ${panelVisible ? "lg:grid-cols-[minmax(0,1fr)_22rem]" : ""}`}>
+              <div className="grid gap-5 lg:grid-cols-[28rem_minmax(0,1fr)]">
+                {/* Parte izquierda: dos pestañas, Chat y Participantes. Las dos quedan en la página para no perder el chat. */}
+                <section aria-label="Chat y participantes" className="tarjeta overflow-hidden p-0 lg:self-start">
+                  <div role="tablist" aria-label="Chat y participantes" onKeyDown={alPulsarPestana} className="flex border-b border-borde">
+                    {(
+                      [
+                        ["chat", "Chat", botonChat],
+                        ["personas", `Participantes (${personas.length})`, botonPersonas],
+                      ] as const
+                    ).map(([clave, texto, ref]) => (
+                      <button
+                        key={clave}
+                        ref={ref}
+                        type="button"
+                        role="tab"
+                        id={`pestana-${clave}`}
+                        aria-selected={pestana === clave}
+                        aria-controls={`panel-${clave}`}
+                        tabIndex={pestana === clave ? 0 : -1}
+                        onClick={() => setPestana(clave)}
+                        className={`min-h-12 flex-1 border-b-[3px] px-4 font-bold ${
+                          pestana === clave ? "border-principal text-texto" : "border-transparent text-suave hover:text-texto"
+                        }`}
+                      >
+                        {texto}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div role="tabpanel" id="panel-chat" aria-labelledby="pestana-chat" hidden={pestana !== "chat"} className="h-[30rem]">
+                    {tiempoReal.cliente && (
+                      <PanelChat
+                        cliente={tiempoReal.cliente}
+                        roomId={sala.id}
+                        estado={tiempoReal.estado}
+                        mensajes={mensajes}
+                        historial={historial}
+                        personas={personas}
+                        miUid={miUid}
+                      />
+                    )}
+                  </div>
+
+                  <div role="tabpanel" id="panel-personas" aria-labelledby="pestana-personas" hidden={pestana !== "personas"} className="p-4">
+                    <ListaPersonas personas={personas} miUid={miUid} />
+                  </div>
+                </section>
+
                 {/* Zona de los cuadros de video: queda en blanco por ahora (el video llega en el Sprint 4). */}
                 <div className="hidden lg:block">
                   <div aria-hidden="true" className="min-h-[28rem]" />
@@ -234,36 +281,6 @@ export function Sala() {
                     </Link>
                   </div>
                 </div>
-
-                {/* Panel de la derecha: Personas y Chat, cada uno se pliega con su título. */}
-                <aside
-                  id="panel-sala"
-                  aria-label="Personas y chat de la sala"
-                  hidden={!panelVisible}
-                  className="tarjeta overflow-hidden p-0 lg:self-start"
-                >
-                  <SeccionColapsable titulo="Personas" detalle={`· ${personas.length} en línea`}>
-                    <div className="px-4 pb-4">
-                      <ListaPersonas personas={personas} miUid={miUid} />
-                    </div>
-                  </SeccionColapsable>
-
-                  <SeccionColapsable titulo="Chat" className="border-t border-borde">
-                    <div className="h-[26rem] border-t border-borde">
-                      {tiempoReal.cliente && (
-                        <PanelChat
-                          cliente={tiempoReal.cliente}
-                          roomId={sala.id}
-                          estado={tiempoReal.estado}
-                          mensajes={mensajes}
-                          historial={historial}
-                          personas={personas}
-                          miUid={miUid}
-                        />
-                      )}
-                    </div>
-                  </SeccionColapsable>
-                </aside>
               </div>
             </>
           )}
