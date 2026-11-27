@@ -1,5 +1,6 @@
 import { io, type Socket } from "socket.io-client";
 import { REALTIME_URL } from "./config";
+import { esperarConexion } from "./esperarConexion";
 import { auth } from "./firebase";
 import type { Mensaje, Persona } from "./tipos";
 
@@ -36,7 +37,8 @@ export interface ClienteSala {
 const USAR_MOCKS = import.meta.env.VITE_USE_MOCKS === "true";
 
 const ESPERA_ACUSE_MS = 10_000;
-const ESPERA_CONEXION_MS = 15_000;
+// Al abrir la sala hay que esperar la conexión: en el plan gratuito de Render el servidor puede tardar casi un minuto en despertar.
+const ESPERA_CONEXION_MS = 60_000;
 export const ERROR_GENERAL = "No pudimos completar la acción. Inténtalo de nuevo.";
 const ERROR_SIN_CONEXION = "No hay conexión con la sala. Revisa tu internet e inténtalo de nuevo.";
 
@@ -45,41 +47,8 @@ interface Acuse {
   error?: string;
 }
 
-function esperarConexion(socket: Socket): Promise<void> {
-  if (socket.connected) return Promise.resolve();
-
-  return new Promise((resolver, rechazar) => {
-    let temporizador: ReturnType<typeof setTimeout>;
-
-    const limpiar = () => {
-      clearTimeout(temporizador);
-      socket.off("connect", alConectar);
-      socket.off("disconnect", alDesconectar);
-    };
-    const alConectar = () => {
-      limpiar();
-      resolver();
-    };
-    const alDesconectar = (motivo: string) => {
-      if (motivo !== "io client disconnect") return;
-      limpiar();
-      rechazar(new Error(ERROR_SIN_CONEXION));
-    };
-
-    temporizador = setTimeout(() => {
-      limpiar();
-      rechazar(new Error(ERROR_SIN_CONEXION));
-    }, ESPERA_CONEXION_MS);
-    socket.once("connect", alConectar);
-    socket.on("disconnect", alDesconectar);
-
-    // Evita perder un connect que ocurra entre la comprobación inicial y los listeners.
-    if (socket.connected) alConectar();
-  });
-}
-
 async function emitir(socket: Socket, evento: string, datos: unknown): Promise<void> {
-  await esperarConexion(socket);
+  if (!socket.connected) throw new Error(ERROR_SIN_CONEXION);
   let acuse: Acuse;
   try {
     acuse = (await socket.timeout(ESPERA_ACUSE_MS).emitWithAck(evento, datos)) as Acuse;
@@ -152,8 +121,9 @@ function crearClienteReal(): ClienteSala {
 
   return {
     async unirse(roomId) {
-      unidas.add(roomId);
+      await esperarConexion(socket, ESPERA_CONEXION_MS, ERROR_SIN_CONEXION);
       await emitir(socket, "unirse", { roomId });
+      unidas.add(roomId);
     },
     enviar: (roomId, texto) => emitir(socket, "mensaje", { roomId, texto }),
     salir(roomId) {

@@ -2,7 +2,7 @@ import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ApiError, apiFetch } from "../api";
 import { auth } from "../firebase";
-import { USUARIO_MOCK } from "../mocks/usuario";
+import { usuarioMock } from "../mocks/usuario";
 import type { Usuario } from "../tipos";
 
 export type { Usuario } from "../tipos";
@@ -37,7 +37,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   // undefined = Firebase todavía no ha dicho si hay sesión.
   const [cuenta, setCuenta] = useState<User | null | undefined>(auth ? undefined : null);
   const [estado, setEstado] = useState<EstadoSesion>(SESION_MOCK ? "listo" : auth ? "cargando" : "anonimo");
-  const [usuario, setUsuario] = useState<Usuario | null>(SESION_MOCK ? USUARIO_MOCK : null);
+  const [usuario, setUsuario] = useState<Usuario | null>(SESION_MOCK ? usuarioMock() : null);
   const [errorConexion, setErrorConexion] = useState<ApiError | null>(null);
   const [intento, setIntento] = useState(0);
   const peticion = useRef<AbortController | null>(null);

@@ -118,7 +118,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
     }
   }
 
-  // Enter envía; Mayús + Enter hace un salto de línea.
+  // Enter envía; Shift + Enter hace un salto de línea.
   function alPulsar(evento: KeyboardEvent<HTMLTextAreaElement>) {
     if (evento.key === "Enter" && !evento.shiftKey && !evento.nativeEvent.isComposing) {
       evento.preventDefault();
@@ -411,7 +411,7 @@ export function PanelChat({ cliente, roomId, estado, mensajes, historial, person
         </div>
 
         <p className={`mt-1.5 text-center text-xs text-texto/75 ${sinConexion || texto.length >= MAXIMO_MENSAJE * 0.9 ? "" : "max-sm:hidden"}`}>
-          {sinConexion ? "Sin conexión con la sala: no se pueden enviar mensajes." : "Enter envía · Mayús + Enter hace un salto de línea"}
+          {sinConexion ? "Sin conexión con la sala: no se pueden enviar mensajes." : "Enter envía · Shift + Enter hace un salto de línea"}
           {texto.length >= MAXIMO_MENSAJE * 0.9 && ` · ${texto.length}/${MAXIMO_MENSAJE}`}
         </p>
 

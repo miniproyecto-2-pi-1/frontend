@@ -123,6 +123,13 @@ export function MisSalas() {
     }
   }, [creando]);
 
+  // Los avisos verdes (ID copiado, sala actualizada o eliminada) se van solos a los 3 segundos.
+  useEffect(() => {
+    if (!aviso) return;
+    const temporizador = setTimeout(() => setAviso(""), 3000);
+    return () => clearTimeout(temporizador);
+  }, [aviso]);
+
   // El aviso que llegó con la navegación se muestra una vez; al recargar ya no vuelve a salir.
   useEffect(() => {
     if ((ubicacion.state as { aviso?: string } | null)?.aviso) {
