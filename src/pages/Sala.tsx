@@ -394,7 +394,12 @@ export function Sala() {
                         pestana === "personas" ? "visible translate-x-0 opacity-100" : "invisible translate-x-6 opacity-0"
                       }`}
                     >
-                      <ListaPersonas personas={personas} miUid={miUid} anfitrionUid={sala?.esAdministrador === true ? miUid : sala?.anfitrionUid} />
+                      <ListaPersonas
+                        personas={personas}
+                        miUid={miUid}
+                        anfitrionUid={sala?.esAdministrador === true ? miUid : sala?.anfitrionUid}
+                        soyAnfitrion={sala?.esAdministrador !== false}
+                      />
                     </div>
                   </div>
                 </div>

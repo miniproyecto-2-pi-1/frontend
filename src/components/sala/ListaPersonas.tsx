@@ -3,7 +3,26 @@ import { Avatar } from "../Avatar";
 import type { Persona } from "../../tipos";
 
 // Personas que están en la sala ahora, con un buscador por nombre. Tú apareces primero.
-export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Persona[]; miUid: string; anfitrionUid?: string }) {
+// Tipo de usuario de cada persona. Si se conoce al anfitrión, es Anfitrión o Invitado según su uid. Si todavía no se conoce
+// (la API aún no manda anfitrionUid), cada quien sabe su propio tipo y, si tú eres el anfitrión, las demás personas son invitadas.
+type Rol = "Anfitrión" | "Invitado" | null;
+
+export function ListaPersonas({
+  personas,
+  miUid,
+  anfitrionUid,
+  soyAnfitrion,
+}: {
+  personas: Persona[];
+  miUid: string;
+  anfitrionUid?: string;
+  soyAnfitrion: boolean;
+}) {
+  const rolDe = (uid: string): Rol => {
+    if (anfitrionUid) return uid === anfitrionUid ? "Anfitrión" : "Invitado";
+    if (uid === miUid) return soyAnfitrion ? "Anfitrión" : "Invitado";
+    return soyAnfitrion ? "Invitado" : null;
+  };
   const [busqueda, setBusqueda] = useState("");
   const idBusqueda = useId();
 
@@ -45,8 +64,14 @@ export function ListaPersonas({ personas, miUid, anfitrionUid }: { personas: Per
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-2">
                 <span className="truncate font-bold">{p.username}</span>
-                {p.uid === anfitrionUid && (
-                  <span className="shrink-0 rounded-md bg-principal-suave px-2 py-0.5 text-[11px] font-bold text-enlace">Anfitrión</span>
+                {rolDe(p.uid) && (
+                  <span
+                    className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold ${
+                      rolDe(p.uid) === "Anfitrión" ? "bg-principal-suave text-enlace" : "bg-sala-campo text-suave"
+                    }`}
+                  >
+                    {rolDe(p.uid)}
+                  </span>
                 )}
               </span>
               <span className="block text-sm text-suave">{p.uid === miUid ? "Tú · En línea" : "En línea"}</span>
