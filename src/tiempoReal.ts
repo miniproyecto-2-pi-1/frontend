@@ -14,8 +14,8 @@ import type { Mensaje, Persona } from "./tipos";
 // Lo que el servidor ENVÍA a quienes están en la sala:
 //   «presencia»        { roomId, personas }   → quién está conectado ahora.
 //   «mensaje»          { id, uid, username, texto, creadoEn }
-//   «sala-eliminada»   { roomId }             → el anfitrión eliminó la sala (pendiente en backend-realtime).
-//   «sala-actualizada» { roomId, nombre }     → el anfitrión cambió el nombre (pendiente en backend-realtime).
+//   «sala-eliminada»   { roomId }             → la sala fue eliminada o ya no existe al reingresar.
+//   «sala-actualizada» { roomId, nombre }     → cambió el nombre guardado en Firestore.
 
 export type EstadoConexion = "conectando" | "conectado" | "reconectando" | "sin-conexion";
 
@@ -106,7 +106,10 @@ function crearClienteReal(): ClienteSala {
   socket.on("disconnect", (motivo) => {
     cambiarEstado(motivo === "io client disconnect" ? "sin-conexion" : "reconectando");
   });
-  socket.on("connect_error", () => cambiarEstado(habiaConectado ? "reconectando" : "sin-conexion"));
+  socket.on("connect_error", (error) => {
+    console.warn("[realtime] connect_error:", error.message);
+    cambiarEstado(habiaConectado ? "reconectando" : "sin-conexion");
+  });
   socket.io.on("reconnect_attempt", () => cambiarEstado("reconectando"));
 
   socket.on("mensaje", (mensaje: Mensaje) => mensajes.avisar(mensaje));

@@ -33,14 +33,13 @@ export const TOTAL_AVATARES = 6;
 
 // ---- Salas y chat (Sprint 3) ----
 
-// Sala tal como la devuelve la API (GET/POST/PATCH /api/v1/rooms). esAdministrador es el anfitrión.
+// Sala tal como la devuelve la API (GET/POST/PATCH /api/v1/rooms).
 export interface SalaDatos {
   id: string;
   nombre: string;
   creadaEn?: string;
   esAdministrador?: boolean;
-  // uid del anfitrión, para marcarlo en la lista de participantes (pendiente en la API: hoy solo llega esAdministrador).
-  anfitrionUid?: string;
+  anfitrionUid: string;
 }
 
 // Persona conectada a una sala (evento «presencia» del servidor de tiempo real).
