@@ -10,6 +10,8 @@ COPY . .
 # Vite incrusta las variables VITE_* al compilar, por eso llegan como argumento de build.
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_REALTIME_URL
+ENV VITE_REALTIME_URL=$VITE_REALTIME_URL
 RUN npm run build
 
 # ---------- Etapa 2: servir los archivos estáticos ----------

@@ -41,6 +41,7 @@ export function useSalaTiempoReal(roomId: string, habilitado: boolean): SalaTiem
       setCliente(nuevo);
       quitarEstado = nuevo.alEstado(setEstado);
       try {
+        // unirse espera a que el socket conecte antes de enviar el evento.
         await nuevo.unirse(roomId);
         if (!cancelado) setUnida(true);
       } catch (error) {

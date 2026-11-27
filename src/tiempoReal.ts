@@ -13,8 +13,8 @@ import type { Mensaje, Persona } from "./tipos";
 // Lo que el servidor ENVÍA a quienes están en la sala:
 //   «presencia»        { roomId, personas }   → quién está conectado ahora.
 //   «mensaje»          { id, uid, username, texto, creadoEn }
-//   «sala-eliminada»   { roomId }             → el anfitrión eliminó la sala (pendiente en backend-realtime).
-//   «sala-actualizada» { roomId, nombre }     → el anfitrión cambió el nombre (pendiente en backend-realtime).
+//   «sala-eliminada»   { roomId }             → la sala fue eliminada o ya no existe al reingresar.
+//   «sala-actualizada» { roomId, nombre }     → cambió el nombre guardado en Firestore.
 
 export type EstadoConexion = "conectando" | "conectado" | "reconectando" | "sin-conexion";
 
@@ -36,6 +36,7 @@ export interface ClienteSala {
 const USAR_MOCKS = import.meta.env.VITE_USE_MOCKS === "true";
 
 const ESPERA_ACUSE_MS = 10_000;
+const ESPERA_CONEXION_MS = 15_000;
 export const ERROR_GENERAL = "No pudimos completar la acción. Inténtalo de nuevo.";
 const ERROR_SIN_CONEXION = "No hay conexión con la sala. Revisa tu internet e inténtalo de nuevo.";
 
@@ -44,8 +45,41 @@ interface Acuse {
   error?: string;
 }
 
+function esperarConexion(socket: Socket): Promise<void> {
+  if (socket.connected) return Promise.resolve();
+
+  return new Promise((resolver, rechazar) => {
+    let temporizador: ReturnType<typeof setTimeout>;
+
+    const limpiar = () => {
+      clearTimeout(temporizador);
+      socket.off("connect", alConectar);
+      socket.off("disconnect", alDesconectar);
+    };
+    const alConectar = () => {
+      limpiar();
+      resolver();
+    };
+    const alDesconectar = (motivo: string) => {
+      if (motivo !== "io client disconnect") return;
+      limpiar();
+      rechazar(new Error(ERROR_SIN_CONEXION));
+    };
+
+    temporizador = setTimeout(() => {
+      limpiar();
+      rechazar(new Error(ERROR_SIN_CONEXION));
+    }, ESPERA_CONEXION_MS);
+    socket.once("connect", alConectar);
+    socket.on("disconnect", alDesconectar);
+
+    // Evita perder un connect que ocurra entre la comprobación inicial y los listeners.
+    if (socket.connected) alConectar();
+  });
+}
+
 async function emitir(socket: Socket, evento: string, datos: unknown): Promise<void> {
-  if (!socket.connected) throw new Error(ERROR_SIN_CONEXION);
+  await esperarConexion(socket);
   let acuse: Acuse;
   try {
     acuse = (await socket.timeout(ESPERA_ACUSE_MS).emitWithAck(evento, datos)) as Acuse;
@@ -103,7 +137,10 @@ function crearClienteReal(): ClienteSala {
   socket.on("disconnect", (motivo) => {
     cambiarEstado(motivo === "io client disconnect" ? "sin-conexion" : "reconectando");
   });
-  socket.on("connect_error", () => cambiarEstado(habiaConectado ? "reconectando" : "sin-conexion"));
+  socket.on("connect_error", (error) => {
+    console.warn("[realtime] connect_error:", error.message);
+    cambiarEstado(habiaConectado ? "reconectando" : "sin-conexion");
+  });
   socket.io.on("reconnect_attempt", () => cambiarEstado("reconectando"));
 
   socket.on("mensaje", (mensaje: Mensaje) => mensajes.avisar(mensaje));
@@ -115,8 +152,8 @@ function crearClienteReal(): ClienteSala {
 
   return {
     async unirse(roomId) {
-      await emitir(socket, "unirse", { roomId });
       unidas.add(roomId);
+      await emitir(socket, "unirse", { roomId });
     },
     enviar: (roomId, texto) => emitir(socket, "mensaje", { roomId, texto }),
     salir(roomId) {
