@@ -2,6 +2,7 @@ import type { RespuestaCruda } from "../api";
 import { auth } from "../firebase";
 import { PATRON_USERNAME, TOTAL_AVATARES, type DatosRegistro, type DatosUsername, type Usuario } from "../tipos";
 import { responderSalas } from "./salas";
+import { CLAVE_USUARIOS, USUARIO_MOCK } from "./usuario";
 
 // MODO MOCK (VITE_USE_MOCKS=true): responde en el navegador las rutas de usuarios mientras la API no las tenga.
 // Firebase Auth sigue siendo real: el mock toma el uid, el correo y el nombre del usuario que ingresó.
@@ -17,7 +18,9 @@ import { responderSalas } from "./salas";
 //
 // Este archivo solo se carga con import() dinámico cuando el modo mock está activo, así no entra en producción.
 
-const CLAVE = "mockUsuarios";
+const CLAVE = CLAVE_USUARIOS;
+// Con sesión simulada no hay usuario de Firebase: «Mi perfil» se edita sobre el perfil simulado.
+const SESION_MOCK = import.meta.env.VITE_MOCK_SESION === "true";
 const DEMORA_MS = 600;
 
 const SEMILLA: Usuario[] = [
@@ -120,6 +123,33 @@ function crearUsuario(uid: string, correo: string, cuerpo: CuerpoPerfil): Respue
   return responder(201, nuevo);
 }
 
+// PATCH /users/me con la sesión simulada: edita nombres, apellidos, username, avatar y correo del perfil simulado.
+function editarPerfilSesion(cuerpo: CuerpoPerfil & { correo?: unknown }): RespuestaCruda {
+  const campos = validarPerfil(cuerpo);
+  if (Object.keys(campos).length > 0) return error(400, "VALIDATION", "Revisa los campos marcados.", campos);
+
+  const usuarios = leer();
+  const base = usuarios.find((u) => u.uid === USUARIO_MOCK.uid) ?? USUARIO_MOCK;
+  const username = (cuerpo.username as string).trim();
+  if (usuarios.some((u) => u.uid !== base.uid && mismoUsername(u.username, username)))
+    return error(409, "USERNAME_TAKEN", "Ese nombre de usuario ya existe. Elige otro.");
+
+  const correo = typeof cuerpo.correo === "string" && cuerpo.correo.trim() ? cuerpo.correo.trim() : base.correo;
+  if (usuarios.some((u) => u.uid !== base.uid && u.correo.toLowerCase() === correo.toLowerCase()))
+    return error(409, "EMAIL_TAKEN", "Ese correo ya está registrado. Usa otro.");
+
+  const actualizado: Usuario = {
+    ...base,
+    nombres: (cuerpo.nombres as string).trim(),
+    apellidos: (cuerpo.apellidos as string).trim(),
+    username,
+    avatar: (cuerpo.avatar ?? 0) as number,
+    correo,
+  };
+  guardar([...usuarios.filter((u) => u.uid !== base.uid), actualizado]);
+  return responder(200, actualizado);
+}
+
 function elegirUsername(uid: string, correo: string, cuerpo: CuerpoPerfil): RespuestaCruda {
   const campos = validarPerfil(cuerpo);
   if (Object.keys(campos).length > 0) return error(400, "VALIDATION", "Revisa los campos marcados.", campos);
@@ -157,6 +187,11 @@ export async function responderMock(ruta: string, init: RequestInit): Promise<Re
     await esperar(DEMORA_MS, init.signal);
     return responderSalas(metodo, camino, new URLSearchParams(ruta.split("?")[1] ?? ""), leerCuerpo(init));
   }
+  if (metodo === "PATCH" && camino === "/api/v1/users/me" && SESION_MOCK) {
+    await esperar(DEMORA_MS, init.signal);
+    return editarPerfilSesion(leerCuerpo(init));
+  }
+
   const conocida =
     (metodo === "POST" && camino === "/api/v1/users") ||
     (metodo === "GET" && camino === "/api/v1/users/me") ||

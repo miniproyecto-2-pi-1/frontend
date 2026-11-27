@@ -1,7 +1,7 @@
 import type { ClienteSala, EstadoConexion } from "../tiempoReal";
 import { MAXIMO_MENSAJE, type Mensaje, type Persona } from "../tipos";
 import { existeSala, guardarMensaje } from "./salas";
-import { USUARIO_MOCK } from "./usuario";
+import { usuarioMock } from "./usuario";
 
 // Servidor de tiempo real SIMULADO en el navegador (VITE_USE_MOCKS=true). Hace lo mismo que backend-realtime:
 // «unirse» valida la sala, «mensaje» se guarda y se devuelve a quienes están en la sala, y «presencia» lista a las personas.
@@ -15,7 +15,6 @@ import { USUARIO_MOCK } from "./usuario";
 
 const DEMORA_MS = 350;
 
-const YO: Persona = { uid: USUARIO_MOCK.uid, username: USUARIO_MOCK.username, avatar: USUARIO_MOCK.avatar };
 // Personas conocidas del simulador: no están en la sala al entrar; llegan con salonMock.entra("Juan").
 const CONOCIDAS: Persona[] = [
   { uid: "mock-juan", username: "Juan", avatar: 1 },
@@ -43,6 +42,8 @@ function esperar(ms: number): Promise<void> {
 }
 
 export function crearClienteMock(): ClienteSala {
+  const yoMock = usuarioMock();
+  const YO: Persona = { uid: yoMock.uid, username: yoMock.username, avatar: yoMock.avatar };
   const mensajes = new Set<(m: Mensaje) => void>();
   const presencia = new Set<(p: Persona[]) => void>();
   const eliminada = new Set<() => void>();
