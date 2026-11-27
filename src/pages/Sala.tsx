@@ -89,7 +89,7 @@ export function Sala() {
     });
     const quitarActualizada = cliente.alSalaActualizada((nombre) => {
       setSala((actual) => (actual ? { ...actual, nombre } : actual));
-      setMensaje(`El anfitrión cambió el nombre de la sala a «${nombre}»`);
+      avisar(`El anfitrión cambió el nombre de la sala a «${nombre}»`);
     });
     return () => {
       quitarEliminada();
@@ -121,7 +121,8 @@ export function Sala() {
     return () => control.abort();
   }, [id, intento]);
 
-  // El aviso de «ID copiado» dura solo 2 segundos; el temporizador se reinicia si se vuelve a copiar.
+  // Los avisos verdes se van solos: «ID copiado» a los 2 segundos y los demás (sala actualizada…) a los 3.
+  // El temporizador se reinicia si llega otro aviso.
   const temporizadorAviso = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(
     () => () => {
@@ -129,6 +130,12 @@ export function Sala() {
     },
     [],
   );
+
+  function avisar(texto: string, milisegundos = 3000) {
+    setMensaje(texto);
+    if (temporizadorAviso.current) clearTimeout(temporizadorAviso.current);
+    temporizadorAviso.current = setTimeout(() => setMensaje((actual) => (actual === texto ? "" : actual)), milisegundos);
+  }
 
   async function copiar() {
     const idSala = sala?.id ?? id;
@@ -139,9 +146,7 @@ export function Sala() {
     } catch {
       texto = "No pudimos copiar el ID. Inténtalo de nuevo.";
     }
-    setMensaje(texto);
-    if (temporizadorAviso.current) clearTimeout(temporizadorAviso.current);
-    temporizadorAviso.current = setTimeout(() => setMensaje((actual) => (actual === texto ? "" : actual)), 2000);
+    avisar(texto, 2000);
   }
 
   // Un solo aviso a la vez: el de una acción reciente (copiar, editar…) tiene prioridad sobre «Sala creada» (5 s).
@@ -434,7 +439,7 @@ export function Sala() {
               alCerrar={() => setEditando(false)}
               alGuardada={(actualizada) => {
                 setSala((actual) => (actual ? { ...actual, nombre: actualizada.nombre } : actual));
-                setMensaje(`Sala actualizada: «${actualizada.nombre}»`);
+                avisar(`Sala actualizada: «${actualizada.nombre}»`);
                 setEditando(false);
               }}
             />
